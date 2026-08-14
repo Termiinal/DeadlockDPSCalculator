@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wraith DPS — abilities, cards & item comparison</title>
+<style>
+  :root{
+    --bg:#0d1117; --panel:#151b25; --panel2:#1a212d; --line:#232c39; --line2:#33404f;
+    --tx:#e8ebf0; --mut:#9aa4b2; --faint:#69737f; --grid:#1d2530;
+    --gold:#f2ab4b; --teal:#3fc7cf; --violet:#ab88ea; --slate:#7c8898;
+    --green:#5fd39a; --orange:#e0744d; --rose:#e06d8f; --blue:#6ea8fe; --lime:#c3e88d;
+    --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--bg);color:var(--tx);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-font-smoothing:antialiased;font-size:15px;line-height:1.5}
+  .wrap{max-width:1080px;margin:0 auto;padding:22px 20px 60px}
+  header h1{font-size:20px;font-weight:600;margin:0 0 3px;letter-spacing:.2px}
+  header p{margin:0;color:var(--mut);font-size:13.5px}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:12px;margin-top:18px}
+  .card > h2{font-size:12px;text-transform:uppercase;letter-spacing:.09em;color:var(--faint);margin:0;padding:14px 18px 0;font-weight:600}
+  .card > h2 .note{color:var(--faint);text-transform:none;letter-spacing:0;font-weight:400;font-size:11.5px;margin-left:8px}
+  .seclabel{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--faint);font-weight:600;padding:16px 18px 0}
+
+  .controls{padding:15px 18px 16px;display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:16px 26px}
+  .controls.tight{padding-top:10px;padding-bottom:14px}
+  .ctl label{display:flex;justify-content:space-between;align-items:baseline;font-size:12.5px;color:var(--mut);margin-bottom:6px}
+  .ctl .val{font-family:var(--mono);color:var(--tx);font-size:13px;font-weight:600}
+  .row{display:flex;align-items:center;gap:9px}
+  input[type=range]{-webkit-appearance:none;appearance:none;flex:1;height:4px;border-radius:3px;background:var(--line2);outline:none;margin:0}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:15px;height:15px;border-radius:50%;background:var(--gold);cursor:pointer;border:2px solid #10151d;box-shadow:0 0 0 1px var(--gold)}
+  input[type=range]::-moz-range-thumb{width:15px;height:15px;border-radius:50%;background:var(--gold);cursor:pointer;border:2px solid #10151d;box-shadow:0 0 0 1px var(--gold)}
+  input[type=number]{width:62px;background:var(--panel2);border:1px solid var(--line2);color:var(--tx);font-family:var(--mono);font-size:12.5px;border-radius:6px;padding:4px 6px;text-align:right;-moz-appearance:textfield;appearance:textfield}
+  input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
+  input[type=number]:focus{outline:none;border-color:var(--gold)}
+
+  /* start-with-cards section */
+  .startsec{margin:0 18px 16px;padding:14px 15px;background:var(--panel2);border:1px solid var(--line);border-radius:10px}
+  .startsec-head{display:flex;align-items:flex-start;gap:11px}
+  .cardslots{display:flex;gap:11px;flex-wrap:wrap;margin-top:14px}
+  .cardwrap{position:relative}
+  .cardslot{width:50px;height:70px;border-radius:9px;background:#123338;border:2.5px solid #05171b;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:.12s;user-select:none;font-size:30px;line-height:1;box-shadow:0 1px 3px rgba(0,0,0,.35);position:relative}
+  .cardslot:hover{transform:translateY(-3px);border-color:#0a262c}
+  .cardslot.active{border-color:var(--gold);box-shadow:0 0 0 2px rgba(242,171,75,.4)}
+  .cardslot.empty{color:#20424a}
+  .cardslot.empty::after{content:"+";font-size:22px;font-weight:400}
+  .cardslot.filled::after{content:none}
+  .cardslot .ord{position:absolute;top:3px;left:6px;font-size:10.5px;font-weight:700;color:rgba(255,255,255,.55);font-family:var(--mono);line-height:1}
+  .picker{position:absolute;top:78px;left:50%;transform:translateX(-50%);z-index:30;background:#0e1822;border:1px solid var(--line2);border-radius:9px;padding:7px;display:flex;gap:5px;box-shadow:0 8px 22px rgba(0,0,0,.55)}
+  .picker::before{content:"";position:absolute;top:-6px;left:50%;transform:translateX(-50%);border-left:6px solid transparent;border-right:6px solid transparent;border-bottom:6px solid var(--line2)}
+  .picker button{width:32px;height:42px;border-radius:6px;background:#123338;border:2px solid #05171b;font-size:19px;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;transition:.1s}
+  .picker button:hover{transform:translateY(-2px);border-color:#0a262c}
+  .picker button.rm{width:38px;font-size:12px;color:var(--faint);font-family:var(--mono)}
+  .throworder{margin-top:14px;font-size:12px;color:var(--mut);display:flex;align-items:center;gap:9px;flex-wrap:wrap}
+  .throworder .lab{color:var(--faint);text-transform:uppercase;letter-spacing:.05em;font-size:10.5px;font-weight:600}
+  .throworder .seq{display:inline-flex;align-items:center;gap:7px;font-family:var(--mono)}
+  .throworder .seq .c{display:inline-flex;align-items:center;gap:3px}
+  .throworder .seq .c b{font-size:15px}
+  .throworder .arrow{color:var(--faint)}
+  .cardlegend{margin-top:12px;font-size:11px;color:var(--faint);display:flex;flex-wrap:wrap;gap:5px 14px}
+  .cardlegend span b{font-size:13px}
+  .csub{font-size:10.5px;color:var(--faint);font-family:var(--mono);margin-top:7px}
+
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;padding:14px 18px 18px}
+  @media(max-width:720px){.grid2{grid-template-columns:1fr}}
+  .subcard{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:13px 14px}
+  .subcard h3{margin:0 0 3px;font-size:14px;font-weight:600;display:flex;align-items:center;gap:9px}
+  .subcard .desc{color:var(--mut);font-size:12px;margin:0 0 11px;line-height:1.45}
+  .opts{display:flex;flex-wrap:wrap;gap:8px}
+  .pill{display:inline-flex;flex-direction:column;gap:1px;cursor:pointer;user-select:none;border:1px solid var(--line2);background:#141a23;border-radius:8px;padding:7px 11px;min-width:86px;transition:.12s}
+  .pill .t{font-size:12px;font-weight:600;color:var(--tx)}
+  .pill .s{font-size:10.5px;color:var(--faint);font-family:var(--mono)}
+  .pill:hover{border-color:var(--slate)}
+  .pill.on{border-color:var(--gold);background:#241d10;box-shadow:inset 0 0 0 1px var(--gold)}
+  .pill.on .s{color:var(--gold)}
+  .pill.dim{opacity:.4}
+  .inl{display:flex;align-items:center;gap:8px;margin-top:10px;flex-wrap:wrap;font-size:12.5px;color:var(--mut)}
+  .inl select,.inl input[type=number]{background:var(--panel);border:1px solid var(--line2);color:var(--tx);font-family:var(--mono);font-size:12px;border-radius:6px;padding:4px 6px}
+  .inl input[type=range]{max-width:120px}
+
+  .sw{position:relative;display:inline-flex;align-items:center;cursor:pointer;user-select:none;flex:none}
+  .sw input{position:absolute;opacity:0;width:0;height:0}
+  .sw .track{width:34px;height:19px;border-radius:11px;background:var(--line2);position:relative;transition:.15s;flex:none}
+  .sw .track::after{content:"";position:absolute;top:2px;left:2px;width:15px;height:15px;border-radius:50%;background:#cdd4dd;transition:.15s}
+  .sw input:checked + .track{background:var(--teal)}
+  .sw input:checked + .track::after{transform:translateX(15px);background:#0d1117}
+
+  .togpanel{margin:2px 18px 0;padding:14px 15px;background:var(--panel2);border:1px solid var(--line);border-radius:10px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px 22px}
+  @media(max-width:760px){.togpanel{grid-template-columns:1fr 1fr}}
+  @media(max-width:500px){.togpanel{grid-template-columns:1fr}}
+  .togcell{display:flex;gap:11px;align-items:flex-start}
+  .togcell .body{min-width:0}
+  .tn{font-size:13px;font-weight:600;line-height:1.2}
+  .td{font-size:11px;color:var(--mut);margin-top:2px;line-height:1.35}
+  .minirow{display:flex;flex-wrap:wrap;gap:5px 15px;margin-top:7px}
+  .mini{font-size:10.5px;color:var(--faint);display:inline-flex;align-items:center;gap:5px;cursor:pointer}
+  .mini input[type=checkbox]{accent-color:var(--teal);width:12px;height:12px;margin:0;cursor:pointer}
+  .mini input[type=number]{width:50px;background:var(--panel);border:1px solid var(--line2);color:var(--tx);font-family:var(--mono);font-size:11px;border-radius:5px;padding:2px 5px;text-align:right}
+  .mini b{color:var(--mut)}
+
+  .verdict{margin:14px 18px 0;padding:11px 14px;background:#12222b;border:1px solid #1e3a44;border-radius:9px;font-size:13px;color:var(--mut);line-height:1.5}
+  .verdict b{color:var(--tx)}
+  .buildline{padding:9px 18px 2px;font-size:11.5px;color:var(--faint);font-family:var(--mono)}
+
+  .cmptable{padding:6px 18px 12px;overflow-x:auto}
+  table{width:100%;border-collapse:collapse;font-size:13px;min-width:520px}
+  thead th{font-size:10px;text-transform:uppercase;letter-spacing:.05em;color:var(--faint);font-weight:600;text-align:right;padding:9px 10px;border-bottom:1px solid var(--line);white-space:nowrap}
+  thead th:first-child{text-align:left}
+  tbody td{padding:10px;text-align:right;font-family:var(--mono);border-bottom:1px solid var(--grid);white-space:nowrap}
+  tbody td:first-child{text-align:left;font-family:inherit;font-weight:600}
+  tbody tr:last-child td{border-bottom:none}
+  .dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:9px;vertical-align:middle}
+
+  .charthead{display:flex;align-items:center;justify-content:space-between;padding:14px 18px 0;flex-wrap:wrap;gap:10px;border-top:1px solid var(--line);margin-top:8px}
+  .charthead .lbl{font-size:12px;text-transform:uppercase;letter-spacing:.09em;color:var(--faint);font-weight:600}
+  .seg{display:inline-flex;border:1px solid var(--line2);border-radius:8px;overflow:hidden}
+  .seg button{background:#141a23;color:var(--mut);border:none;padding:6px 13px;font-size:12px;cursor:pointer;font-family:inherit}
+  .seg button.on{background:var(--gold);color:#161009;font-weight:600}
+  .chartwrap{padding:10px 12px 6px}
+  canvas{width:100%;display:block}
+  .clegend{display:flex;flex-wrap:wrap;gap:12px 18px;padding:2px 18px 16px;font-size:12px}
+  .clegend .k{display:flex;align-items:center;gap:7px;color:var(--mut)}
+  .clegend .ln{width:16px;height:3px;border-radius:2px;flex:none}
+
+  .notes{padding:6px 20px 24px;color:var(--mut);font-size:12.5px;line-height:1.6}
+  .notes h2{font-size:12px;text-transform:uppercase;letter-spacing:.09em;color:var(--faint);margin:14px 0 6px}
+  .notes code{font-family:var(--mono);background:var(--panel2);padding:1px 5px;border-radius:4px;font-size:11.5px;color:#cdd4dd}
+  .notes b{color:var(--tx)}
+  .flag{border-left:2px solid var(--gold);padding-left:11px;margin:8px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Wraith — DPS simulator</h1>
+    <p>Dual-channel damage (weapon vs spirit, independent resists), Full Auto &amp; Card Trick, and one-item comparison. Seeded Monte-Carlo over the engagement.</p>
+  </header>
+
+  <div class="card">
+    <h2>Base values <span class="note">Wraith &amp; the target — shared by every build</span></h2>
+    <div class="controls" id="baseGrid"></div>
+  </div>
+
+  <div class="card">
+    <h2>Abilities</h2>
+    <div class="grid2">
+      <div class="subcard">
+        <h3><label class="sw"><input type="checkbox" id="fa_on" checked><span class="track"></span></label> Full Auto</h3>
+        <p class="desc">+20% fire rate and <code>2 + 0.03·Spirit</code> spirit damage per bullet for 5s. Active from the start of the engagement; reverts to base afterward (single cast, no cooldown modeled).</p>
+        <div class="opts">
+          <div class="pill" data-cb="fa_ap2"><span class="t">2 AP</span><span class="s">+10% FR · +3s</span></div>
+          <div class="pill" data-cb="fa_ap5"><span class="t">5 AP</span><span class="s">spirit ×0.075</span></div>
+        </div>
+      </div>
+      <div class="subcard">
+        <h3><label class="sw"><input type="checkbox" id="ct_on" checked><span class="track"></span></label> Card Trick</h3>
+        <p class="desc">Shooting builds cards (body 3.4% / head 5.1% per hit); thrown for <code>45 + 0.55·Spirit</code> spirit dmg. 1/9 Joker chance else a 2-of-each stack draw. Spades ×1.6, Diamonds −8% both resists (5s), Joker = all suits.</p>
+        <div class="opts">
+          <div class="pill" data-cb="ct_ap2"><span class="t">2 AP</span><span class="s">+40 +0.4·Sp</span></div>
+          <div class="pill" data-cb="ct_ap5"><span class="t">5 AP</span><span class="s">Joker 1/5 · ×2 · −13%</span></div>
+          <div class="pill" data-cb="ct_rr"><span class="t">Rapid Recharge</span><span class="s">+14% CDR · cap 6</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="startsec">
+      <div class="startsec-head">
+        <label class="sw"><input type="checkbox" id="sc_on"><span class="track"></span></label>
+        <div><div class="tn">Start with cards</div><div class="td">Begin the fight holding a pre-built hand — click a slot to pick its suit. Cards throw in order, left → right. Cap is 4 (6 with Rapid Recharge).</div></div>
+      </div>
+      <div class="cardslots" id="cardslots"></div>
+      <div class="throworder" id="throworder"></div>
+      <div class="cardlegend" id="cardlegend"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Comparison items <span class="note">one item slot — which single pick wins?</span></h2>
+
+    <div class="seclabel">Stat purchases — set how much each item gives</div>
+    <div class="controls tight" id="cmpGrid"></div>
+
+    <div class="seclabel">Named items — toggle to compare, or fold into the baseline</div>
+    <div class="togpanel">
+      <div class="togcell">
+        <label class="sw"><input type="checkbox" id="merc_cmp"><span class="track"></span></label>
+        <div class="body"><div class="tn">Mercurial Magnum</div>
+          <div class="td">+7 spirit · +22% fire rate · bullets deal spirit = <code>25%+0.49%·Sp</code> of pre-% base dmg</div>
+          <div class="minirow"><label class="mini"><input type="checkbox" id="merc_base"> <b>add to baseline</b></label><label class="mini"><input type="checkbox" id="merc_card"> card bonus</label></div>
+        </div>
+      </div>
+      <div class="togcell">
+        <label class="sw"><input type="checkbox" id="tesla_cmp"><span class="track"></span></label>
+        <div class="body"><div class="tn">Tesla Bullets</div>
+          <div class="td">15% of bullets proc <code>33+0.19·Sp</code> spirit shock (0.2s cd)</div>
+          <div class="minirow"><label class="mini"><input type="checkbox" id="tesla_base"> <b>add to baseline</b></label><label class="mini"><input type="checkbox" id="tesla_cap"> Capacitor</label></div>
+        </div>
+      </div>
+      <div class="togcell">
+        <label class="sw"><input type="checkbox" id="ee_cmp"><span class="track"></span></label>
+        <div class="body"><div class="tn">Escalating Exposure</div>
+          <div class="td">−8% spirit resist · +4.5% spirit dmg per stack (0.7s cd, max 12)</div>
+          <div class="minirow"><label class="mini"><input type="checkbox" id="ee_base"> <b>add to baseline</b></label></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="verdict" id="verdict"></div>
+    <div class="buildline" id="buildline"></div>
+    <div class="cmptable">
+      <table>
+        <thead><tr><th>Item</th><th>DPS @3s</th><th id="th_eng">DPS @15s</th><th>Total dmg</th></tr></thead>
+        <tbody id="cmpBody"></tbody>
+      </table>
+    </div>
+
+    <div class="charthead">
+      <span class="lbl">DPS vs fight length</span>
+      <div class="seg" id="xseg"><button data-x="eng" class="on">vs engagement</button><button data-x="boons">vs boons</button></div>
+    </div>
+    <div class="chartwrap"><canvas id="chart" height="320"></canvas></div>
+    <div class="clegend" id="chartlegend"></div>
+  </div>
+
+  <div class="card">
+    <div class="notes">
+      <h2>Model &amp; assumptions</h2>
+      <p><b>Two damage channels.</b> Weapon damage is reduced only by bullet resist; spirit damage only by spirit resist. Resists may go negative (amplify).</p>
+      <p><b>Weapon damage</b> per bullet is <code>(5.64 + 0.14·boons)</code>, boon-driven, then scaled by your <b>Weapon Damage %</b> stat. <b>Headshots deal ×1.65 bullet damage</b> (weapon channel only), averaged by headshot rate, and generate cards faster (5.1% vs 3.4%). <b>Boons grant 1.1 Spirit each</b> on top of the base-spirit slider (+7 with Mercurial) — the totals show under those sliders.</p>
+      <p><b>Comparison.</b> The <i>stat purchase</i> sliders layer a hypothetical item on top of your build and show it as a <code>+Stat</code> row (only when above 0). <i>Named items</i> show a <code>+Item</code> row when toggled on; ticking <b>add to baseline</b> folds one into the baseline so every row includes it (and its own row drops out) — use it to ask "given I already own this, what's best next?". Highlighted cells win each column.</p>
+      <p><b>Full Auto</b> runs from the start for its duration then reverts (no recast). <b>Card Trick</b> accrues cards per shot (×CDR), thrown on a 0.6s gap with a 0.1s shooting lockout; suit is 1/9 Joker (1/5 at 5AP) else a 2-of-each stack draw. <b>Tesla</b> procs per bullet on a 0.2s cd; <b>Escalating Exposure</b> ramps one amp stack per 0.7s to 12 and amplifies every spirit source.</p>
+      <div class="flag"><p style="margin:0"><b>Modeling choices:</b> the Mercurial card bonus is added <i>after</i> the suit multiplier (so Spades/Joker don't scale it), and its bullet-conversion is a % of the <b>pre-% base</b> bullet damage (boon-driven, unaffected by Weapon Damage %). The table's <b>@3s</b> column is a short-fight reference and <b>DPS @[engagement]</b> uses your set fight length; the chart traces the full sweep.</p></div>
+    </div>
+  </div>
+</div>
+
+<script>
+"use strict";
+/* ================= ENGINE (verified in Node) ================= */
+function mulberry32(a){return function(){a|=0;a=(a+0x6D2B79F5)|0;let t=Math.imul(a^(a>>>15),1|a);t=(t+Math.imul(t^(t>>>7),61|t))^t;return((t^(t>>>14))>>>0)/4294967296;};}
+const CAP_BOONS=35;
+function resolve(cfg){
+  const boons=Math.min(cfg.boons,CAP_BOONS);
+  const merc=cfg.mercurial;
+  const spirit=cfg.baseSpirit+1.1*boons+(merc.on?7:0);
+  const flatWeapon=5.64+0.14*boons;
+  const weaponDmg=flatWeapon*(1+cfg.weaponDamagePct/100);
+  const fa=cfg.fullAuto;
+  const faFR=fa.on?(0.20+(fa.ap2?0.10:0)):0;
+  const faDur=5+(fa.ap2?3:0);
+  const faScale=fa.ap5?0.075:0.03;
+  const faSpiritPerBullet=2+faScale*spirit;
+  const ct=cfg.cardTrick;
+  const cardBase=45+0.55*spirit+(ct.ap2?(40+0.4*spirit):0);
+  const spadesMult=ct.ap5?2.0:1.6;
+  const cardDiamondShred=ct.ap5?0.13:0.08;
+  const pJoker=ct.ap5?0.20:(1/9);
+  const cdr=ct.rapidRecharge?0.14:0;
+  const cardGenMult=1/(1-cdr);
+  const maxCards=ct.rapidRecharge?6:4;
+  const mercSpiritPerBullet=merc.on?flatWeapon*(0.25+0.0049*spirit):0;
+  const mercFR=merc.on?0.22:0;
+  const mercCardFull=60+0.16*spirit;
+  const tesla=cfg.tesla;
+  const teslaProc=tesla.on?(tesla.capacitor?0.20:0.15):0;
+  const teslaDmg=tesla.capacitor?(43+0.19*spirit):(33+0.19*spirit);
+  const ee=cfg.escalatingExposure.on;
+  const genPerShot=(cfg.headshotRate*0.051+(1-cfg.headshotRate)*0.034)*cardGenMult;
+  const wdPerBullet=weaponDmg*(1+cfg.headshotRate*0.65);
+  return{boons,spirit,weaponDmg,wdPerBullet,
+    fa:{on:fa.on,fr:faFR,dur:faDur,spb:faSpiritPerBullet},
+    ct:{on:ct.on,base:cardBase,spades:spadesMult,dShred:cardDiamondShred,pJoker,genPerShot,maxCards,startSuits:(ct.startSuits||[]).slice(0,maxCards)},
+    merc:{on:merc.on,spb:mercSpiritPerBullet,fr:mercFR,cardBonus:!!merc.cardBonus,cardFull:mercCardFull},
+    tesla:{on:tesla.on,proc:teslaProc,dmg:teslaDmg},ee,
+    baseFR:10.6,firePct:cfg.fireRatePct/100,tBulletRes:cfg.targetBulletResist/100,baseBulletShred:cfg.baseBulletShred/100,
+    tSpiritRes:cfg.targetSpiritResist/100,baseSpiritShred:cfg.baseSpiritShred/100,
+    engagement:cfg.engagement,extraFR:cfg.extraFireRate||0};
+}
+const isSpadesLike=s=>s==='S'||s==='J';
+const isDiamondLike=s=>s==='D'||s==='J';
+function runOnce(R,rng,acc){
+  let t=0;const q=[];for(const s of R.ct.startSuits)q.push(s);
+  let stack=[],prog=0,lastThrow=-1e9,eeStacks=0,lastEE=-1e9,eeActive=false,diamondUntil=-1e9,teslaCd=-1e9,nextThrow=0,guard=0,throws=0;
+  while(t<R.engagement){
+    if(++guard>200000)break;
+    const faOn=R.fa.on&&t<R.fa.dur;
+    const fr=R.baseFR*(1+R.firePct+(faOn?R.fa.fr:0)+R.merc.fr+R.extraFR);
+    if(fr<=0)break;
+    const dActive=t<diamondUntil, dShred=dActive?R.ct.dShred:0;
+    const weaponMult=1-(R.tBulletRes-R.baseBulletShred-dShred);
+    const eeShred=(R.ee&&eeActive)?0.08:0;
+    const spiritMult=1-(R.tSpiritRes-R.baseSpiritShred-dShred-eeShred);
+    const ampMult=1+eeStacks*0.045;
+    acc.weapon+=R.wdPerBullet*weaponMult;
+    let dealt=false;
+    if(faOn){acc.fa+=R.fa.spb*spiritMult*ampMult;dealt=true;}
+    if(R.merc.on){acc.merc+=R.merc.spb*spiritMult*ampMult;dealt=true;}
+    if(R.tesla.on&&t>=teslaCd){if(rng()<R.tesla.proc){acc.tesla+=R.tesla.dmg*spiritMult*ampMult;teslaCd=t+0.2;dealt=true;}}
+    if(R.ee&&dealt){eeActive=true;if(t>=lastEE+0.7&&eeStacks<12){eeStacks++;lastEE=t;}}
+    if(R.ct.on){prog+=R.ct.genPerShot;while(prog>=1){prog-=1;if(q.length<R.ct.maxCards){let suit;if(rng()<R.ct.pJoker)suit='J';else{if(stack.length===0)stack=['S','S','D','D','C','C','H','H'];const idx=(rng()*stack.length)|0;suit=stack.splice(idx,1)[0];}q.push(suit);}}}
+    let threw=false;
+    if(R.ct.on&&q.length>0&&t>=nextThrow){const suit=q.shift();const charge=Math.min(1,(t-lastThrow)/14);const mercBonus=(R.merc.on&&R.merc.cardBonus)?R.merc.cardFull*charge:0;const base=R.ct.base*(isSpadesLike(suit)?R.ct.spades:1)+mercBonus;acc.card+=base*spiritMult*ampMult;if(isDiamondLike(suit))diamondUntil=t+5;if(R.ee){eeActive=true;if(t>=lastEE+0.7&&eeStacks<12){eeStacks++;lastEE=t;}}lastThrow=t;nextThrow=t+0.6;threw=true;throws++;}
+    t+=threw?Math.max(1/fr,0.1):1/fr;
+  }
+  acc.throws+=throws;acc.stacks+=eeStacks;
+}
+function simulate(cfg,iters,seed){
+  const R=resolve(cfg),rng=mulberry32(seed>>>0);
+  const acc={weapon:0,fa:0,merc:0,tesla:0,card:0,throws:0,stacks:0};
+  for(let i=0;i<iters;i++)runOnce(R,rng,acc);
+  const eng=R.engagement,n=iters,dps=k=>acc[k]/(n*eng);
+  const weapon=dps('weapon'),fa=dps('fa'),merc=dps('merc'),tesla=dps('tesla'),card=dps('card');
+  return{total:weapon+fa+merc+tesla+card,weapon,spirit:fa+merc+tesla+card,
+    faSpirit:fa,mercSpirit:merc,teslaSpirit:tesla,cardSpirit:card,
+    effWeaponDmg:R.weaponDmg,spiritStat:R.spirit,throws:acc.throws/n,stacks:acc.stacks/n,
+    frBase:R.baseFR*(1+R.firePct+R.merc.fr+R.extraFR),frFA:R.baseFR*(1+R.firePct+(R.fa.on?R.fa.fr:0)+R.merc.fr+R.extraFR),faOn:R.fa.on};
+}
+const SEED=1234567, ITER=600, CHART_ITER=180, CHART_PTS=20;
+
+/* ================= UI ================= */
+const $=id=>document.getElementById(id);
+const clone=o=>JSON.parse(JSON.stringify(o));
+function makeSlider(gridEl,b){
+  const d=document.createElement('div');d.className='ctl';
+  d.innerHTML=`<label><span>${b.label}</span><span class="val" id="v_${b.id}"></span></label>
+    <div class="row"><input type="range" id="r_${b.id}" min="${b.min}" max="${b.max}" step="${b.step}" value="${b.val}">
+    <input type="number" id="n_${b.id}" min="${b.min}" max="${b.max}" step="${b.step}" value="${b.val}"></div>
+    ${b.sub?`<div class="csub" id="sub_${b.id}"></div>`:''}`;
+  gridEl.appendChild(d);
+  const r=$(`r_${b.id}`),n=$(`n_${b.id}`),v=$(`v_${b.id}`);
+  const show=x=>{const num=+x;v.textContent=(b.step<1?num.toFixed(b.step<0.1?2:1):num)+(b.suffix||'');};
+  r.addEventListener('input',()=>{n.value=r.value;show(r.value);schedule();});
+  n.addEventListener('input',()=>{r.value=n.value;show(n.value);schedule();});
+  show(b.val);
+}
+const BASE=[
+  {id:'boons',label:'Boons',min:0,max:35,step:1,val:20,sub:1},
+  {id:'hs',label:'Headshot rate',min:0,max:100,step:1,val:18,suffix:'%',sub:1},
+  {id:'wd',label:'Weapon Damage',min:0,max:200,step:1,val:0,suffix:'%',sub:1},
+  {id:'fr',label:'Fire Rate',min:0,max:150,step:1,val:0,suffix:'%',sub:1},
+  {id:'tbr',label:'Target bullet resist',min:-30,max:80,step:1,val:0,suffix:'%',sub:1},
+  {id:'bbs',label:'Base bullet resist shred',min:0,max:60,step:1,val:0,suffix:'%',sub:1},
+  {id:'eng',label:'Engagement length',min:1,max:30,step:0.5,val:15,suffix:'s'},
+  {id:'spr',label:'Spirit',min:22,max:200,step:1,val:22,sub:1},
+  {id:'tsr',label:'Target spirit resist',min:-30,max:80,step:1,val:0,suffix:'%',sub:1},
+  {id:'bss',label:'Base spirit resist shred',min:0,max:60,step:1,val:0,suffix:'%',sub:1},
+];
+const CMP=[
+  {id:'cwd',label:'Weapon Damage item',min:0,max:150,step:1,val:25,suffix:'%'},
+  {id:'cfr',label:'Fire Rate item',min:0,max:100,step:1,val:20,suffix:'%'},
+  {id:'cbbs',label:'Bullet Resist Shred',min:0,max:60,step:1,val:0,suffix:'%'},
+  {id:'cspr',label:'Spirit',min:0,max:200,step:1,val:30},
+  {id:'csss',label:'Spirit Resist Shred',min:0,max:60,step:1,val:0,suffix:'%'},
+];
+BASE.forEach(b=>makeSlider($('baseGrid'),b));
+CMP.forEach(b=>makeSlider($('cmpGrid'),b));
+const getB=id=>+$(`r_${id}`).value;
+
+// Spirit base slider shows TOTAL spirit; its floor is the spirit granted by boons (1.1/boon).
+// We track the item portion (above the floor) so total tracks boons while staying editable.
+let spiritItem=0;
+const spiritFloor=()=>Math.round(1.1*getB('boons'));
+function syncSpiritSlider(){
+  const floor=spiritFloor(), total=Math.min(floor+spiritItem,200);
+  const r=$('r_spr'),n=$('n_spr');
+  r.min=floor;n.min=floor;r.value=total;n.value=total;$('v_spr').textContent=total;
+}
+function onSpiritInput(){
+  const floor=spiritFloor();
+  let val=Math.round(+$('n_spr').value); if(!(val>=floor))val=floor; if(val>200)val=200;
+  spiritItem=val-floor;
+  $('r_spr').value=val;$('n_spr').value=val;$('v_spr').textContent=val;
+}
+$('r_spr').addEventListener('input',onSpiritInput);
+$('n_spr').addEventListener('input',onSpiritInput);
+$('r_boons').addEventListener('input',syncSpiritSlider);
+$('n_boons').addEventListener('input',syncSpiritSlider);
+syncSpiritSlider();
+
+document.querySelectorAll('.pill[data-cb]').forEach(p=>{p.addEventListener('click',()=>{p.classList.toggle('on');schedule();});});
+const pillOn=cb=>document.querySelector(`.pill[data-cb="${cb}"]`).classList.contains('on');
+function updateDim(){
+  const faOff=!$('fa_on').checked, ctOff=!$('ct_on').checked;
+  ['fa_ap2','fa_ap5'].forEach(cb=>document.querySelector(`.pill[data-cb="${cb}"]`).classList.toggle('dim',faOff));
+  ['ct_ap2','ct_ap5','ct_rr'].forEach(cb=>document.querySelector(`.pill[data-cb="${cb}"]`).classList.toggle('dim',ctOff));
+  const ss=document.querySelector('.startsec');if(ss)ss.style.opacity=ctOff?'.45':'1';
+}
+// start-with-cards slot picker
+const SUITS=['S','D','C','H','J'];
+const SUIT_GLYPH={S:'\u2660',D:'\u2666',C:'\u2663',H:'\u2665',J:'\u2605'};
+const SUIT_COLOR={S:'#e8ebf0',D:'#f2ab4b',C:'#5fd39a',H:'#e06d8f',J:'#ab88ea'};
+const SUIT_NAME={S:'Spades',D:'Diamonds',C:'Clubs',H:'Hearts',J:'Joker'};
+let startSlots=[null,null,null,null,null,null];
+let pickerOpen=-1;
+const maxCards=()=>pillOn('ct_rr')?6:4;
+function renderCardSlots(){
+  const on=$('sc_on').checked, mx=maxCards(), host=$('cardslots'), leg=$('cardlegend'), ord=$('throworder');
+  host.style.display=on?'flex':'none'; leg.style.display=on?'flex':'none'; ord.style.display=on?'flex':'none';
+  host.innerHTML=''; leg.innerHTML=''; ord.innerHTML='';
+  if(!on){pickerOpen=-1;return;}
+  let seq=0;
+  for(let i=0;i<mx;i++){
+    const s=startSlots[i];
+    const wrap=document.createElement('div');wrap.className='cardwrap';
+    const el=document.createElement('div');
+    el.className='cardslot '+(s?'filled':'empty')+(pickerOpen===i?' active':'');
+    if(s){el.style.color=SUIT_COLOR[s];seq++;el.innerHTML=`<span class="ord">${seq}</span>${SUIT_GLYPH[s]}`;}
+    el.addEventListener('click',e=>{e.stopPropagation();pickerOpen=(pickerOpen===i?-1:i);renderCardSlots();});
+    wrap.appendChild(el);
+    if(pickerOpen===i){
+      const pk=document.createElement('div');pk.className='picker';
+      SUITS.forEach(su=>{const btn=document.createElement('button');btn.textContent=SUIT_GLYPH[su];btn.style.color=SUIT_COLOR[su];btn.title=SUIT_NAME[su];
+        btn.addEventListener('click',e=>{e.stopPropagation();startSlots[i]=su;pickerOpen=-1;renderCardSlots();schedule();});pk.appendChild(btn);});
+      const rm=document.createElement('button');rm.className='rm';rm.textContent='\u2715';rm.title='Empty';
+      rm.addEventListener('click',e=>{e.stopPropagation();startSlots[i]=null;pickerOpen=-1;renderCardSlots();schedule();});pk.appendChild(rm);
+      wrap.appendChild(pk);
+    }
+    host.appendChild(wrap);
+  }
+  const hand=startSlots.slice(0,mx).filter(Boolean);
+  if(hand.length){
+    ord.innerHTML=`<span class="lab">Throw order</span><span>left \u2192 right \u00b7 ${hand.length} card${hand.length>1?'s':''}</span>`;
+  } else {
+    ord.innerHTML=`<span class="lab">Throw order</span><span style="color:var(--faint)">no cards — click a slot to add one</span>`;
+  }
+  const ap5=pillOn('ct_ap5');
+  const spM=ap5?'\u00d72':'\u00d71.6', diS=ap5?'\u221213%':'\u22128%', jkP=ap5?'1/5':'1/9';
+  leg.innerHTML=`<span style="color:${SUIT_COLOR.S}"><b>\u2660</b> Spades ${spM}</span><span style="color:${SUIT_COLOR.D}"><b>\u2666</b> Diamonds ${diS} res</span><span style="color:${SUIT_COLOR.C}"><b>\u2663</b> Clubs</span><span style="color:${SUIT_COLOR.H}"><b>\u2665</b> Hearts</span><span style="color:${SUIT_COLOR.J}"><b>\u2605</b> Joker = all (drawn ${jkP})</span>`;
+}
+document.addEventListener('click',()=>{if(pickerOpen!==-1){pickerOpen=-1;renderCardSlots();}});
+$('sc_on').addEventListener('change',()=>{renderCardSlots();schedule();});
+document.querySelector('.pill[data-cb="ct_rr"]').addEventListener('click',()=>setTimeout(renderCardSlots,0));
+['fa_on','ct_on','merc_cmp','merc_base','merc_card','tesla_cmp','tesla_base','tesla_cap','ee_cmp','ee_base'].forEach(id=>$(id).addEventListener('change',schedule));
+
+function core(){
+  return{
+    boons:getB('boons'),headshotRate:getB('hs')/100,weaponDamagePct:getB('wd'),fireRatePct:getB('fr'),
+    targetBulletResist:getB('tbr'),baseBulletShred:getB('bbs'),engagement:getB('eng'),
+    baseSpirit:getB('spr')-1.1*getB('boons'),targetSpiritResist:getB('tsr'),baseSpiritShred:getB('bss'),extraFireRate:0,
+    fullAuto:{on:$('fa_on').checked,ap2:pillOn('fa_ap2'),ap5:pillOn('fa_ap5')},
+    cardTrick:{on:$('ct_on').checked,ap2:pillOn('ct_ap2'),ap5:pillOn('ct_ap5'),startSuits:$('sc_on').checked?startSlots.slice(0,maxCards()).filter(Boolean):[],rapidRecharge:pillOn('ct_rr')},
+    mercurial:{on:false,cardBonus:false},tesla:{on:false,capacitor:false},escalatingExposure:{on:false}
+  };
+}
+const mags=()=>({wd:getB('cwd'),fr:getB('cfr'),bbs:getB('cbbs'),spirit:getB('cspr'),sss:getB('csss')});
+const named=()=>({
+  merc:{cmp:$('merc_cmp').checked,base:$('merc_base').checked,card:$('merc_card').checked},
+  tesla:{cmp:$('tesla_cmp').checked,base:$('tesla_base').checked,cap:$('tesla_cap').checked},
+  ee:{cmp:$('ee_cmp').checked,base:$('ee_base').checked},
+});
+function baselineCfg(c0,nm){
+  const c=clone(c0);
+  if(nm.merc.base)c.mercurial={on:true,cardBonus:nm.merc.card};
+  if(nm.tesla.base)c.tesla={on:true,capacitor:nm.tesla.cap};
+  if(nm.ee.base)c.escalatingExposure={on:true};
+  return c;
+}
+function buildRows(c0,nm,mg){
+  const bc=baselineCfg(c0,nm);
+  const rows=[{key:'base',name:'Baseline',color:'--slate',cfg:bc}];
+  const stat=(cond,key,name,color,fn)=>{if(cond){const c=clone(bc);fn(c);rows.push({key,name,color,cfg:c});}};
+  stat(mg.wd>0,'cwd','+ Weapon Damage','--gold',c=>c.weaponDamagePct+=mg.wd);
+  stat(mg.fr>0,'cfr','+ Fire Rate','--teal',c=>c.extraFireRate+=mg.fr/100);
+  stat(mg.bbs>0,'cbbs','+ Bullet Res. Shred','--blue',c=>c.baseBulletShred+=mg.bbs);
+  stat(mg.spirit>0,'cspr','+ Spirit','--orange',c=>c.baseSpirit+=mg.spirit);
+  stat(mg.sss>0,'csss','+ Spirit Res. Shred','--rose',c=>c.baseSpiritShred+=mg.sss);
+  const nrow=(n,key,name,color,fn)=>{if(n.cmp&&!n.base){const c=clone(bc);fn(c);rows.push({key,name,color,cfg:c});}};
+  nrow(nm.merc,'merc','+ Mercurial','--violet',c=>c.mercurial={on:true,cardBonus:nm.merc.card});
+  nrow(nm.tesla,'tesla','+ Tesla','--lime',c=>c.tesla={on:true,capacitor:nm.tesla.cap});
+  nrow(nm.ee,'ee','+ Escalating Exp.','--green',c=>c.escalatingExposure={on:true});
+  return rows;
+}
+
+const fmtN=x=>Math.abs(x)>=1000?Math.round(x).toLocaleString():x.toFixed(1);
+const cssv=v=>getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+const setSub=(id,t)=>{const e=$('sub_'+id);if(e)e.textContent=t;};
+function updateSubLabels(){
+  const boons=getB('boons'),hr=getB('hs')/100,wd=getB('wd'),fr=getB('fr'),tbr=getB('tbr'),bbs=getB('bbs'),spr=getB('spr'),tsr=getB('tsr'),bss=getB('bss');
+  const flatW=5.64+0.14*boons, wdmg=flatW*(1+wd/100), boonSp=1.1*boons;
+  setSub('boons',`${wdmg.toFixed(2)} dmg/bullet · +${boonSp.toFixed(1)} spirit`);
+  setSub('hs',`avg ×${(1+hr*0.65).toFixed(2)} bullet dmg`);
+  setSub('wd',`×${(1+wd/100).toFixed(2)} on base ${flatW.toFixed(2)}`);
+  setSub('fr',`${(10.6*(1+fr/100)).toFixed(2)} /s · base 10.60`);
+  setSub('tbr',`×${(1-tbr/100).toFixed(2)} weapon dmg`);
+  setSub('bbs',`eff resist ${Math.round(tbr-bbs)}% → ×${(1-(tbr-bbs)/100).toFixed(2)}`);
+  setSub('spr',`${boonSp.toFixed(1)} from boons \u00b7 ${Math.max(0,spr-boonSp).toFixed(1)} from items`);
+  setSub('tsr',`×${(1-tsr/100).toFixed(2)} spirit dmg`);
+  setSub('bss',`eff resist ${Math.round(tsr-bss)}% → ×${(1-(tsr-bss)/100).toFixed(2)}`);
+}
+
+let timer=null;
+function schedule(){clearTimeout(timer);timer=setTimeout(recompute,80);}
+function recompute(){
+  renderCardSlots();updateDim();updateSubLabels();
+  const c0=core(), nm=named(), mg=mags();
+  const rows=buildRows(c0,nm,mg);
+
+  const data=rows.map(r=>{
+    const cur=simulate(r.cfg,ITER,SEED);
+    const s3=simulate({...r.cfg,engagement:3},ITER,SEED).total;
+    return {r,sim:cur,avg:cur.total,s3,total:cur.total*c0.engagement};
+  });
+  const cols=['s3','avg','total'];
+  const winners={};
+  cols.forEach(c=>{let bi=0;for(let i=1;i<data.length;i++)if(data[i][c]>data[bi][c])bi=i;winners[c]=bi;});
+  $('th_eng').textContent=`DPS @${c0.engagement%1?c0.engagement.toFixed(1):c0.engagement}s`;
+  $('cmpBody').innerHTML=data.map((d,i)=>{
+    const col=cssv(d.r.color);
+    const cells=cols.map(c=>{const win=winners[c]===i&&data.length>1;const s=win?` style="background:${col};color:#11151c;font-weight:700;border-radius:5px"`:'';return `<td${s}>${fmtN(d[c])}</td>`;}).join('');
+    return `<tr><td><span class="dot" style="background:${col}"></span>${d.r.name}</td>${cells}</tr>`;
+  }).join('');
+
+  const bl=data[0].sim;
+  if(data.length>1){
+    let bi=1;for(let i=2;i<data.length;i++)if(data[i].avg>data[bi].avg)bi=i;
+    const best=data[bi], dB=best.avg-data[0].avg, pB=data[0].avg>0?100*dB/data[0].avg:0;
+    const chans=[['weapon fire',bl.weapon],['Full Auto',bl.faSpirit],['cards',bl.cardSpirit],['Mercurial bullets',bl.mercSpirit],['Tesla',bl.teslaSpirit]].filter(c=>c[1]>0.05).sort((a,b)=>b[1]-a[1]);
+    const top=chans[0]||['weapon fire',bl.weapon];
+    const sg=dB>=0?'+':'−';
+    $('verdict').innerHTML=`Over a <b>${c0.engagement.toFixed(1)}s</b> fight your biggest damage source is <b>${top[0]}</b> (${fmtN(top[1])} DPS). Of the ${data.length-1} pick${data.length-1>1?'s':''}, <b>${best.r.name.replace('+ ','')}</b> adds the most — <b>${sg}${fmtN(Math.abs(dB))} DPS</b> (${pB>=0?'+':''}${pB.toFixed(1)}%). Highlighted cells win each column.`;
+  } else {
+    $('verdict').innerHTML=`Baseline only — raise a <b>stat purchase</b> slider above 0 or toggle a <b>named item</b> to add comparison rows.`;
+  }
+  const cards=bl.throws.toFixed(bl.throws<10?1:0);
+  $('buildline').textContent=`Fire rate ${bl.frBase.toFixed(1)}${bl.faOn?`→${bl.frFA.toFixed(1)} FA`:''}/s · Spirit ${bl.spiritStat.toFixed(0)} · ~${cards} cards thrown${nm.ee.base?` · EE ${bl.stacks.toFixed(1)}/12`:''}`;
+
+  drawChart(c0,nm,mg);
+}
+
+/* -------- chart -------- */
+let X_MODE='eng';
+document.querySelectorAll('#xseg button').forEach(b=>b.addEventListener('click',()=>{
+  document.querySelectorAll('#xseg button').forEach(x=>x.classList.remove('on'));b.classList.add('on');X_MODE=b.dataset.x;recompute();
+}));
+function niceStep(range,ticks){const raw=range/ticks,mag=Math.pow(10,Math.floor(Math.log10(raw))),n=raw/mag;const s=n<1.5?1:n<3?2:n<7?5:10;return s*mag;}
+function drawChart(c0,nm,mg){
+  const base=buildRows(c0,nm,mg).slice(0,8);
+  const series=base.map(r=>({name:r.name,color:cssv(r.color),pts:[]}));
+  const xr=X_MODE==='eng'?[1,30]:[0,35];
+  const xs=[];for(let i=0;i<CHART_PTS;i++)xs.push(xr[0]+(xr[1]-xr[0])*i/(CHART_PTS-1));
+  let ymax=0;
+  xs.forEach(x=>{const cc=clone(c0);if(X_MODE==='eng')cc.engagement=x;else cc.boons=x;const rr=buildRows(cc,nm,mg);rr.slice(0,8).forEach((row,i)=>{const y=simulate(row.cfg,CHART_ITER,SEED).total;ymax=Math.max(ymax,y);series[i].pts.push({x,y});});});
+  const cv=$('chart'),dpr=window.devicePixelRatio||1;
+  const W=cv.clientWidth,H=320;cv.width=W*dpr;cv.height=H*dpr;
+  const g=cv.getContext('2d');g.setTransform(dpr,0,0,dpr,0,0);g.clearRect(0,0,W,H);
+  const L=52,R=14,T=12,B=32,pw=W-L-R,ph=H-T-B;
+  ymax=Math.max(ymax*1.08,1);const ys=niceStep(ymax,5);ymax=Math.ceil(ymax/ys)*ys;
+  const X=x=>L+pw*(x-xr[0])/(xr[1]-xr[0]), Y=y=>T+ph*(1-y/ymax);
+  g.font='11px '+cssv('--mono');g.textBaseline='middle';
+  for(let v=0;v<=ymax+1e-6;v+=ys){const yy=Y(v);g.strokeStyle=cssv('--grid');g.lineWidth=1;g.beginPath();g.moveTo(L,yy);g.lineTo(L+pw,yy);g.stroke();g.fillStyle=cssv('--faint');g.textAlign='right';g.fillText(Math.round(v),L-8,yy);}
+  g.textAlign='center';g.textBaseline='top';
+  for(let v=Math.ceil(xr[0]/5)*5;v<=xr[1]+1e-6;v+=5){const xx=X(v);g.strokeStyle=cssv('--grid');g.beginPath();g.moveTo(xx,T);g.lineTo(xx,T+ph);g.stroke();g.fillStyle=cssv('--faint');g.fillText(X_MODE==='eng'?v+'s':v,xx,T+ph+7);}
+  g.fillStyle=cssv('--faint');g.textAlign='center';g.fillText(X_MODE==='eng'?'engagement length':'boons',L+pw/2,H-12);
+  for(const s of series){g.strokeStyle=s.color;g.lineWidth=s.name==='Baseline'?1.6:2.2;g.beginPath();s.pts.forEach((p,i)=>{const xx=X(p.x),yy=Y(p.y);i?g.lineTo(xx,yy):g.moveTo(xx,yy);});g.stroke();}
+  if(X_MODE==='eng'){const ex=X(c0.engagement);g.strokeStyle=cssv('--line2');g.setLineDash([4,4]);g.lineWidth=1;g.beginPath();g.moveTo(ex,T);g.lineTo(ex,T+ph);g.stroke();g.setLineDash([]);}
+  $('chartlegend').innerHTML=series.map(s=>`<span class="k"><span class="ln" style="background:${s.color}"></span>${s.name}</span>`).join('');
+}
+window.addEventListener('resize',()=>{clearTimeout(timer);timer=setTimeout(()=>drawChart(core(),named(),mags()),120);});
+recompute();
+</script>
+</body>
+</html>
