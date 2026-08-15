@@ -9,7 +9,7 @@
     --bg:#0d1117; --panel:#151b25; --panel2:#1a212d; --line:#232c39; --line2:#33404f;
     --tx:#e8ebf0; --mut:#9aa4b2; --faint:#69737f; --grid:#1d2530;
     --gold:#f2ab4b; --teal:#3fc7cf; --violet:#ab88ea; --slate:#7c8898;
-    --green:#5fd39a; --orange:#e0744d; --rose:#e06d8f; --blue:#6ea8fe; --lime:#c3e88d;
+    --green:#5fd39a; --orange:#e0744d; --rose:#e06d8f; --blue:#6ea8fe; --lime:#c3e88d; --pink:#e884c4; --yellow:#e6d24a; --cyan:#4fd0d8; --magenta:#cf5ae0;
     --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
   }
   *{box-sizing:border-box}
@@ -35,6 +35,7 @@
   input[type=number]:focus{outline:none;border-color:var(--gold)}
 
   /* start-with-cards section */
+  .tgtrow{display:flex;align-items:flex-start;gap:11px;margin:0 18px 16px;padding:13px 15px;background:var(--panel2);border:1px solid var(--line);border-radius:10px}
   .startsec{margin:0 18px 16px;padding:14px 15px;background:var(--panel2);border:1px solid var(--line);border-radius:10px}
   .startsec-head{display:flex;align-items:flex-start;gap:11px}
   .cardslots{display:flex;gap:11px;flex-wrap:wrap;margin-top:14px}
@@ -85,10 +86,10 @@
   .sw input:checked + .track{background:var(--teal)}
   .sw input:checked + .track::after{transform:translateX(15px);background:#0d1117}
 
-  .togpanel{margin:2px 18px 0;padding:14px 15px;background:var(--panel2);border:1px solid var(--line);border-radius:10px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px 22px}
-  @media(max-width:760px){.togpanel{grid-template-columns:1fr 1fr}}
-  @media(max-width:500px){.togpanel{grid-template-columns:1fr}}
-  .togcell{display:flex;gap:11px;align-items:flex-start}
+  .togpanel{margin:2px 18px 0;padding:14px 15px;background:var(--panel2);border:1px solid var(--line);border-radius:10px;display:grid;grid-template-columns:1fr 1fr;gap:16px 22px}
+  @media(max-width:640px){.togpanel{grid-template-columns:1fr}}
+  .togcell{display:flex;gap:11px;align-items:flex-start;min-width:0}
+  .togcell .body{min-width:0}
   .togcell .body{min-width:0}
   .tn{font-size:13px;font-weight:600;line-height:1.2}
   .td{font-size:11px;color:var(--mut);margin-top:2px;line-height:1.35}
@@ -96,7 +97,20 @@
   .mini{font-size:10.5px;color:var(--faint);display:inline-flex;align-items:center;gap:5px;cursor:pointer}
   .mini input[type=checkbox]{accent-color:var(--teal);width:12px;height:12px;margin:0;cursor:pointer}
   .mini input[type=number]{width:50px;background:var(--panel);border:1px solid var(--line2);color:var(--tx);font-family:var(--mono);font-size:11px;border-radius:5px;padding:2px 5px;text-align:right}
+  .invsel{background:var(--panel);border:1px solid var(--line2);color:var(--tx);font-family:var(--mono);font-size:10.5px;border-radius:5px;padding:2px 4px;max-width:140px;min-width:0}
+  .invsel:focus{outline:none;border-color:var(--gold)}
   .mini b{color:var(--mut)}
+  .customgrid{display:flex;flex-wrap:wrap;gap:6px 10px;margin-top:9px}
+  .customgrid label{font-size:9.5px;text-transform:uppercase;letter-spacing:.03em;color:var(--faint);display:inline-flex;flex-direction:column;gap:2px}
+  .customgrid input[type=number]{width:52px;background:var(--panel);border:1px solid var(--line2);color:var(--tx);font-family:var(--mono);font-size:11px;border-radius:5px;padding:3px 5px;text-align:right}
+  #customBox{margin:2px 18px 0;display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px 20px}
+  .customcell{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:13px 14px}
+  .custlabel{width:100%;background:var(--panel);border:1px solid var(--line2);color:var(--tx);font-size:13px;font-weight:600;border-radius:6px;padding:5px 8px;font-family:inherit}
+  .custlabel:focus{outline:none;border-color:var(--gold)}
+  .custrm{background:none;border:none;color:var(--faint);font-size:10px;cursor:pointer;font-family:var(--mono);padding:0;margin-left:auto}
+  .custrm:hover{color:var(--rose)}
+  .addbtn{display:inline-block;margin:12px 18px 4px;background:#141a23;border:1px dashed var(--line2);color:var(--mut);font-size:12px;cursor:pointer;font-family:inherit;border-radius:8px;padding:8px 14px}
+  .addbtn:hover{border-color:var(--slate);color:var(--tx)}
 
   .verdict{margin:14px 18px 0;padding:11px 14px;background:#12222b;border:1px solid #1e3a44;border-radius:9px;font-size:13px;color:var(--mut);line-height:1.5}
   .verdict b{color:var(--tx)}
@@ -139,6 +153,10 @@
   <div class="card">
     <h2>Base values <span class="note">Wraith &amp; the target — shared by every build</span></h2>
     <div class="controls" id="baseGrid"></div>
+    <div class="tgtrow">
+      <label class="sw"><input type="checkbox" id="plated_on"><span class="track"></span></label>
+      <div><div class="tn">Enemy has Plated Armor</div><div class="td">Per bullet: 30% chance to deflect the bullet (weapon) damage, and a separate 50% chance to block that bullet's card generation. Spirit damage is unaffected.</div></div>
+    </div>
   </div>
 
   <div class="card">
@@ -185,30 +203,49 @@
         <label class="sw"><input type="checkbox" id="merc_cmp"><span class="track"></span></label>
         <div class="body"><div class="tn">Mercurial Magnum</div>
           <div class="td">+7 spirit · +22% fire rate · bullets deal spirit = <code>25%+0.49%·Sp</code> of pre-% base dmg</div>
-          <div class="minirow"><label class="mini"><input type="checkbox" id="merc_base"> <b>add to baseline</b></label><label class="mini"><input type="checkbox" id="merc_card"> card bonus</label></div>
+          <div class="minirow"><label class="mini"><input type="checkbox" id="merc_base"> <b>add to baseline</b></label><label class="mini"><input type="checkbox" id="merc_card"> card bonus</label><label class="mini">spirit invest <select id="merc_inv_from" class="invsel" title="tier before this purchase"></select> → <select id="merc_inv_to" class="invsel" title="tier after this purchase"></select></label></div>
         </div>
       </div>
       <div class="togcell">
         <label class="sw"><input type="checkbox" id="tesla_cmp"><span class="track"></span></label>
         <div class="body"><div class="tn">Tesla Bullets</div>
           <div class="td">15% of bullets proc <code>33+0.19·Sp</code> spirit shock (0.2s cd)</div>
-          <div class="minirow"><label class="mini"><input type="checkbox" id="tesla_base"> <b>add to baseline</b></label><label class="mini"><input type="checkbox" id="tesla_cap"> Capacitor</label></div>
+          <div class="minirow"><label class="mini"><input type="checkbox" id="tesla_base"> <b>add to baseline</b></label><label class="mini"><input type="checkbox" id="tesla_cap"> Capacitor (+5% FR · 100 burst)</label><label class="mini">wpn invest <select id="tesla_inv_from" class="invsel" title="tier before this purchase"></select> → <select id="tesla_inv_to" class="invsel" title="tier after this purchase"></select></label></div>
         </div>
       </div>
       <div class="togcell">
         <label class="sw"><input type="checkbox" id="ee_cmp"><span class="track"></span></label>
         <div class="body"><div class="tn">Escalating Exposure</div>
           <div class="td">−8% spirit resist · +4.5% spirit dmg per stack (0.7s cd, max 12)</div>
-          <div class="minirow"><label class="mini"><input type="checkbox" id="ee_base"> <b>add to baseline</b></label></div>
+          <div class="minirow"><label class="mini"><input type="checkbox" id="ee_base"> <b>add to baseline</b></label><label class="mini">spirit invest <select id="ee_inv_from" class="invsel" title="tier before this purchase"></select> → <select id="ee_inv_to" class="invsel" title="tier after this purchase"></select></label></div>
+        </div>
+      </div>
+      <div class="togcell">
+        <label class="sw"><input type="checkbox" id="apr_cmp"><span class="track"></span></label>
+        <div class="body"><div class="tn">Armor Piercing Rounds</div>
+          <div class="td">+8% weapon damage · 55% of bullets ignore Plated Armor and the enemy's bullet resistance</div>
+          <div class="minirow"><label class="mini"><input type="checkbox" id="apr_base"> <b>add to baseline</b></label><label class="mini">wpn invest <select id="apr_inv_from" class="invsel" title="tier before this purchase"></select> → <select id="apr_inv_to" class="invsel" title="tier after this purchase"></select></label></div>
+        </div>
+      </div>
+      <div class="togcell">
+        <label class="sw"><input type="checkbox" id="so_cmp"><span class="track"></span></label>
+        <div class="body"><div class="tn">Spiritual Overflow</div>
+          <div class="td">+6 spirit · +13% duration (Full Auto &amp; Diamond shred) · each bullet builds 11.5%; at 100% gain +40 spirit &amp; +30% fire rate</div>
+          <div class="minirow"><label class="mini"><input type="checkbox" id="so_base"> <b>add to baseline</b></label><label class="mini">wpn invest <select id="so_inv_from" class="invsel" title="tier before this purchase"></select> → <select id="so_inv_to" class="invsel" title="tier after this purchase"></select></label></div>
         </div>
       </div>
     </div>
+
+    <div class="seclabel">Custom items — bundle multiple stats into one comparison; toggle a row on to edit its stats</div>
+    <div id="customBox"></div>
+    <button id="addCustom" class="addbtn">+ Add custom item</button>
+
 
     <div class="verdict" id="verdict"></div>
     <div class="buildline" id="buildline"></div>
     <div class="cmptable">
       <table>
-        <thead><tr><th>Item</th><th>DPS @3s</th><th id="th_eng">DPS @15s</th><th>Total dmg</th></tr></thead>
+        <thead><tr><th>Item</th><th>DPS @3s</th><th id="th_eng">DPS @6s</th><th>Total dmg</th></tr></thead>
         <tbody id="cmpBody"></tbody>
       </table>
     </div>
@@ -224,10 +261,10 @@
   <div class="card">
     <div class="notes">
       <h2>Model &amp; assumptions</h2>
-      <p><b>Two damage channels.</b> Weapon damage is reduced only by bullet resist; spirit damage only by spirit resist. Resists may go negative (amplify).</p>
+      <p><b>Two damage channels.</b> Weapon damage is reduced only by bullet resist; spirit damage only by spirit resist. Resists may go negative (amplify). <b>Plated Armor</b> on the target deflects 30% of bullets (weapon damage only) and blocks 50% of bullets' card generation — modeled as ×0.70 weapon damage and ×0.50 card-generation rate, <b>Armor Piercing Rounds</b> gives +8% weapon damage and makes 55% of bullets ignore Plated Armor and the target's bullet resistance (modeled as a 55/45 blend of ignoring vs normal bullets).</p>
       <p><b>Weapon damage</b> per bullet is <code>(5.64 + 0.14·boons)</code>, boon-driven, then scaled by your <b>Weapon Damage %</b> stat. <b>Headshots deal ×1.65 bullet damage</b> (weapon channel only), averaged by headshot rate, and generate cards faster (5.1% vs 3.4%). <b>Boons grant 1.1 Spirit each</b> on top of the base-spirit slider (+7 with Mercurial) — the totals show under those sliders.</p>
       <p><b>Comparison.</b> The <i>stat purchase</i> sliders layer a hypothetical item on top of your build and show it as a <code>+Stat</code> row (only when above 0). <i>Named items</i> show a <code>+Item</code> row when toggled on; ticking <b>add to baseline</b> folds one into the baseline so every row includes it (and its own row drops out) — use it to ask "given I already own this, what's best next?". Highlighted cells win each column.</p>
-      <p><b>Full Auto</b> runs from the start for its duration then reverts (no recast). <b>Card Trick</b> accrues cards per shot (×CDR), thrown on a 0.6s gap with a 0.1s shooting lockout; suit is 1/9 Joker (1/5 at 5AP) else a 2-of-each stack draw. <b>Tesla</b> procs per bullet on a 0.2s cd; <b>Escalating Exposure</b> ramps one amp stack per 0.7s to 12 and amplifies every spirit source.</p>
+      <p><b>Full Auto</b> runs from the start for its duration then reverts (no recast). <b>Card Trick</b> accrues cards per shot (×CDR), thrown on a 0.6s gap with a 0.1s shooting lockout; suit is 1/9 Joker (1/5 at 5AP) else a 2-of-each stack draw. <b>Tesla</b> procs per bullet on a 0.2s cd; <b>Capacitor</b> also fires a one-time 100 spirit-damage burst at the start of combat (which triggers Escalating Exposure's first stack). <b>Escalating Exposure</b> ramps one amp stack per 0.7s to 12 and amplifies every spirit source. <b>Spiritual Overflow</b> gives +6 spirit and +13% duration (Full Auto window and Diamond-card shred); each bullet builds its meter 11.5% (halved by Plated Armor's block), and once it reaches 100% you gain +40 spirit and +30% fire rate for the rest of the fight — modeled by switching to the buffed spirit values at the fill point.</p>
       <div class="flag"><p style="margin:0"><b>Modeling choices:</b> the Mercurial card bonus is added <i>after</i> the suit multiplier (so Spades/Joker don't scale it), and its bullet-conversion is a % of the <b>pre-% base</b> bullet damage (boon-driven, unaffected by Weapon Damage %). The table's <b>@3s</b> column is a short-fight reference and <b>DPS @[engagement]</b> uses your set fight length; the chart traces the full sweep.</p></div>
     </div>
   </div>
@@ -244,33 +281,41 @@ function resolve(cfg){
   const spirit=cfg.baseSpirit+1.1*boons+(merc.on?7:0);
   const flatWeapon=5.64+0.14*boons;
   const weaponDmg=flatWeapon*(1+cfg.weaponDamagePct/100);
+  const so=cfg.spiritOverflow||{}, soOn=!!so.on;
+  const durMult=soOn?1.13:1, s1=spirit+(soOn?40:0);
   const fa=cfg.fullAuto;
   const faFR=fa.on?(0.20+(fa.ap2?0.10:0)):0;
-  const faDur=5+(fa.ap2?3:0);
+  const faDur=(5+(fa.ap2?3:0))*durMult;
   const faScale=fa.ap5?0.075:0.03;
-  const faSpiritPerBullet=2+faScale*spirit;
+  const faSpiritPerBullet=2+faScale*spirit, faSpbB=2+faScale*s1;
   const ct=cfg.cardTrick;
-  const cardBase=45+0.55*spirit+(ct.ap2?(40+0.4*spirit):0);
+  const cardBase=45+0.55*spirit+(ct.ap2?(40+0.4*spirit):0), cardBaseB=45+0.55*s1+(ct.ap2?(40+0.4*s1):0);
   const spadesMult=ct.ap5?2.0:1.6;
   const cardDiamondShred=ct.ap5?0.13:0.08;
   const pJoker=ct.ap5?0.20:(1/9);
   const cdr=ct.rapidRecharge?0.14:0;
   const cardGenMult=1/(1-cdr);
   const maxCards=ct.rapidRecharge?6:4;
-  const mercSpiritPerBullet=merc.on?flatWeapon*(0.25+0.0049*spirit):0;
+  const mercSpiritPerBullet=merc.on?flatWeapon*(0.25+0.0049*spirit):0, mercSpbB=merc.on?flatWeapon*(0.25+0.0049*s1):0;
   const mercFR=merc.on?0.22:0;
-  const mercCardFull=60+0.16*spirit;
+  const mercCardFull=60+0.16*spirit, mercCardFullB=60+0.16*s1;
   const tesla=cfg.tesla;
   const teslaProc=tesla.on?(tesla.capacitor?0.20:0.15):0;
-  const teslaDmg=tesla.capacitor?(43+0.19*spirit):(33+0.19*spirit);
+  const teslaDmg=tesla.capacitor?(43+0.19*spirit):(33+0.19*spirit), teslaDmgB=tesla.capacitor?(43+0.19*s1):(33+0.19*s1);
+  const teslaFR=(tesla.on&&tesla.capacitor)?0.05:0;
+  const teslaBurst=(tesla.on&&tesla.capacitor)?100:0;
   const ee=cfg.escalatingExposure.on;
-  const genPerShot=(cfg.headshotRate*0.051+(1-cfg.headshotRate)*0.034)*cardGenMult;
+  const plated=cfg.platedArmor;
+  const aprIgnore=cfg.apr?0.55:0;
+  const genBlock=plated?(aprIgnore+(1-aprIgnore)*0.5):1;
+  const genPerShot=(cfg.headshotRate*0.051+(1-cfg.headshotRate)*0.034)*cardGenMult*genBlock;
   const wdPerBullet=weaponDmg*(1+cfg.headshotRate*0.65);
-  return{boons,spirit,weaponDmg,wdPerBullet,
-    fa:{on:fa.on,fr:faFR,dur:faDur,spb:faSpiritPerBullet},
-    ct:{on:ct.on,base:cardBase,spades:spadesMult,dShred:cardDiamondShred,pJoker,genPerShot,maxCards,startSuits:(ct.startSuits||[]).slice(0,maxCards)},
-    merc:{on:merc.on,spb:mercSpiritPerBullet,fr:mercFR,cardBonus:!!merc.cardBonus,cardFull:mercCardFull},
-    tesla:{on:tesla.on,proc:teslaProc,dmg:teslaDmg},ee,
+  const soFR=soOn?0.30:0, soBuild=soOn?0.115:0, diamondDur=5*durMult;
+  return{boons,spirit,weaponDmg,wdPerBullet,plated,aprIgnore,soFR,soBuild,diamondDur,
+    fa:{on:fa.on,fr:faFR,dur:faDur,spb:faSpiritPerBullet,spbB:faSpbB},
+    ct:{on:ct.on,base:cardBase,baseB:cardBaseB,spades:spadesMult,dShred:cardDiamondShred,pJoker,genPerShot,maxCards,startSuits:(ct.startSuits||[]).slice(0,maxCards)},
+    merc:{on:merc.on,spb:mercSpiritPerBullet,spbB:mercSpbB,fr:mercFR,cardBonus:!!merc.cardBonus,cardFull:mercCardFull,cardFullB:mercCardFullB},
+    tesla:{on:tesla.on,proc:teslaProc,dmg:teslaDmg,dmgB:teslaDmgB},ee,teslaFR,teslaBurst,
     baseFR:10.6,firePct:cfg.fireRatePct/100,tBulletRes:cfg.targetBulletResist/100,baseBulletShred:cfg.baseBulletShred/100,
     tSpiritRes:cfg.targetSpiritResist/100,baseSpiritShred:cfg.baseSpiritShred/100,
     engagement:cfg.engagement,extraFR:cfg.extraFireRate||0};
@@ -279,26 +324,35 @@ const isSpadesLike=s=>s==='S'||s==='J';
 const isDiamondLike=s=>s==='D'||s==='J';
 function runOnce(R,rng,acc){
   let t=0;const q=[];for(const s of R.ct.startSuits)q.push(s);
-  let stack=[],prog=0,lastThrow=-1e9,eeStacks=0,lastEE=-1e9,eeActive=false,diamondUntil=-1e9,teslaCd=-1e9,nextThrow=0,guard=0,throws=0;
+  let stack=[],prog=0,lastThrow=-1e9,eeStacks=0,lastEE=-1e9,eeActive=false,diamondUntil=-1e9,teslaCd=-1e9,nextThrow=0,guard=0,throws=0,overflow=0,overflowActive=false;
+  if(R.teslaBurst>0){
+    acc.tesla+=R.teslaBurst*(1-(R.tSpiritRes-R.baseSpiritShred));
+    if(R.ee){eeActive=true;if(eeStacks<12){eeStacks++;lastEE=0;}}
+  }
   while(t<R.engagement){
     if(++guard>200000)break;
     const faOn=R.fa.on&&t<R.fa.dur;
-    const fr=R.baseFR*(1+R.firePct+(faOn?R.fa.fr:0)+R.merc.fr+R.extraFR);
+    const fr=R.baseFR*(1+R.firePct+(faOn?R.fa.fr:0)+R.merc.fr+R.extraFR+R.teslaFR+(overflowActive?R.soFR:0));
     if(fr<=0)break;
     const dActive=t<diamondUntil, dShred=dActive?R.ct.dShred:0;
-    const weaponMult=1-(R.tBulletRes-R.baseBulletShred-dShred);
+    const multNormal=1-(R.tBulletRes-R.baseBulletShred-dShred);
+    const multIgnore=1-(-R.baseBulletShred-dShred);
+    const deflect=R.plated?0.7:1;
+    const weaponFactor=R.aprIgnore*multIgnore+(1-R.aprIgnore)*multNormal*deflect;
     const eeShred=(R.ee&&eeActive)?0.08:0;
     const spiritMult=1-(R.tSpiritRes-R.baseSpiritShred-dShred-eeShred);
     const ampMult=1+eeStacks*0.045;
-    acc.weapon+=R.wdPerBullet*weaponMult;
+    const faSpb=overflowActive?R.fa.spbB:R.fa.spb, mSpb=overflowActive?R.merc.spbB:R.merc.spb, tDmg=overflowActive?R.tesla.dmgB:R.tesla.dmg, cBase=overflowActive?R.ct.baseB:R.ct.base, mCardFull=overflowActive?R.merc.cardFullB:R.merc.cardFull;
+    acc.weapon+=R.wdPerBullet*weaponFactor;
     let dealt=false;
-    if(faOn){acc.fa+=R.fa.spb*spiritMult*ampMult;dealt=true;}
-    if(R.merc.on){acc.merc+=R.merc.spb*spiritMult*ampMult;dealt=true;}
-    if(R.tesla.on&&t>=teslaCd){if(rng()<R.tesla.proc){acc.tesla+=R.tesla.dmg*spiritMult*ampMult;teslaCd=t+0.2;dealt=true;}}
+    if(faOn){acc.fa+=faSpb*spiritMult*ampMult;dealt=true;}
+    if(R.merc.on){acc.merc+=mSpb*spiritMult*ampMult;dealt=true;}
+    if(R.tesla.on&&t>=teslaCd){if(rng()<R.tesla.proc){acc.tesla+=tDmg*spiritMult*ampMult;teslaCd=t+0.2;dealt=true;}}
     if(R.ee&&dealt){eeActive=true;if(t>=lastEE+0.7&&eeStacks<12){eeStacks++;lastEE=t;}}
     if(R.ct.on){prog+=R.ct.genPerShot;while(prog>=1){prog-=1;if(q.length<R.ct.maxCards){let suit;if(rng()<R.ct.pJoker)suit='J';else{if(stack.length===0)stack=['S','S','D','D','C','C','H','H'];const idx=(rng()*stack.length)|0;suit=stack.splice(idx,1)[0];}q.push(suit);}}}
     let threw=false;
-    if(R.ct.on&&q.length>0&&t>=nextThrow){const suit=q.shift();const charge=Math.min(1,(t-lastThrow)/14);const mercBonus=(R.merc.on&&R.merc.cardBonus)?R.merc.cardFull*charge:0;const base=R.ct.base*(isSpadesLike(suit)?R.ct.spades:1)+mercBonus;acc.card+=base*spiritMult*ampMult;if(isDiamondLike(suit))diamondUntil=t+5;if(R.ee){eeActive=true;if(t>=lastEE+0.7&&eeStacks<12){eeStacks++;lastEE=t;}}lastThrow=t;nextThrow=t+0.6;threw=true;throws++;}
+    if(R.ct.on&&q.length>0&&t>=nextThrow){const suit=q.shift();const charge=Math.min(1,(t-lastThrow)/14);const mercBonus=(R.merc.on&&R.merc.cardBonus)?mCardFull*charge:0;const base=cBase*(isSpadesLike(suit)?R.ct.spades:1)+mercBonus;acc.card+=base*spiritMult*ampMult;if(isDiamondLike(suit))diamondUntil=t+R.diamondDur;if(R.ee){eeActive=true;if(t>=lastEE+0.7&&eeStacks<12){eeStacks++;lastEE=t;}}lastThrow=t;nextThrow=t+0.6;threw=true;throws++;}
+    if(!overflowActive&&R.soBuild>0){overflow+=R.soBuild*(R.plated?0.5:1);if(overflow>=1)overflowActive=true;}
     t+=threw?Math.max(1/fr,0.1):1/fr;
   }
   acc.throws+=throws;acc.stacks+=eeStacks;
@@ -312,7 +366,7 @@ function simulate(cfg,iters,seed){
   return{total:weapon+fa+merc+tesla+card,weapon,spirit:fa+merc+tesla+card,
     faSpirit:fa,mercSpirit:merc,teslaSpirit:tesla,cardSpirit:card,
     effWeaponDmg:R.weaponDmg,spiritStat:R.spirit,throws:acc.throws/n,stacks:acc.stacks/n,
-    frBase:R.baseFR*(1+R.firePct+R.merc.fr+R.extraFR),frFA:R.baseFR*(1+R.firePct+(R.fa.on?R.fa.fr:0)+R.merc.fr+R.extraFR),faOn:R.fa.on};
+    frBase:R.baseFR*(1+R.firePct+R.merc.fr+R.extraFR+R.teslaFR),frFA:R.baseFR*(1+R.firePct+(R.fa.on?R.fa.fr:0)+R.merc.fr+R.extraFR+R.teslaFR),faOn:R.fa.on};
 }
 const SEED=1234567, ITER=600, CHART_ITER=180, CHART_PTS=20;
 
@@ -339,7 +393,7 @@ const BASE=[
   {id:'fr',label:'Fire Rate',min:0,max:150,step:1,val:0,suffix:'%',sub:1},
   {id:'tbr',label:'Target bullet resist',min:-30,max:80,step:1,val:0,suffix:'%',sub:1},
   {id:'bbs',label:'Base bullet resist shred',min:0,max:60,step:1,val:0,suffix:'%',sub:1},
-  {id:'eng',label:'Engagement length',min:1,max:30,step:0.5,val:15,suffix:'s'},
+  {id:'eng',label:'Engagement length',min:1,max:30,step:0.5,val:6,suffix:'s'},
   {id:'spr',label:'Spirit',min:22,max:200,step:1,val:22,sub:1},
   {id:'tsr',label:'Target spirit resist',min:-30,max:80,step:1,val:0,suffix:'%',sub:1},
   {id:'bss',label:'Base spirit resist shred',min:0,max:60,step:1,val:0,suffix:'%',sub:1},
@@ -429,13 +483,55 @@ function renderCardSlots(){
 document.addEventListener('click',()=>{if(pickerOpen!==-1){pickerOpen=-1;renderCardSlots();}});
 $('sc_on').addEventListener('change',()=>{renderCardSlots();schedule();});
 document.querySelector('.pill[data-cb="ct_rr"]').addEventListener('click',()=>setTimeout(renderCardSlots,0));
-['fa_on','ct_on','merc_cmp','merc_base','merc_card','tesla_cmp','tesla_base','tesla_cap','ee_cmp','ee_base'].forEach(id=>$(id).addEventListener('change',schedule));
+['fa_on','ct_on','plated_on','merc_cmp','merc_base','merc_card','merc_inv_from','merc_inv_to','tesla_cmp','tesla_base','tesla_cap','tesla_inv_from','tesla_inv_to','ee_cmp','ee_base','ee_inv_from','ee_inv_to','apr_cmp','apr_base','apr_inv_from','apr_inv_to','so_cmp','so_base','so_inv_from','so_inv_to'].forEach(id=>$(id).addEventListener('change',schedule));
+
+// souls-invested category bonuses (cumulative totals), from the item tier table
+const SPIRIT_INVEST=[[800,7],[1600,11],[2400,15],[3200,19],[4800,38],[6400,45],[8000,52],[11200,59],[16000,66],[22400,75],[28800,100]];
+const WEAPON_INVEST=[[800,9],[1600,12],[2400,15],[3200,18],[4800,46],[6400,54],[8000,62],[11200,74],[16000,86],[22400,100],[28800,115]];
+// investment adds only the MARGINAL bonus = cumulative[to] − cumulative[from]
+const readInvest=base=>Math.max(0,(+$(base+'_to').value)-(+$(base+'_from').value));
+function fillInvest(base,arr,unit){
+  const opts='<option value="0">none</option>'+arr.map(([s,c])=>`<option value="${c}">${s.toLocaleString()} · +${c}${unit}</option>`).join('');
+  $(base+'_from').innerHTML=opts; $(base+'_to').innerHTML=opts;
+}
+fillInvest('merc_inv',SPIRIT_INVEST,' Sp');
+fillInvest('ee_inv',SPIRIT_INVEST,' Sp');
+fillInvest('tesla_inv',WEAPON_INVEST,'% wpn');
+fillInvest('apr_inv',WEAPON_INVEST,'% wpn');
+fillInvest('so_inv',WEAPON_INVEST,'% wpn');
+
+// ---- dynamic custom items ----
+const CUSTOM_STATS=[['wd','Wpn dmg %',150],['fr','Fire rate %',100],['bbs','Bullet shred %',60],['spr','Spirit',200],['sss','Spirit shred %',60]];
+const CUSTOM_COLORS=['--yellow','--cyan','--pink','--lime','--blue','--orange','--rose','--violet'];
+const customColor=i=>CUSTOM_COLORS[i%CUSTOM_COLORS.length];
+let customNextId=1;
+const newCustom=()=>({id:customNextId++,label:'',cmp:false,base:false,wd:0,fr:0,bbs:0,spr:0,sss:0});
+let customItems=[newCustom()];
+const escAttr=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function renderCustomItems(){
+  $('customBox').innerHTML=customItems.map((cu,i)=>`
+    <div class="togcell customcell">
+      <label class="sw"><input type="checkbox" data-i="${i}" data-f="cmp" ${cu.cmp?'checked':''}><span class="track"></span></label>
+      <div class="body" style="flex:1">
+        <input type="text" class="custlabel" data-i="${i}" data-f="label" maxlength="24" placeholder="Custom item ${i+1}" value="${escAttr(cu.label)}">
+        <div class="minirow"><label class="mini"><input type="checkbox" data-i="${i}" data-f="base" ${cu.base?'checked':''}> <b>add to baseline</b></label><button class="custrm" data-i="${i}">✕ remove</button></div>
+        <div class="customgrid" style="display:${cu.cmp?'flex':'none'}">
+          ${CUSTOM_STATS.map(([k,l,mx])=>`<label>${l}<input type="number" data-i="${i}" data-f="${k}" min="0" max="${mx}" step="1" value="${cu[k]}"></label>`).join('')}
+        </div>
+      </div>
+    </div>`).join('');
+}
+$('customBox').addEventListener('input',e=>{const t=e.target;if(t.type==='checkbox')return;const i=+t.dataset.i,f=t.dataset.f;if(!(i>=0)||!f)return;if(f==='label')customItems[i].label=t.value;else customItems[i][f]=+t.value;schedule();});
+$('customBox').addEventListener('change',e=>{const t=e.target;if(t.type!=='checkbox')return;const i=+t.dataset.i,f=t.dataset.f;customItems[i][f]=t.checked;if(f==='cmp'){const g=t.closest('.togcell').querySelector('.customgrid');g.style.display=t.checked?'flex':'none';}schedule();});
+$('customBox').addEventListener('click',e=>{const btn=e.target.closest('.custrm');if(!btn)return;customItems.splice(+btn.dataset.i,1);if(!customItems.length)customItems.push(newCustom());renderCustomItems();schedule();});
+$('addCustom').addEventListener('click',()=>{customItems.push(newCustom());renderCustomItems();schedule();});
+renderCustomItems();
 
 function core(){
   return{
     boons:getB('boons'),headshotRate:getB('hs')/100,weaponDamagePct:getB('wd'),fireRatePct:getB('fr'),
     targetBulletResist:getB('tbr'),baseBulletShred:getB('bbs'),engagement:getB('eng'),
-    baseSpirit:getB('spr')-1.1*getB('boons'),targetSpiritResist:getB('tsr'),baseSpiritShred:getB('bss'),extraFireRate:0,
+    baseSpirit:getB('spr')-1.1*getB('boons'),targetSpiritResist:getB('tsr'),baseSpiritShred:getB('bss'),extraFireRate:0,platedArmor:$('plated_on').checked,
     fullAuto:{on:$('fa_on').checked,ap2:pillOn('fa_ap2'),ap5:pillOn('fa_ap5')},
     cardTrick:{on:$('ct_on').checked,ap2:pillOn('ct_ap2'),ap5:pillOn('ct_ap5'),startSuits:$('sc_on').checked?startSlots.slice(0,maxCards()).filter(Boolean):[],rapidRecharge:pillOn('ct_rr')},
     mercurial:{on:false,cardBonus:false},tesla:{on:false,capacitor:false},escalatingExposure:{on:false}
@@ -443,15 +539,20 @@ function core(){
 }
 const mags=()=>({wd:getB('cwd'),fr:getB('cfr'),bbs:getB('cbbs'),spirit:getB('cspr'),sss:getB('csss')});
 const named=()=>({
-  merc:{cmp:$('merc_cmp').checked,base:$('merc_base').checked,card:$('merc_card').checked},
-  tesla:{cmp:$('tesla_cmp').checked,base:$('tesla_base').checked,cap:$('tesla_cap').checked},
-  ee:{cmp:$('ee_cmp').checked,base:$('ee_base').checked},
+  merc:{cmp:$('merc_cmp').checked,base:$('merc_base').checked,card:$('merc_card').checked,inv:readInvest('merc_inv')},
+  tesla:{cmp:$('tesla_cmp').checked,base:$('tesla_base').checked,cap:$('tesla_cap').checked,inv:readInvest('tesla_inv')},
+  ee:{cmp:$('ee_cmp').checked,base:$('ee_base').checked,inv:readInvest('ee_inv')},
+  apr:{cmp:$('apr_cmp').checked,base:$('apr_base').checked,inv:readInvest('apr_inv')},
+  so:{cmp:$('so_cmp').checked,base:$('so_base').checked,inv:readInvest('so_inv')},
 });
 function baselineCfg(c0,nm){
   const c=clone(c0);
-  if(nm.merc.base)c.mercurial={on:true,cardBonus:nm.merc.card};
-  if(nm.tesla.base)c.tesla={on:true,capacitor:nm.tesla.cap};
-  if(nm.ee.base)c.escalatingExposure={on:true};
+  if(nm.merc.base){c.mercurial={on:true,cardBonus:nm.merc.card};c.baseSpirit+=nm.merc.inv;}
+  if(nm.tesla.base){c.tesla={on:true,capacitor:nm.tesla.cap};c.weaponDamagePct+=nm.tesla.inv;}
+  if(nm.ee.base){c.escalatingExposure={on:true};c.baseSpirit+=nm.ee.inv;}
+  if(nm.apr.base){c.weaponDamagePct+=8+nm.apr.inv;c.apr=true;}
+  if(nm.so.base){c.baseSpirit+=6;c.weaponDamagePct+=nm.so.inv;c.spiritOverflow={on:true};}
+  for(const cu of customItems){if(cu.base){c.weaponDamagePct+=cu.wd;c.extraFireRate+=cu.fr/100;c.baseBulletShred+=cu.bbs;c.baseSpirit+=cu.spr;c.baseSpiritShred+=cu.sss;}}
   return c;
 }
 function buildRows(c0,nm,mg){
@@ -464,9 +565,12 @@ function buildRows(c0,nm,mg){
   stat(mg.spirit>0,'cspr','+ Spirit','--orange',c=>c.baseSpirit+=mg.spirit);
   stat(mg.sss>0,'csss','+ Spirit Res. Shred','--rose',c=>c.baseSpiritShred+=mg.sss);
   const nrow=(n,key,name,color,fn)=>{if(n.cmp&&!n.base){const c=clone(bc);fn(c);rows.push({key,name,color,cfg:c});}};
-  nrow(nm.merc,'merc','+ Mercurial','--violet',c=>c.mercurial={on:true,cardBonus:nm.merc.card});
-  nrow(nm.tesla,'tesla','+ Tesla','--lime',c=>c.tesla={on:true,capacitor:nm.tesla.cap});
-  nrow(nm.ee,'ee','+ Escalating Exp.','--green',c=>c.escalatingExposure={on:true});
+  nrow(nm.merc,'merc','+ Mercurial','--violet',c=>{c.mercurial={on:true,cardBonus:nm.merc.card};c.baseSpirit+=nm.merc.inv;});
+  nrow(nm.tesla,'tesla','+ Tesla','--lime',c=>{c.tesla={on:true,capacitor:nm.tesla.cap};c.weaponDamagePct+=nm.tesla.inv;});
+  nrow(nm.ee,'ee','+ Escalating Exp.','--green',c=>{c.escalatingExposure={on:true};c.baseSpirit+=nm.ee.inv;});
+  nrow(nm.apr,'apr','+ Armor Piercing','--pink',c=>{c.weaponDamagePct+=8+nm.apr.inv;c.apr=true;});
+  nrow(nm.so,'so','+ Spiritual Overflow','--magenta',c=>{c.baseSpirit+=6;c.weaponDamagePct+=nm.so.inv;c.spiritOverflow={on:true};});
+  customItems.forEach((cu,i)=>{if(cu.cmp&&!cu.base){const c=clone(bc);c.weaponDamagePct+=cu.wd;c.extraFireRate+=cu.fr/100;c.baseBulletShred+=cu.bbs;c.baseSpirit+=cu.spr;c.baseSpiritShred+=cu.sss;rows.push({key:'cu'+cu.id,name:'+ '+((cu.label||'').trim()||'Custom item'),color:customColor(i),cfg:c});}});
   return rows;
 }
 
