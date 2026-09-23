@@ -176,7 +176,7 @@
   .dock.collapsed .dock-btn{transform:rotate(180deg)}
   .dock-body{border-top:1px solid var(--line);padding:5px 7px 7px;max-height:min(46vh,380px);overflow-y:auto}
   .dock.collapsed .dock-body{display:none}
-  .dock-row{display:grid;grid-template-columns:minmax(0,1fr) auto 62px;align-items:center;gap:8px;padding:4px 6px;border-radius:6px}
+  .dock-row{display:grid;grid-template-columns:minmax(0,1fr) 66px 66px;align-items:center;gap:8px;padding:4px 6px;border-radius:6px}
   .dock-row.cap{font-size:9.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--faint);padding-bottom:2px}
   .dock-row .nm{display:flex;align-items:center;gap:7px;min-width:0;color:var(--tx)}
   .dock-row .nm span:last-child{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -973,11 +973,17 @@ function renderDock(mode,data,c0){
   let wi=0;for(let i=1;i<data.length;i++)if(ttk?data[i][key]<data[wi][key]:data[i][key]>data[wi][key])wi=i;
   const fv=x=>ttk?x.toFixed(2)+'s':fmtN(x);
   const fd=(x,i)=>{if(i===0)return '<span style="color:var(--faint)">—</span>';const good=ttk?x<=0:x>=0;return `<span style="color:${good?'var(--green)':'var(--rose)'}">${x>=0?'+':'−'}${ttk?Math.abs(x).toFixed(2)+'s':fmtN(Math.abs(x))}</span>`;};
-  const hdr=ttk?'Time to kill':`DPS @${c0.engagement%1?c0.engagement.toFixed(1):c0.engagement}<span style="text-transform:none">s</span>`;
-  $('dockBody').innerHTML=`<div class="dock-row cap"><span>Item</span><span class="v">${hdr}</span><span class="d">vs base</span></div>`+data.map((d,i)=>{
-    const col=cssv(d.r.color), win=i===wi&&data.length>1;
-    const vs=win?` style="background:${col};color:#11151c;font-weight:700"`:'';
-    return `<div class="dock-row"><span class="nm"><span class="dot" style="background:${col}"></span><span>${d.r.name}</span></span><span class="v"${vs}>${fv(d[key])}</span><span class="d">${fd(d[key]-b0,i)}</span></div>`;}).join('');
+  const unit=`<span style="text-transform:none">s</span>`, eng=c0.engagement%1?c0.engagement.toFixed(1):c0.engagement;
+  // DPS mode: DPS @3s then DPS @engagement (same order as the table), each column highlights its own winner
+  const cols=ttk?null:['s3','avg'];
+  const win={};if(cols)cols.forEach(c=>{let w=0;for(let i=1;i<data.length;i++)if(data[i][c]>data[w][c])w=i;win[c]=w;});
+  const hl=(i,w,col)=>(i===w&&data.length>1)?` style="background:${col};color:#11151c;font-weight:700"`:'';
+  const cap=ttk?`<span class="v">Time to kill</span><span class="d">vs base</span>`:`<span class="v">DPS @3${unit}</span><span class="v">DPS @${eng}${unit}</span>`;
+  $('dockBody').innerHTML=`<div class="dock-row cap"><span>Item</span>${cap}</div>`+data.map((d,i)=>{
+    const col=cssv(d.r.color);
+    const cells=ttk?`<span class="v"${hl(i,wi,col)}>${fv(d[key])}</span><span class="d">${fd(d[key]-b0,i)}</span>`
+                   :cols.map(c=>`<span class="v"${hl(i,win[c],col)}>${fmtN(d[c])}</span>`).join('');
+    return `<div class="dock-row"><span class="nm"><span class="dot" style="background:${col}"></span><span>${d.r.name}</span></span>${cells}</div>`;}).join('');
   let sum;
   if(data.length>1){let bi=1;for(let i=2;i<data.length;i++)if(ttk?data[i][key]<data[bi][key]:data[i][key]>data[bi][key])bi=i;const dx=data[bi][key]-b0;
     sum=`Best: <b>${data[bi].r.name.replace('+ ','')}</b> ${fd(dx,1)}`;}
