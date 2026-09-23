@@ -9,7 +9,7 @@
     --bg:#0d1117; --panel:#151b25; --panel2:#1a212d; --line:#232c39; --line2:#33404f;
     --tx:#e8ebf0; --mut:#9aa4b2; --faint:#69737f; --grid:#1d2530;
     --gold:#f2ab4b; --teal:#3fc7cf; --violet:#ab88ea; --slate:#7c8898;
-    --green:#5fd39a; --orange:#e0744d; --rose:#e06d8f; --blue:#6ea8fe; --lime:#c3e88d; --pink:#e884c4; --yellow:#e6d24a; --cyan:#4fd0d8; --magenta:#cf5ae0; --indigo:#7a86f0; --crimson:#e34d5c; --ivory:#dfe3ea; --tan:#c49a6c; --olive:#a4a632; --sky:#9ad4ff; --emerald:#1fa67a;
+    --green:#5fd39a; --orange:#e0744d; --rose:#e06d8f; --blue:#6ea8fe; --lime:#c3e88d; --pink:#e884c4; --yellow:#e6d24a; --cyan:#4fd0d8; --magenta:#cf5ae0; --indigo:#7a86f0; --crimson:#e34d5c; --ivory:#dfe3ea; --tan:#c49a6c; --olive:#a4a632; --sky:#9ad4ff; --emerald:#1fa67a; --coral:#ff7f66; --lavender:#cdb8ff; --mint:#9df0cf;
     --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
   }
   *{box-sizing:border-box}
@@ -27,14 +27,29 @@
   .ctl label{display:flex;justify-content:space-between;align-items:baseline;font-size:12.5px;color:var(--mut);margin-bottom:6px}
   .ctl .val{font-family:var(--mono);color:var(--tx);font-size:13px;font-weight:600}
   .row{display:flex;align-items:center;gap:9px}
-  input[type=range]{-webkit-appearance:none;appearance:none;flex:1;height:4px;border-radius:3px;background:var(--line2);outline:none;margin:0}
-  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:15px;height:15px;border-radius:50%;background:var(--gold);cursor:pointer;border:2px solid #10151d;box-shadow:0 0 0 1px var(--gold)}
-  input[type=range]::-moz-range-thumb{width:15px;height:15px;border-radius:50%;background:var(--gold);cursor:pointer;border:2px solid #10151d;box-shadow:0 0 0 1px var(--gold)}
+  input[type=range]{-webkit-appearance:none;appearance:none;flex:1;height:18px;background:transparent;outline:none;margin:0;cursor:pointer;--a:0%;--b:0%;
+    --fill:linear-gradient(90deg,var(--line2) 0,var(--line2) var(--a),#c9812e var(--a),var(--gold) var(--b),var(--line2) var(--b),var(--line2) 100%)}
+  input[type=range]::-webkit-slider-runnable-track{height:6px;border-radius:999px;background:var(--line2);box-shadow:inset 0 1px 2px rgba(0,0,0,.45)}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;box-sizing:border-box;width:16px;height:16px;margin-top:-5px;border-radius:50%;background:#fff4e2;border:3px solid var(--gold);box-shadow:0 1px 4px rgba(0,0,0,.55);transition:transform .12s ease,box-shadow .12s ease}
+  input[type=range]:hover::-webkit-slider-thumb{transform:scale(1.12)}
+  input[type=range]:active::-webkit-slider-thumb{transform:scale(1.15);box-shadow:0 0 0 6px rgba(242,171,75,.18),0 1px 4px rgba(0,0,0,.55)}
+  input[type=range]:focus-visible::-webkit-slider-thumb{box-shadow:0 0 0 4px rgba(242,171,75,.4),0 1px 4px rgba(0,0,0,.55)}
+  input[type=range]::-moz-range-track{height:6px;border-radius:999px;background:var(--line2);box-shadow:inset 0 1px 2px rgba(0,0,0,.45)}
+  input[type=range]::-moz-range-thumb{box-sizing:border-box;width:16px;height:16px;border-radius:50%;background:#fff4e2;border:3px solid var(--gold);box-shadow:0 1px 4px rgba(0,0,0,.55);transition:transform .12s ease,box-shadow .12s ease}
+  input[type=range]:hover::-moz-range-thumb{transform:scale(1.12)}
+  input[type=range]:active::-moz-range-thumb{transform:scale(1.15);box-shadow:0 0 0 6px rgba(242,171,75,.18),0 1px 4px rgba(0,0,0,.55)}
+  input[type=range]:focus-visible::-moz-range-thumb{box-shadow:0 0 0 4px rgba(242,171,75,.4),0 1px 4px rgba(0,0,0,.55)}
   input[type=number]{width:62px;background:var(--panel2);border:1px solid var(--line2);color:var(--tx);font-family:var(--mono);font-size:12.5px;border-radius:6px;padding:4px 6px;text-align:right;-moz-appearance:textfield;appearance:textfield}
   input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
   input[type=number]:focus{outline:none;border-color:var(--gold)}
 
   /* start-with-cards section */
+  .ttkopts{display:flex;flex-direction:column;gap:9px;margin-top:12px}
+  .ttkline{display:flex;align-items:center;gap:9px;font-size:12px;color:var(--mut)}
+  .shivopts{display:flex;flex-wrap:wrap;align-items:center;gap:7px 16px;margin:-2px 0 0 20px;padding:2px 0 2px 11px;border-left:2px solid var(--line2)}
+  .ttkline .lab{min-width:66px}.ttkline input[type=range]{max-width:280px}
+  .tgtrow.duo{display:grid;grid-template-columns:1fr 1fr;gap:12px 22px}.duocell{display:flex;gap:11px;align-items:flex-start}
+  @media(max-width:640px){.tgtrow.duo{grid-template-columns:1fr}}
   .tgtrow{display:flex;align-items:flex-start;gap:11px;margin:0 18px 16px;padding:13px 15px;background:var(--panel2);border:1px solid var(--line);border-radius:10px}
   .startsec{margin:0 18px 16px;padding:14px 15px;background:var(--panel2);border:1px solid var(--line);border-radius:10px}
   .startsec-head{display:flex;align-items:flex-start;gap:11px}
@@ -141,6 +156,14 @@
   .notes h2{font-size:12px;text-transform:uppercase;letter-spacing:.09em;color:var(--faint);margin:14px 0 6px}
   .notes code{font-family:var(--mono);background:var(--panel2);padding:1px 5px;border-radius:4px;font-size:11.5px;color:#cdd4dd}
   .notes b{color:var(--tx)}
+  .notes .lead{font-size:13.5px;color:var(--tx);margin:4px 0 10px}
+  .notes .steps{margin:4px 0 6px;padding-left:22px}.notes .steps li{margin:0 0 8px;padding-left:4px}.notes .steps li::marker{color:var(--gold);font-weight:700}
+  .notes .tips{margin:4px 0 6px;padding-left:18px}.notes .tips li{margin:0 0 6px}.notes .tips li::marker{color:var(--faint)}
+  .notes details.model{margin-top:14px;border-top:1px solid var(--line);padding-top:10px}
+  .notes details.model summary{cursor:pointer;font-size:12px;text-transform:uppercase;letter-spacing:.09em;color:var(--faint);font-weight:600;list-style:none}
+  .notes details.model summary::before{content:'▸ ';color:var(--gold)}.notes details.model[open] summary::before{content:'▾ '}
+  .notes details.model[open] summary{margin-bottom:8px}
+  header a{color:var(--gold);text-decoration:none;white-space:nowrap}header a:hover{text-decoration:underline}
   .flag{border-left:2px solid var(--gold);padding-left:11px;margin:8px 0}
 </style>
 </head>
@@ -148,7 +171,7 @@
 <div class="wrap">
   <header>
     <h1>Wraith — DPS simulator</h1>
-    <p>Dual-channel damage (weapon vs spirit, independent resists), Full Auto &amp; Card Trick, and one-item comparison. Seeded Monte-Carlo over the engagement.</p>
+    <p>Set up your Wraith, pick the items you're considering, and see which one adds the most damage or kills fastest. New here? <a href="#howto">How to use ↓</a></p>
   </header>
 
   <div class="card">
@@ -161,6 +184,29 @@
     <div class="tgtrow">
       <label class="sw"><input type="checkbox" id="dr_on"><span class="track"></span></label>
       <div style="flex:1"><div class="tn">Enemy Debuff Remover <span class="mini" id="dr_wrap" style="margin-left:8px;font-weight:400">activates at <input type="number" id="dr_time" min="0" max="30" step="0.1" value="3"> s</span></div><div class="td">Removes active Diamond-card shred, all Escalating Exposure stacks (and its −8%), and Focus Lens's active shred — any damage Focus Lens has stored so far is dealt immediately.</div></div>
+    </div>
+    <div class="tgtrow duo">
+      <div class="duocell"><label class="sw"><input type="checkbox" id="sil_on"><span class="track"></span></label><div><div class="tn">Affected by Silencer</div><div class="td">Your spirit damage is reduced by 25%.</div></div></div>
+      <div class="duocell"><label class="sw"><input type="checkbox" id="inh_on"><span class="track"></span></label><div><div class="tn">Affected by Inhibitor</div><div class="td">All of your damage is reduced by 30%.</div></div></div>
+    </div>
+    <div class="tgtrow">
+      <label class="sw"><input type="checkbox" id="ttk_on"><span class="track"></span></label>
+      <div style="flex:1"><div class="tn">Time to kill</div><div class="td">Run each fight until the target dies (60s cap) instead of a fixed engagement length. The comparison table and chart switch to kill time.</div>
+        <div class="ttkopts" id="ttkopts" style="display:none">
+          <div class="ttkline"><span class="lab">Target HP</span><input type="range" id="ttk_hp_r" min="100" max="6000" step="10" value="2000"><input type="number" id="ttk_hp" min="100" max="20000" step="10" value="2000"></div>
+          <label class="mini"><input type="checkbox" id="ttk_hsdr_on"> Target headshot damage reduction <input type="number" id="ttk_hsdr" min="0" max="100" step="1" value="40"> % <span id="ttk_hsdr_hint" style="color:var(--faint)"></span></label>
+          <label class="mini"><input type="checkbox" id="ttk_spres"> Target has Spirit Resilience <span style="color:var(--faint)">+30% spirit resist, +45% below 50% HP</span></label>
+          <label class="mini"><input type="checkbox" id="ttk_bures"> Target has Bullet Resilience <span style="color:var(--faint)">+30% bullet resist, +45% below 50% HP</span></label>
+          <label class="mini"><input type="checkbox" id="ttk_shiv"> Shiv Bloodletting <span style="color:var(--faint)">defers part of the damage taken over 6s; active cleanses part of what's pending</span></label>
+          <div class="shivopts" id="shivopts" style="display:none">
+            <label class="mini"><input type="checkbox" id="shiv_rage"> Full Rage <span style="color:var(--faint)">+15% deferred</span></label>
+            <label class="mini"><input type="checkbox" id="shiv_ap2"> 2AP <span style="color:var(--faint)">cleanse 30% → 70%</span></label>
+            <label class="mini"><input type="checkbox" id="shiv_ap5"> 5AP <span style="color:var(--faint)">+15% deferred</span></label>
+            <label class="mini">time to activation <input type="number" id="shiv_time" min="0" max="60" step="0.1" value="3"> s</label>
+            <div class="td" id="shiv_hint" style="flex-basis:100%;margin-top:0"></div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -292,6 +338,27 @@
           <div class="minirow"><label class="mini"><input type="checkbox" id="fl_base"> <b>add to baseline</b></label><label class="mini">spirit invest <select id="fl_inv_from" class="invsel" title="tier before this purchase"></select> → <select id="fl_inv_to" class="invsel" title="tier after this purchase"></select></label></div>
         </div>
       </div>
+      <div class="togcell">
+        <label class="sw"><input type="checkbox" id="rush_cmp"><span class="track"></span></label>
+        <div class="body"><div class="tn">Recharging Rush</div>
+          <div class="td">+10% weapon damage. Dealing 200 weapon damage within 3.5s refills 1 charge (Wraith: generates a card); 25s cooldown.</div>
+          <div class="minirow"><label class="mini"><input type="checkbox" id="rush_base"> <b>add to baseline</b></label><label class="mini">wpn invest <select id="rush_inv_from" class="invsel" title="tier before this purchase"></select> → <select id="rush_inv_to" class="invsel" title="tier after this purchase"></select></label></div>
+        </div>
+      </div>
+      <div class="togcell">
+        <label class="sw"><input type="checkbox" id="im_cmp"><span class="track"></span></label>
+        <div class="body"><div class="tn">Intensifying Magazine</div>
+          <div class="td">While firing, weapon damage ramps linearly from +0% to +45% over 2.5s.</div>
+          <div class="minirow"><label class="mini"><input type="checkbox" id="im_base"> <b>add to baseline</b></label><label class="mini">wpn invest <select id="im_inv_from" class="invsel" title="tier before this purchase"></select> → <select id="im_inv_to" class="invsel" title="tier after this purchase"></select></label></div>
+        </div>
+      </div>
+      <div class="togcell">
+        <label class="sw"><input type="checkbox" id="ss_cmp"><span class="track"></span></label>
+        <div class="body"><div class="tn">Sharpshooter</div>
+          <div class="td">+10% weapon damage, plus +60% more vs targets 15m+ away. Falloff range +20% (21.6–62.4m instead of 18–52m).</div>
+          <div class="minirow"><label class="mini"><input type="checkbox" id="ss_base"> <b>add to baseline</b></label><label class="mini">wpn invest <select id="ss_inv_from" class="invsel" title="tier before this purchase"></select> → <select id="ss_inv_to" class="invsel" title="tier after this purchase"></select></label></div>
+        </div>
+      </div>
     </div>
 
     <div class="seclabel">Custom items — bundle multiple stats into one comparison; toggle a row on to edit its stats</div>
@@ -303,27 +370,44 @@
     <div class="buildline" id="buildline"></div>
     <div class="cmptable">
       <table>
-        <thead><tr><th>Item</th><th>DPS @3s</th><th id="th_eng">DPS @6s</th><th>Total dmg</th></tr></thead>
+        <thead id="cmpHead"><tr><th>Item</th><th>DPS @3s</th><th id="th_eng">DPS @6s</th><th>Total dmg</th></tr></thead>
         <tbody id="cmpBody"></tbody>
       </table>
     </div>
 
     <div class="charthead">
-      <span class="lbl">DPS vs fight length</span>
-      <div class="seg" id="xseg"><button data-x="eng" class="on">vs engagement</button><button data-x="boons">vs boons</button></div>
+      <span class="lbl" id="chartLbl">DPS vs fight length</span>
+      <div class="seg" id="xseg"><button data-x="eng" class="on" id="xEngBtn">vs engagement</button><button data-x="boons">vs boons</button></div>
     </div>
     <div class="chartwrap"><canvas id="chart" height="320"></canvas></div>
     <div class="clegend" id="chartlegend"></div>
   </div>
 
-  <div class="card">
+  <div class="card" id="howto">
     <div class="notes">
-      <h2>Model &amp; assumptions</h2>
-      <p><b>Two damage channels.</b> Weapon damage is reduced only by bullet resist; spirit damage only by spirit resist. Resists may go negative (amplify). <b>Plated Armor</b> on the target deflects 30% of bullets (weapon damage only, ×0.70) and its 50% block cuts both card generation and per-bullet Full Auto / Mercurial / Tesla spirit (×0.50 each; the Capacitor burst and thrown-card damage are exempt). <b>Armor Piercing Rounds</b> gives +8% weapon damage and makes 55% of bullets ignore Plated Armor and the target's bullet resistance (modeled as a 55/45 blend of ignoring vs normal bullets), which also lifts that spirit block on the ignoring bullets.</p>
-      <p><b>Weapon damage</b> per bullet is <code>(5.64 + 0.14·boons)</code>, boon-driven, then scaled by your <b>Weapon Damage %</b> stat. <b>Headshots deal ×1.65 bullet damage</b> (weapon channel only), averaged by headshot rate, and generate cards faster (5.1% vs 3.4%). <b>Boons grant 1.1 Spirit each</b> on top of the base-spirit slider (+7 with Mercurial) — the totals show under those sliders.</p>
-      <p><b>Comparison.</b> The <i>stat purchase</i> sliders layer a hypothetical item on top of your build and show it as a <code>+Stat</code> row (only when above 0). <i>Named items</i> show a <code>+Item</code> row when toggled on; ticking <b>add to baseline</b> folds one into the baseline so every row includes it (and its own row drops out) — use it to ask "given I already own this, what's best next?". Highlighted cells win each column.</p>
-      <p><b>Full Auto</b> runs from the start for its duration then reverts (no recast). <b>Card Trick</b> accrues cards per shot (×CDR), thrown on a 0.6s gap with a 0.1s shooting lockout; suit is 1/9 Joker (1/5 at 5AP) else a 2-of-each stack draw. <b>Tesla</b> procs per bullet on a 0.2s cd; <b>Capacitor</b> also fires a one-time 100 spirit-damage burst at the start of combat (which triggers Escalating Exposure's first stack). <b>Escalating Exposure</b> ramps one amp stack per 0.7s to 12 and amplifies every spirit source. <b>Spiritual Overflow</b> gives +6 spirit and +13% duration (Full Auto window and Diamond-card shred); each bullet builds its meter ~8.5% (halved by Plated Armor's block), and once it reaches 100% you gain +30 spirit and +25% fire rate for the rest of the fight — <b>Rapid Recharge</b> speeds card generation 14%, raises the hand cap to 6, and grants +14 spirit that applies only to card base damage (plus a spirit-investment dropdown for the souls it costs). <b>Shadow Weave</b> gives a start-of-combat buff — +25% fire rate and +25 spirit for 5s (extended by duration bonuses like Spiritual Overflow's +13%) — then reverts, and counts toward weapon investment. <b>Surge of Power</b> gives +28 spirit to card base damage; throwing a card grants +20% fire rate for 8s (duration-scaled) on a 14s cooldown, and counts toward spirit investment. <b>Spellslinger</b> grants +11% fire rate per ability or active-item use (up to 6 stacks, kept for the whole fight): the Full Auto cast and Capacitor burst each add a stack at t=0, and every Card Trick throw adds one. Tick <b>pre-stacked</b> to start the fight with 1–6 stacks already built (t=0 uses still add on top, up to the cap). Counts toward weapon investment. <b>Burst Fire</b> gives a passive +10% fire rate; hitting an enemy grants +32% fire rate for 4.5s (duration-scaled) on a 9s cooldown that starts at the trigger — so it fires on the first bullet and again every 9s. Counts toward weapon investment. <b>Fury Trance</b> gives +6% weapon damage passively; its active grants +32% fire rate for 6.5s (duration-scaled) but disables abilities while it lasts — card throws wait until it ends (cards still generate), and it counts as an active-item use for Spellslinger. Without a set activation time it fires at 0s right after Full Auto; with one, it fires at that time (at 0s it goes before Full Auto, which is then cast when Fury Trance expires). It counts toward vitality investment, so no investment is modeled. <b>Lucky Shot</b> gives each bullet a 25% chance to deal +100% of its body-shot damage — taken after Weapon Damage % and resist/shred, but before the headshot multiplier (a 10 / 16.5 bullet lucky-headshots for 26.5) — and never doubles spirit on-hit damage. It's modeled at its expected value (+25% of body-shot damage per bullet), and counts toward weapon investment. <b>Focus Lens</b> gives +10% fire rate passively; its active fires at 0s (before the Capacitor burst, so the burst is both shred and stored), shreds 9% spirit resist for 12s, and over a 4.5s window stores 35% of all damage actually dealt — weapon and spirit, after resists and amps — then deals it again ignoring resists when the window closes (both durations scale). The echo only counts if it lands within the engagement. It's an item, so Fury Trance doesn't block it, and it grants a Spellslinger stack. Counts toward spirit investment.</p><p><b>Enemy Debuff Remover</b> (target setting) fires once at the set time: it ends any active Diamond shred, clears Escalating Exposure's stacks and −8% (the next spirit damage re-applies the −8% and stacks rebuild on EE's 0.7s cadence), and removes Focus Lens's shred — if its storage window is still open, what's stored so far is dealt immediately (and counts even in fights shorter than the window). It is not an immunity: a Diamond card thrown the same instant or later re-applies. Base shred sliders are left alone.</p>
-      <div class="flag"><p style="margin:0"><b>Modeling choices:</b> the Mercurial card bonus is added <i>after</i> the suit multiplier (so Spades/Joker don't scale it), and its bullet-conversion is a % of the <b>pre-% base</b> bullet damage (boon-driven, unaffected by Weapon Damage %). The table's <b>@3s</b> column is a short-fight reference and <b>DPS @[engagement]</b> uses your set fight length; the chart traces the full sweep.</p></div>
+      <h2>How to use</h2>
+      <p class="lead">This tool answers one question: <b>which item should Wraith buy next?</b> Describe your build, pick the items you're considering, and it simulates fights to show which one adds the most damage.</p>
+      <ol class="steps">
+        <li><b>Set your baseline stats.</b> In <i>Base values</i>, enter your boons, headshot rate, and any weapon damage, fire rate, or spirit you already have.</li>
+        <li><b>Toggle abilities.</b> Turn Full Auto and Card Trick on or off, and tick any AP upgrades you have leveled. You can also click the card slots to start the fight holding cards.</li>
+        <li><b>Choose what items/stats to compare.</b> Each stat slider in <i>Comparison items</i> set above 0, and each item you switch on, adds its own row to the table. If you already own an item, tick its <i>add to baseline</i> box instead: every row then includes it, so the table shows what's best to buy next.</li>
+        <li><b>Table explanation.</b> Each row is your build plus that one item or stat, and the highlighted cell in each column is the best result. <i>DPS @3s</i> is a short burst, the next column uses your engagement length, and <i>Total dmg</i> is the damage dealt over that fight. With <i>Time to kill</i> on, the table shows seconds to kill instead, where lower is better.</li>
+      </ol>
+      <details class="model"><summary>Modeling details</summary>
+        <ul class="tips">
+          <li>Weapon damage is reduced by bullet resist and spirit damage by spirit resist; shred subtracts from resist, which can go negative and amplify.</li>
+          <li>Bullet damage is <code>(5.64 + 0.14·boons) × (1 + Weapon Damage %)</code>; headshots deal ×1.65 on bullet damage only. Boons also give 1.1 spirit each.</li>
+          <li>Numbers are averages over many seeded simulated fights, so the same inputs always give the same results.</li>
+          <li>Abilities and active items are used once per fight at the start (Full Auto first), unless an item lets you set its timing. No recasts.</li>
+          <li>Cards are thrown as soon as they're ready (0.6s apart); a starting hand throws left to right. Suits come from a 2-of-each deck plus a Joker chance.</li>
+          <li>Fire-rate bonuses add together; separate damage reductions multiply.</li>
+          <li>Lucky Shot, Plated Armor, and Armor Piercing Rounds use their average effect rather than rolling each bullet.</li>
+          <li>Past 18m, bullet damage and on-hit effects (Full Auto, Mercurial, Tesla/Capacitor) fall off linearly to 10% at 52m (21.6m and 62.4m with Sharpshooter). Cards and the Capacitor burst don't fall off.</li>
+          <li>Mercurial's card bonus is added after the suit multiplier, and its bullet damage uses base damage before Weapon Damage %.</li>
+          <li>Focus Lens's echo only counts if it lands before the fight ends. Time to kill caps at 60s; a <code>*</code> marks rows that sometimes don't kill in time.</li>
+          <li>Each item's own mechanics are described next to its toggle.</li>
+        </ul>
+      </details>
     </div>
   </div>
 </div>
@@ -332,13 +416,15 @@
 "use strict";
 /* ================= ENGINE (verified in Node) ================= */
 function mulberry32(a){return function(){a|=0;a=(a+0x6D2B79F5)|0;let t=Math.imul(a^(a>>>15),1|a);t=(t+Math.imul(t^(t>>>7),61|t))^t;return((t^(t>>>14))>>>0)/4294967296;};}
-const CAP_BOONS=35;
+const CAP_BOONS=35, TTK_CAP=60;
 function resolve(cfg){
   const boons=Math.min(cfg.boons,CAP_BOONS);
   const merc=cfg.mercurial;
   const spirit=cfg.baseSpirit+1.1*boons+(merc.on?7:0);
   const flatWeapon=5.64+0.14*boons;
-  const weaponDmg=flatWeapon*(1+cfg.weaponDamagePct/100);
+  const rangeM=+cfg.range||0, ssOn=!!(cfg.sharpshooter&&cfg.sharpshooter.on);   // Sharpshooter: +10% wpn dmg, +60% more at 15m+, falloff range +20%
+  const wdPctEff=cfg.weaponDamagePct+(ssOn?10+(rangeM>=15?60:0):0);
+  const weaponDmg=flatWeapon*(1+wdPctEff/100);
   const so=cfg.spiritOverflow||{}, soOn=!!so.on;
   const sw=cfg.shadowWeave||{}, swOn=!!sw.on;
   const durMult=soOn?1.13:1;
@@ -366,9 +452,18 @@ function resolve(cfg){
   const aprIgnore=cfg.apr?0.55:0;
   const platedBlock=plated?(aprIgnore+(1-aprIgnore)*0.5):1;
   const genPerShot=(cfg.headshotRate*0.051+(1-cfg.headshotRate)*0.034)*cardGenMult*platedBlock;
-  const wdPerBullet=weaponDmg*(1+cfg.headshotRate*0.65);
+  const tk=cfg.ttk||{}, ttkOn=!!tk.on, ttkHP=ttkOn?Math.max(1,+tk.hp||1):0;
+  const hsDR=(ttkOn&&tk.hsDROn)?Math.min(1,Math.max(0,(+tk.hsDR||0)/100)):0;
+  const spRes=ttkOn&&!!tk.spiritRes, buRes=ttkOn&&!!tk.bulletRes;   // Resilience: +30% resist, +45% below 50% HP
+  const sv=tk.shiv||{}, bl=ttkOn&&!!sv.on;   // Shiv Bloodletting: defers part of damage taken over 6s; active cleanses part of the pending pool
+  const blDefer=bl?0.25+(sv.rage?0.15:0)+(sv.ap5?0.15:0):0, blCleanse=bl?(sv.ap2?0.70:0.30):0, blTime=bl?Math.max(0,+sv.time||0):1e9;
+  const wdPerBullet=weaponDmg*(1+cfg.headshotRate*0.65*(1-hsDR));
   const luckyBonus=(cfg.luckyShot&&cfg.luckyShot.on)?0.25*weaponDmg:0;   // expected +100% of pre-headshot bullet dmg on 25% of bullets
+  const fs0=ssOn?21.6:18, fs1=ssOn?62.4:52, fall=1-0.9*Math.min(1,Math.max(0,(rangeM-fs0)/(fs1-fs0)));   // range falloff: 100% to fs0, linear to 10% at fs1
+  const imOn=!!(cfg.intensifyingMag&&cfg.intensifyingMag.on), wdFrac=wdPctEff/100;   // Intensifying Magazine: +0%->+45% weapon damage over 2.5s of firing
+  const rushOn=!!(cfg.rechargingRush&&cfg.rechargingRush.on);   // Recharging Rush: 200 weapon dmg within 3.5s -> +1 card, 25s cd
   const flOn=!!(cfg.focusLens&&cfg.focusLens.on), flFR=flOn?0.10:0, flShred=flOn?0.09:0, flShredDur=flOn?12*durMult:0, flWin=flOn?4.5*durMult:0, flStore=flOn?0.35:0;
+  const outW=cfg.inhibitor?0.70:1, outS=outW*(cfg.silencer?0.75:1);   // Inhibitor: all dmg -30%; Silencer: spirit dmg -25%
   const drTime=(cfg.debuffRemover&&cfg.debuffRemover.on)?Math.max(0,+cfg.debuffRemover.time||0):1e9;   // enemy cleanse time
   const soFR=soOn?0.25:0, soSpirit=soOn?30:0, soBuild=soOn?0.115/1.35:0, diamondDur=5*durMult;
   const swFR=swOn?0.25:0, swSpirit=swOn?25:0, swDur=swOn?5*durMult:0;
@@ -382,14 +477,14 @@ function resolve(cfg){
   const faStart=ftFirst?ftDur:0;                  // Full Auto cast as soon as abilities are available
   const surgeCardSp=surgeOn?28:0, surgeFR=surgeOn?0.20:0, surgeDur=surgeOn?8*durMult:0;
   return{boons,spirit,flatWeapon,weaponDmg,wdPerBullet,plated,aprIgnore,platedBlock,faScale,rrCardSp,cardConst,cardCoef,teslaDmgBase,
-    soFR,soSpirit,soBuild,diamondDur,swFR,swSpirit,swDur,surgeCardSp,surgeFR,surgeDur,spellFR,spellMax,spellPre,bfPassive,bfFR,bfDur,bfCd,ftFR,ftDur,ftStart,faStart,luckyBonus,flFR,flShred,flShredDur,flWin,flStore,drTime,
+    soFR,soSpirit,soBuild,diamondDur,swFR,swSpirit,swDur,surgeCardSp,surgeFR,surgeDur,spellFR,spellMax,spellPre,bfPassive,bfFR,bfDur,bfCd,ftFR,ftDur,ftStart,faStart,luckyBonus,flFR,flShred,flShredDur,flWin,flStore,drTime,rushOn,imOn,wdFrac,fall,outW,outS,ttk:ttkOn,hp:ttkHP,spRes,buRes,bl,blDefer,blCleanse,blTime,
     fa:{on:fa.on,fr:faFR,dur:faDur},
     ct:{on:ct.on,spades:spadesMult,dShred:cardDiamondShred,pJoker,genPerShot,maxCards,startSuits:(ct.startSuits||[]).slice(0,maxCards)},
     merc:{on:merc.on,fr:mercFR,cardBonus:!!merc.cardBonus},
     tesla:{on:tesla.on,proc:teslaProc},ee,teslaFR,teslaBurst,
     baseFR:10.6,firePct:cfg.fireRatePct/100,tBulletRes:cfg.targetBulletResist/100,baseBulletShred:cfg.baseBulletShred/100,
     tSpiritRes:cfg.targetSpiritResist/100,baseSpiritShred:cfg.baseSpiritShred/100,
-    engagement:cfg.engagement,extraFR:cfg.extraFireRate||0};
+    engagement:ttkOn?TTK_CAP:cfg.engagement,extraFR:cfg.extraFireRate||0};
 }
 const isSpadesLike=s=>s==='S'||s==='J';
 const isDiamondLike=s=>s==='D'||s==='J';
@@ -397,15 +492,30 @@ function runOnce(R,rng,acc){
   let t=0;const q=[];for(const s of R.ct.startSuits)q.push(s);
   let stack=[],prog=0,lastThrow=-1e9,eeStacks=0,lastEE=-1e9,eeActive=false,diamondUntil=-1e9,teslaCd=-1e9,nextThrow=0,guard=0,throws=0,overflow=0,overflowActive=false,surgeUntil=-1e9,surgeCd=-1e9,spellStacks=0,bfUntil=-1e9,bfNext=0,faCast=false,ftCast=false;
   const dealtNow=()=>acc.weapon+acc.fa+acc.merc+acc.tesla+acc.card;
+  const addCard=()=>{if(q.length<R.ct.maxCards){let suit;if(rng()<R.ct.pJoker)suit='J';else{if(stack.length===0)stack=['S','S','D','D','C','C','H','H'];const idx=(rng()*stack.length)|0;suit=stack.splice(idx,1)[0];}q.push(suit);}};
+  const rushQ=[]; let rushHead=0, rushSum=0, rushCd=0;
   const flStart=dealtNow(); let flDone=!(R.flStore>0);   // Focus Lens activates first at t=0
   let drDone=!(R.drTime<1e9), flCleansed=false;
+  const dealtAll=()=>dealtNow()+acc.focus, runStart=dealtAll();
+  // Bloodletting HP model: hpDmg = HP actually lost; each hit's deferred share bleeds in linearly over 6s (FIFO chunks, piecewise-constant rate)
+  let hpDmg=0, blLast=runStart, dT=0, rate=0, bqi=0, cleansed=false, crossT=0; const blq=[];
+  const adv=to=>{for(;;){
+      if(!cleansed&&dT>=R.blTime){for(let i=bqi;i<blq.length;i++)blq[i].r*=(1-R.blCleanse);rate*=(1-R.blCleanse);cleansed=true;}
+      if(dT>=to)return false;
+      let nx=to; if(!cleansed&&R.blTime<nx)nx=R.blTime; if(bqi<blq.length&&blq[bqi].end<nx)nx=blq[bqi].end;
+      const sg=nx-dT; if(rate>0&&hpDmg+rate*sg>=R.hp){crossT=dT+(R.hp-hpDmg)/rate;hpDmg=R.hp;return true;}
+      hpDmg+=rate*sg; dT=nx;
+      while(bqi<blq.length&&blq[bqi].end<=dT){rate-=blq[bqi].r;bqi++;} if(bqi>=blq.length||rate<1e-12)rate=bqi>=blq.length?0:Math.max(0,rate);}};
+  const lowHP=()=>R.ttk&&(R.bl?hpDmg:dealtAll()-runStart)>0.5*R.hp;   // target below 50% HP
+  let endT=R.engagement, killed=false;
   if(R.spellFR>0){spellStacks=Math.min(R.spellPre+(R.teslaBurst>0?1:0)+(R.flStore>0?1:0),R.spellMax);}
   if(R.teslaBurst>0){
-    acc.tesla+=R.teslaBurst*(1-(R.tSpiritRes-R.baseSpiritShred-(R.flShredDur>0?R.flShred:0)));
+    acc.tesla+=R.outS*R.teslaBurst*(1-(R.tSpiritRes+(R.spRes?0.30:0)-R.baseSpiritShred-(R.flShredDur>0?R.flShred:0)));
     if(R.ee){eeActive=true;if(eeStacks<12){eeStacks++;lastEE=0;}}
   }
   while(t<R.engagement){
     if(++guard>200000)break;
+    if(R.bl&&adv(t)){endT=crossT;killed=true;break;}
     if(!drDone&&t>=R.drTime){drDone=true;
       diamondUntil=-1e9;                    // strip active Diamond shred
       eeStacks=0;eeActive=false;            // strip EE stacks + its -8% (re-applied by next spirit damage)
@@ -421,38 +531,49 @@ function runOnce(R,rng,acc){
     const fr=R.baseFR*(1+R.firePct+(faOn?R.fa.fr:0)+R.merc.fr+R.extraFR+R.teslaFR+(overflowActive?R.soFR:0)+(swActive?R.swFR:0)+(t<surgeUntil?R.surgeFR:0)+spellStacks*R.spellFR+R.bfPassive+(t<bfUntil?R.bfFR:0)+(ftActive?R.ftFR:0)+R.flFR);
     if(fr<=0)break;
     const dActive=t<diamondUntil, dShred=dActive?R.ct.dShred:0;
-    const multNormal=1-(R.tBulletRes-R.baseBulletShred-dShred);
+    const low=lowHP(), resSp=R.spRes?(low?0.45:0.30):0, resBu=R.buRes?(low?0.45:0.30):0;
+    const multNormal=1-(R.tBulletRes+resBu-R.baseBulletShred-dShred);
     const multIgnore=1-(-R.baseBulletShred-dShred);
     const deflect=R.plated?0.7:1;
     const weaponFactor=R.aprIgnore*multIgnore+(1-R.aprIgnore)*multNormal*deflect;
     const eeShred=(R.ee&&eeActive)?0.08:0;
-    const spiritMult=1-(R.tSpiritRes-R.baseSpiritShred-dShred-eeShred-(t<R.flShredDur&&!flCleansed?R.flShred:0));
+    const spiritMult=1-(R.tSpiritRes+resSp-R.baseSpiritShred-dShred-eeShred-(t<R.flShredDur&&!flCleansed?R.flShred:0));
     const ampMult=1+eeStacks*0.045;
     const curSp=R.spirit+(overflowActive?R.soSpirit:0)+(swActive?R.swSpirit:0);
     const faSpb=2+R.faScale*curSp, mSpb=R.merc.on?R.flatWeapon*(0.20+0.0038*curSp):0, tDmg=R.teslaDmgBase+0.19*curSp, cBase=R.cardConst+R.cardCoef*(curSp+R.rrCardSp+R.surgeCardSp), mCardFull=60+0.16*curSp;
-    acc.weapon+=(R.wdPerBullet+R.luckyBonus)*weaponFactor;
+    const imMul=R.imOn?(1+R.wdFrac+0.45*Math.min(1,t/2.5))/(1+R.wdFrac):1;   // ramp adds to Weapon Damage %
+    const wHit=(R.wdPerBullet+R.luckyBonus)*weaponFactor*R.outW*imMul*R.fall; acc.weapon+=wHit;
     let dealt=false;
-    if(faOn){acc.fa+=faSpb*spiritMult*ampMult*R.platedBlock;dealt=true;}
-    if(R.merc.on){acc.merc+=mSpb*spiritMult*ampMult*R.platedBlock;dealt=true;}
-    if(R.tesla.on&&t>=teslaCd){if(rng()<R.tesla.proc){acc.tesla+=tDmg*spiritMult*ampMult*R.platedBlock;teslaCd=t+0.2;dealt=true;}}
+    if(faOn){acc.fa+=faSpb*spiritMult*ampMult*R.platedBlock*R.outS*R.fall;dealt=true;}
+    if(R.merc.on){acc.merc+=mSpb*spiritMult*ampMult*R.platedBlock*R.outS*R.fall;dealt=true;}
+    if(R.tesla.on&&t>=teslaCd){if(rng()<R.tesla.proc){acc.tesla+=tDmg*spiritMult*ampMult*R.platedBlock*R.outS*R.fall;teslaCd=t+0.2;dealt=true;}}
     if(R.ee&&dealt){eeActive=true;if(t>=lastEE+0.7&&eeStacks<12){eeStacks++;lastEE=t;}}
-    if(R.ct.on){prog+=R.ct.genPerShot;while(prog>=1){prog-=1;if(q.length<R.ct.maxCards){let suit;if(rng()<R.ct.pJoker)suit='J';else{if(stack.length===0)stack=['S','S','D','D','C','C','H','H'];const idx=(rng()*stack.length)|0;suit=stack.splice(idx,1)[0];}q.push(suit);}}}
+    if(R.ct.on){prog+=R.ct.genPerShot;while(prog>=1){prog-=1;addCard();}}
+    if(R.rushOn){rushQ.push([t,wHit]);rushSum+=wHit;while(rushQ[rushHead][0]<=t-3.5){rushSum-=rushQ[rushHead][1];rushHead++;}
+      if(t>=rushCd&&rushSum>=200&&R.ct.on&&q.length<R.ct.maxCards){rushCd=t+25;addCard();}}   // full hand: no refill, cooldown not consumed
     let threw=false;
-    if(R.ct.on&&q.length>0&&t>=nextThrow&&!ftActive){const suit=q.shift();const charge=Math.min(1,(t-lastThrow)/14);const mercBonus=(R.merc.on&&R.merc.cardBonus)?mCardFull*charge:0;const base=cBase*(isSpadesLike(suit)?R.ct.spades:1)+mercBonus;acc.card+=base*spiritMult*ampMult;if(isDiamondLike(suit))diamondUntil=t+R.diamondDur;if(R.ee){eeActive=true;if(t>=lastEE+0.7&&eeStacks<12){eeStacks++;lastEE=t;}}lastThrow=t;nextThrow=t+0.6;threw=true;throws++;if(R.surgeFR>0&&t>=surgeCd){surgeUntil=t+R.surgeDur;surgeCd=t+14;}if(R.spellFR>0&&spellStacks<R.spellMax)spellStacks++;}
+    if(R.ct.on&&q.length>0&&t>=nextThrow&&!ftActive){const suit=q.shift();const charge=Math.min(1,(t-lastThrow)/14);const mercBonus=(R.merc.on&&R.merc.cardBonus)?mCardFull*charge:0;const base=cBase*(isSpadesLike(suit)?R.ct.spades:1)+mercBonus;acc.card+=base*spiritMult*ampMult*R.outS;if(isDiamondLike(suit))diamondUntil=t+R.diamondDur;if(R.ee){eeActive=true;if(t>=lastEE+0.7&&eeStacks<12){eeStacks++;lastEE=t;}}lastThrow=t;nextThrow=t+0.6;threw=true;throws++;if(R.surgeFR>0&&t>=surgeCd){surgeUntil=t+R.surgeDur;surgeCd=t+14;}if(R.spellFR>0&&spellStacks<R.spellMax)spellStacks++;}
     if(!overflowActive&&R.soBuild>0){overflow+=R.soBuild*(R.plated?0.5:1);if(overflow>=1)overflowActive=true;}
+    if(R.bl){const cur=dealtAll(),d=cur-blLast;blLast=cur;
+      if(d>0){hpDmg+=d*(1-R.blDefer);if(R.blDefer>0){const r=d*R.blDefer/6;blq.push({r,end:t+6});rate+=r;}}
+      if(hpDmg>=R.hp){endT=t;killed=true;break;}}
+    else if(R.ttk&&dealtAll()-runStart>=R.hp){endT=t;killed=true;break;}
     t+=threw?Math.max(1/fr,0.1):1/fr;
   }
-  if(!flDone&&R.flWin<=R.engagement)acc.focus+=R.flStore*(dealtNow()-flStart);
-  acc.throws+=throws;acc.stacks+=eeStacks;
+  if(!flDone&&!killed&&R.flWin<=R.engagement)acc.focus+=R.flStore*(dealtNow()-flStart);
+  acc.throws+=throws;acc.stacks+=eeStacks;acc.time+=endT;
+  if(R.ttk){acc.ttks.push(endT);if(killed)acc.kills++;}
 }
 function simulate(cfg,iters,seed){
   const R=resolve(cfg),rng=mulberry32(seed>>>0);
-  const acc={weapon:0,fa:0,merc:0,tesla:0,card:0,focus:0,throws:0,stacks:0};
+  const acc={weapon:0,fa:0,merc:0,tesla:0,card:0,focus:0,throws:0,stacks:0,time:0,kills:0,ttks:[]};
   for(let i=0;i<iters;i++)runOnce(R,rng,acc);
-  const eng=R.engagement,n=iters,dps=k=>acc[k]/(n*eng);
+  const eng=R.engagement,n=iters,T=R.ttk?acc.time:n*eng,dps=k=>acc[k]/T;   // TTK: DPS over the actual kill time
+  const srt=R.ttk?acc.ttks.slice().sort((a,b)=>a-b):[], pct=q=>srt.length?srt[Math.min(n-1,Math.floor(q*(n-1)+0.5))]:0;
   const weapon=dps('weapon'),fa=dps('fa'),merc=dps('merc'),tesla=dps('tesla'),card=dps('card'),focus=dps('focus');
   return{total:weapon+fa+merc+tesla+card+focus,focusEcho:focus,weapon,spirit:fa+merc+tesla+card,
     faSpirit:fa,mercSpirit:merc,teslaSpirit:tesla,cardSpirit:card,
+    ttk:acc.time/n,killRate:acc.kills/n,ttkP10:pct(0.10),ttkP90:pct(0.90),
     effWeaponDmg:R.weaponDmg,spiritStat:R.spirit,throws:acc.throws/n,stacks:acc.stacks/n,
     frBase:R.baseFR*(1+R.firePct+R.merc.fr+R.extraFR+R.teslaFR+R.bfPassive+R.flFR),frFA:R.baseFR*(1+R.firePct+(R.fa.on?R.fa.fr:0)+R.merc.fr+R.extraFR+R.teslaFR+R.bfPassive+R.flFR),faOn:R.fa.on};
 }
@@ -482,6 +603,7 @@ const BASE=[
   {id:'tbr',label:'Target bullet resist',min:-30,max:80,step:1,val:0,suffix:'%',sub:1},
   {id:'bbs',label:'Base bullet resist shred',min:0,max:60,step:1,val:0,suffix:'%',sub:1},
   {id:'eng',label:'Engagement length',min:1,max:30,step:0.5,val:6,suffix:'s'},
+  {id:'range',label:'Engagement range',min:0,max:60,step:1,val:15,suffix:'m',sub:1},
   {id:'spr',label:'Spirit',min:22,max:200,step:1,val:22,sub:1},
   {id:'tsr',label:'Target spirit resist',min:-30,max:80,step:1,val:0,suffix:'%',sub:1},
   {id:'bss',label:'Base spirit resist shred',min:0,max:60,step:1,val:0,suffix:'%',sub:1},
@@ -572,7 +694,7 @@ function renderCardSlots(){
 document.addEventListener('click',()=>{if(pickerOpen!==-1){pickerOpen=-1;renderCardSlots();}});
 $('sc_on').addEventListener('change',()=>{renderCardSlots();schedule();});
 document.querySelector('.pill[data-cb="ct_rr"]').addEventListener('click',()=>setTimeout(renderCardSlots,0));
-['fa_on','ct_on','plated_on','dr_on','merc_cmp','merc_base','merc_card','merc_inv_from','merc_inv_to','tesla_cmp','tesla_base','tesla_cap','tesla_inv_from','tesla_inv_to','ee_cmp','ee_base','ee_inv_from','ee_inv_to','apr_cmp','apr_base','apr_inv_from','apr_inv_to','so_cmp','so_base','so_inv_from','so_inv_to','shw_cmp','shw_base','shw_inv_from','shw_inv_to','sop_cmp','sop_base','sop_inv_from','sop_inv_to','spl_cmp','spl_base','spl_inv_from','spl_inv_to','spl_pre','spl_pre_n','bf_cmp','bf_base','bf_inv_from','bf_inv_to','ft_cmp','ft_base','ft_delay','ls_cmp','ls_base','ls_inv_from','ls_inv_to','fl_cmp','fl_base','fl_inv_from','fl_inv_to'].forEach(id=>$(id).addEventListener('change',schedule));
+['fa_on','ct_on','plated_on','dr_on','sil_on','inh_on','merc_cmp','merc_base','merc_card','merc_inv_from','merc_inv_to','tesla_cmp','tesla_base','tesla_cap','tesla_inv_from','tesla_inv_to','ee_cmp','ee_base','ee_inv_from','ee_inv_to','apr_cmp','apr_base','apr_inv_from','apr_inv_to','so_cmp','so_base','so_inv_from','so_inv_to','shw_cmp','shw_base','shw_inv_from','shw_inv_to','sop_cmp','sop_base','sop_inv_from','sop_inv_to','spl_cmp','spl_base','spl_inv_from','spl_inv_to','spl_pre','spl_pre_n','bf_cmp','bf_base','bf_inv_from','bf_inv_to','ft_cmp','ft_base','ft_delay','ls_cmp','ls_base','ls_inv_from','ls_inv_to','fl_cmp','fl_base','fl_inv_from','fl_inv_to','rush_cmp','rush_base','rush_inv_from','rush_inv_to','im_cmp','im_base','im_inv_from','im_inv_to','ss_cmp','ss_base','ss_inv_from','ss_inv_to'].forEach(id=>$(id).addEventListener('change',schedule));
 $('ft_delay_s').addEventListener('input',schedule);
 function syncFtHint(){const on=$('ft_delay').checked, d=+$('ft_delay_s').value||0;
   $('ft_delay_wrap').style.opacity=on?'1':'.4';
@@ -599,7 +721,24 @@ fillInvest('spl_inv',WEAPON_INVEST,'% wpn');
 fillInvest('bf_inv',WEAPON_INVEST,'% wpn');
 fillInvest('ls_inv',WEAPON_INVEST,'% wpn');
 fillInvest('fl_inv',SPIRIT_INVEST,' Sp');
+fillInvest('rush_inv',WEAPON_INVEST,'% wpn');
+fillInvest('im_inv',WEAPON_INVEST,'% wpn');
+fillInvest('ss_inv',WEAPON_INVEST,'% wpn');
 $('dr_time').addEventListener('input',schedule);
+['ttk_on','ttk_hsdr_on','ttk_spres','ttk_bures','ttk_shiv','shiv_rage','shiv_ap2','shiv_ap5'].forEach(id=>$(id).addEventListener('change',schedule));
+['ttk_shiv','shiv_rage','shiv_ap2','shiv_ap5'].forEach(id=>$(id).addEventListener('change',()=>syncTtk()));
+$('shiv_time').addEventListener('input',()=>{syncTtk();schedule();});
+$('ttk_on').addEventListener('change',()=>syncTtk());
+$('ttk_hp_r').addEventListener('input',()=>{$('ttk_hp').value=$('ttk_hp_r').value;schedule();});
+$('ttk_hp').addEventListener('input',()=>{$('ttk_hp_r').value=$('ttk_hp').value;schedule();});
+$('ttk_hsdr').addEventListener('input',schedule);
+function syncTtk(){const on=$('ttk_on').checked;$('ttkopts').style.display=on?'flex':'none';
+  const sv=$('ttk_shiv').checked;$('shivopts').style.display=sv?'flex':'none';
+  if(sv){const df=25+($('shiv_rage').checked?15:0)+($('shiv_ap5').checked?15:0),cl=$('shiv_ap2').checked?70:30,tm=Math.max(0,+$('shiv_time').value||0);
+    $('shiv_hint').textContent=`${df}% of damage taken is deferred over 6s · at ${tm.toFixed(1)}s the active cleanses ${cl}% of what's still pending`;}
+  const dr=Math.min(100,Math.max(0,+$('ttk_hsdr').value||0));$('ttk_hsdr_hint').textContent=`(headshots ×${(1+0.65*(1-dr/100)).toFixed(2)})`;
+  const e=$('r_eng').closest('.ctl');e.style.opacity=on?'.4':'1';e.title=on?'Replaced by time to kill':'';
+  $('chartLbl').textContent=on?'Time to kill (s) — lower is better':'DPS vs fight length';$('xEngBtn').textContent=on?'vs target HP':'vs engagement';}
 const syncDr=()=>{$('dr_wrap').style.opacity=$('dr_on').checked?'1':'.45';};$('dr_on').addEventListener('change',syncDr);syncDr();
 const syncSplPre=()=>{$('spl_pre_n').style.opacity=$('spl_pre').checked?'1':'.4';};
 $('spl_pre').addEventListener('change',syncSplPre);syncSplPre();
@@ -636,9 +775,9 @@ renderCustomItems();
 
 function core(){
   return{
-    boons:getB('boons'),headshotRate:getB('hs')/100,weaponDamagePct:getB('wd'),fireRatePct:getB('fr'),
+    boons:getB('boons'),range:getB('range'),headshotRate:getB('hs')/100,weaponDamagePct:getB('wd'),fireRatePct:getB('fr'),
     targetBulletResist:getB('tbr'),baseBulletShred:getB('bbs'),engagement:getB('eng'),
-    baseSpirit:getB('spr')-1.1*getB('boons')+(pillOn('ct_rr')?readInvest('rr_inv'):0),targetSpiritResist:getB('tsr'),baseSpiritShred:getB('bss'),extraFireRate:0,platedArmor:$('plated_on').checked,debuffRemover:{on:$('dr_on').checked,time:+$('dr_time').value||0},
+    baseSpirit:getB('spr')-1.1*getB('boons')+(pillOn('ct_rr')?readInvest('rr_inv'):0),targetSpiritResist:getB('tsr'),baseSpiritShred:getB('bss'),extraFireRate:0,platedArmor:$('plated_on').checked,debuffRemover:{on:$('dr_on').checked,time:+$('dr_time').value||0},silencer:$('sil_on').checked,inhibitor:$('inh_on').checked,ttk:{on:$('ttk_on').checked,hp:Math.max(1,+$('ttk_hp').value||1),hsDROn:$('ttk_hsdr_on').checked,hsDR:+$('ttk_hsdr').value||0,spiritRes:$('ttk_spres').checked,bulletRes:$('ttk_bures').checked,shiv:{on:$('ttk_shiv').checked,rage:$('shiv_rage').checked,ap2:$('shiv_ap2').checked,ap5:$('shiv_ap5').checked,time:+$('shiv_time').value||0}},
     fullAuto:{on:$('fa_on').checked,ap2:pillOn('fa_ap2'),ap5:pillOn('fa_ap5')},
     cardTrick:{on:$('ct_on').checked,ap2:pillOn('ct_ap2'),ap5:pillOn('ct_ap5'),startSuits:$('sc_on').checked?startSlots.slice(0,maxCards()).filter(Boolean):[],rapidRecharge:pillOn('ct_rr')},
     mercurial:{on:false,cardBonus:false},tesla:{on:false,capacitor:false},escalatingExposure:{on:false}
@@ -658,6 +797,9 @@ const named=()=>({
   ft:{cmp:$('ft_cmp').checked,base:$('ft_base').checked,delayOn:$('ft_delay').checked,delay:+$('ft_delay_s').value||0},
   ls:{cmp:$('ls_cmp').checked,base:$('ls_base').checked,inv:readInvest('ls_inv')},
   fl:{cmp:$('fl_cmp').checked,base:$('fl_base').checked,inv:readInvest('fl_inv')},
+  rush:{cmp:$('rush_cmp').checked,base:$('rush_base').checked,inv:readInvest('rush_inv')},
+  im:{cmp:$('im_cmp').checked,base:$('im_base').checked,inv:readInvest('im_inv')},
+  ss:{cmp:$('ss_cmp').checked,base:$('ss_base').checked,inv:readInvest('ss_inv')},
 });
 function baselineCfg(c0,nm){
   const c=clone(c0);
@@ -673,6 +815,9 @@ function baselineCfg(c0,nm){
   if(nm.ft.base){c.weaponDamagePct+=6;c.furyTrance={on:true,delayOn:nm.ft.delayOn,delay:nm.ft.delay};}
   if(nm.ls.base){c.weaponDamagePct+=nm.ls.inv;c.luckyShot={on:true};}
   if(nm.fl.base){c.baseSpirit+=nm.fl.inv;c.focusLens={on:true};}
+  if(nm.rush.base){c.weaponDamagePct+=10+nm.rush.inv;c.rechargingRush={on:true};}
+  if(nm.im.base){c.weaponDamagePct+=nm.im.inv;c.intensifyingMag={on:true};}
+  if(nm.ss.base){c.weaponDamagePct+=nm.ss.inv;c.sharpshooter={on:true};}
   for(const cu of customItems){if(cu.base){c.weaponDamagePct+=cu.wd;c.extraFireRate+=cu.fr/100;c.baseBulletShred+=cu.bbs;c.baseSpirit+=cu.spr;c.baseSpiritShred+=cu.sss;}}
   return c;
 }
@@ -698,6 +843,9 @@ function buildRows(c0,nm,mg){
   nrow(nm.ft,'ft','+ Fury Trance','--olive',c=>{c.weaponDamagePct+=6;c.furyTrance={on:true,delayOn:nm.ft.delayOn,delay:nm.ft.delay};});
   nrow(nm.ls,'ls','+ Lucky Shot','--sky',c=>{c.weaponDamagePct+=nm.ls.inv;c.luckyShot={on:true};});
   nrow(nm.fl,'fl','+ Focus Lens','--emerald',c=>{c.baseSpirit+=nm.fl.inv;c.focusLens={on:true};});
+  nrow(nm.rush,'rush','+ Recharging Rush','--coral',c=>{c.weaponDamagePct+=10+nm.rush.inv;c.rechargingRush={on:true};});
+  nrow(nm.im,'im','+ Intensifying Mag','--lavender',c=>{c.weaponDamagePct+=nm.im.inv;c.intensifyingMag={on:true};});
+  nrow(nm.ss,'ss','+ Sharpshooter','--mint',c=>{c.weaponDamagePct+=nm.ss.inv;c.sharpshooter={on:true};});
   customItems.forEach((cu,i)=>{if(cu.cmp&&!cu.base){const c=clone(bc);c.weaponDamagePct+=cu.wd;c.extraFireRate+=cu.fr/100;c.baseBulletShred+=cu.bbs;c.baseSpirit+=cu.spr;c.baseSpiritShred+=cu.sss;rows.push({key:'cu'+cu.id,name:'+ '+((cu.label||'').trim()||'Custom item'),color:customColor(i),cfg:c});}});
   return rows;
 }
@@ -716,15 +864,22 @@ function updateSubLabels(){
   setSub('bbs',`eff resist ${Math.round(tbr-bbs)}% → ×${(1-(tbr-bbs)/100).toFixed(2)}`);
   setSub('spr',`${boonSp.toFixed(1)} from boons \u00b7 ${Math.max(0,spr-boonSp).toFixed(1)} from items`);
   setSub('tsr',`×${(1-tsr/100).toFixed(2)} spirit dmg`);
+  {const rg=getB('range'),ss=$('ss_base').checked,a=ss?21.6:18,z=ss?62.4:52,f=1-0.9*Math.min(1,Math.max(0,(rg-a)/(z-a)));setSub('range',rg<=a?`×1.00 · falloff starts past ${a}m`:`×${f.toFixed(2)} bullet & on-hit damage`);}
   setSub('bss',`eff resist ${Math.round(tsr-bss)}% → ×${(1-(tsr-bss)/100).toFixed(2)}`);
 }
 
 let timer=null;
 function schedule(){clearTimeout(timer);timer=setTimeout(recompute,80);}
+function paintRanges(){document.querySelectorAll('input[type=range]').forEach(el=>{const mn=+el.min||0,mx=+el.max||100,v=+el.value;if(!(mx>mn))return;
+  const pos=x=>Math.min(100,Math.max(0,(x-mn)/(mx-mn)*100)), p=pos(v), z=mn<0&&mx>0?pos(0):0;   // signed ranges fill from zero
+  el.style.setProperty('--a',Math.min(z,p)+'%');el.style.setProperty('--b',Math.max(z,p)+'%');});}
+document.addEventListener('input',paintRanges);
 function recompute(){
-  renderCardSlots();updateDim();updateSubLabels();
+  paintRanges();renderCardSlots();updateDim();updateSubLabels();syncTtk();
   const c0=core(), nm=named(), mg=mags();
   const rows=buildRows(c0,nm,mg);
+  if(c0.ttk.on){recomputeTTK(c0,nm,rows);drawChart(c0,nm,mg);return;}
+  $('cmpHead').innerHTML='<tr><th>Item</th><th>DPS @3s</th><th id="th_eng"></th><th>Total dmg</th></tr>';
 
   const data=rows.map(r=>{
     const cur=simulate(r.cfg,ITER,SEED);
@@ -758,6 +913,27 @@ function recompute(){
   drawChart(c0,nm,mg);
 }
 
+function recomputeTTK(c0,nm,rows){
+  const fT=x=>x.toFixed(2)+'s';
+  const data=rows.map(r=>{const sim=simulate(r.cfg,ITER,SEED);return {r,sim,ttk:sim.ttk,dps:sim.total};});
+  const b0=data[0].ttk;
+  $('cmpHead').innerHTML='<tr><th>Item</th><th>Time to kill</th><th>vs baseline</th><th>10–90% of runs</th><th>DPS during kill</th></tr>';
+  let wT=0,wD=0;for(let i=1;i<data.length;i++){if(data[i].ttk<data[wT].ttk)wT=i;if(data[i].dps>data[wD].dps)wD=i;}
+  const hl=(i,w,col)=>(w===i&&data.length>1)?` style="background:${col};color:#11151c;font-weight:700;border-radius:5px"`:'';
+  $('cmpBody').innerHTML=data.map((d,i)=>{const col=cssv(d.r.color),dt=d.ttk-b0;
+    const warn=d.sim.killRate<0.999?`<span title="${(100*(1-d.sim.killRate)).toFixed(0)}% of runs didn't kill within ${TTK_CAP}s" style="color:var(--rose)"> *</span>`:'';
+    const dc=i===0?'<td style="color:var(--faint)">—</td>':`<td style="color:${dt<=0?'var(--green)':'var(--rose)'}">${dt<=0?'−':'+'}${Math.abs(dt).toFixed(2)}s</td>`;
+    return `<tr><td><span class="dot" style="background:${col}"></span>${d.r.name}</td><td${hl(i,wT,col)}>${fT(d.ttk)}${warn}</td>${dc}<td style="color:var(--mut)">${d.sim.ttkP10.toFixed(2)}–${d.sim.ttkP90.toFixed(2)}s</td><td${hl(i,wD,col)}>${fmtN(d.dps)}</td></tr>`;}).join('');
+  const bl=data[0].sim;
+  let v=`Against a <b>${Math.round(c0.ttk.hp).toLocaleString()} HP</b> target your baseline kills in <b>${fT(b0)}</b> (10–90% of runs: ${bl.ttkP10.toFixed(2)}–${bl.ttkP90.toFixed(2)}s).`;
+  if(data.length>1){let bi=1;for(let i=2;i<data.length;i++)if(data[i].ttk<data[bi].ttk)bi=i;const d=data[bi].ttk-b0;
+    v+=d<0?` <b>${data[bi].r.name.replace('+ ','')}</b> kills fastest — <b>${Math.abs(d).toFixed(2)}s sooner</b> (−${Math.abs(100*d/b0).toFixed(1)}%).`:' None of the picks kill faster than the baseline.';
+  }else v+=' Raise a stat purchase or toggle a named item to compare kill times.';
+  $('verdict').innerHTML=v;
+  const cards=bl.throws.toFixed(bl.throws<10?1:0);
+  $('buildline').textContent=`Fire rate ${bl.frBase.toFixed(1)}${bl.faOn?`→${bl.frFA.toFixed(1)} FA`:''}/s · Spirit ${bl.spiritStat.toFixed(0)} · ~${cards} cards thrown per kill`;
+}
+
 /* -------- chart -------- */
 let X_MODE='eng';
 document.querySelectorAll('#xseg button').forEach(b=>b.addEventListener('click',()=>{
@@ -767,10 +943,11 @@ function niceStep(range,ticks){const raw=range/ticks,mag=Math.pow(10,Math.floor(
 function drawChart(c0,nm,mg){
   const base=buildRows(c0,nm,mg).slice(0,8);
   const series=base.map(r=>({name:r.name,color:cssv(r.color),pts:[]}));
-  const xr=X_MODE==='eng'?[1,30]:[0,35];
+  const tm=!!(c0.ttk&&c0.ttk.on), hpM=tm&&X_MODE==='eng';
+  const xr=hpM?[100,Math.max(500,2*c0.ttk.hp)]:(X_MODE==='eng'?[1,30]:[0,35]);
   const xs=[];for(let i=0;i<CHART_PTS;i++)xs.push(xr[0]+(xr[1]-xr[0])*i/(CHART_PTS-1));
   let ymax=0;
-  xs.forEach(x=>{const cc=clone(c0);if(X_MODE==='eng')cc.engagement=x;else cc.boons=x;const rr=buildRows(cc,nm,mg);rr.slice(0,8).forEach((row,i)=>{const y=simulate(row.cfg,CHART_ITER,SEED).total;ymax=Math.max(ymax,y);series[i].pts.push({x,y});});});
+  xs.forEach(x=>{const cc=clone(c0);if(hpM)cc.ttk.hp=x;else if(X_MODE==='eng')cc.engagement=x;else cc.boons=x;const rr=buildRows(cc,nm,mg);rr.slice(0,8).forEach((row,i)=>{const sm=simulate(row.cfg,CHART_ITER,SEED),y=tm?sm.ttk:sm.total;ymax=Math.max(ymax,y);series[i].pts.push({x,y});});});
   const cv=$('chart'),dpr=window.devicePixelRatio||1;
   const W=cv.clientWidth,H=320;cv.width=W*dpr;cv.height=H*dpr;
   const g=cv.getContext('2d');g.setTransform(dpr,0,0,dpr,0,0);g.clearRect(0,0,W,H);
@@ -778,12 +955,13 @@ function drawChart(c0,nm,mg){
   ymax=Math.max(ymax*1.08,1);const ys=niceStep(ymax,5);ymax=Math.ceil(ymax/ys)*ys;
   const X=x=>L+pw*(x-xr[0])/(xr[1]-xr[0]), Y=y=>T+ph*(1-y/ymax);
   g.font='11px '+cssv('--mono');g.textBaseline='middle';
-  for(let v=0;v<=ymax+1e-6;v+=ys){const yy=Y(v);g.strokeStyle=cssv('--grid');g.lineWidth=1;g.beginPath();g.moveTo(L,yy);g.lineTo(L+pw,yy);g.stroke();g.fillStyle=cssv('--faint');g.textAlign='right';g.fillText(Math.round(v),L-8,yy);}
+  for(let v=0;v<=ymax+1e-6;v+=ys){const yy=Y(v);g.strokeStyle=cssv('--grid');g.lineWidth=1;g.beginPath();g.moveTo(L,yy);g.lineTo(L+pw,yy);g.stroke();g.fillStyle=cssv('--faint');g.textAlign='right';g.fillText(ys<1?v.toFixed(ys<0.1?2:1):Math.round(v),L-8,yy);}
   g.textAlign='center';g.textBaseline='top';
-  for(let v=Math.ceil(xr[0]/5)*5;v<=xr[1]+1e-6;v+=5){const xx=X(v);g.strokeStyle=cssv('--grid');g.beginPath();g.moveTo(xx,T);g.lineTo(xx,T+ph);g.stroke();g.fillStyle=cssv('--faint');g.fillText(X_MODE==='eng'?v+'s':v,xx,T+ph+7);}
-  g.fillStyle=cssv('--faint');g.textAlign='center';g.fillText(X_MODE==='eng'?'engagement length':'boons',L+pw/2,H-12);
+  const xs5=hpM?niceStep(xr[1]-xr[0],6):5;
+  for(let v=Math.ceil(xr[0]/xs5)*xs5;v<=xr[1]+1e-6;v+=xs5){const xx=X(v);g.strokeStyle=cssv('--grid');g.beginPath();g.moveTo(xx,T);g.lineTo(xx,T+ph);g.stroke();g.fillStyle=cssv('--faint');g.fillText(hpM?Math.round(v):(X_MODE==='eng'?v+'s':v),xx,T+ph+7);}
+  g.fillStyle=cssv('--faint');g.textAlign='center';g.fillText(hpM?'target HP':(X_MODE==='eng'?'engagement length':'boons'),L+pw/2,H-12);
   for(const s of series){g.strokeStyle=s.color;g.lineWidth=s.name==='Baseline'?1.6:2.2;g.beginPath();s.pts.forEach((p,i)=>{const xx=X(p.x),yy=Y(p.y);i?g.lineTo(xx,yy):g.moveTo(xx,yy);});g.stroke();}
-  if(X_MODE==='eng'){const ex=X(c0.engagement);g.strokeStyle=cssv('--line2');g.setLineDash([4,4]);g.lineWidth=1;g.beginPath();g.moveTo(ex,T);g.lineTo(ex,T+ph);g.stroke();g.setLineDash([]);}
+  if(X_MODE==='eng'){const ex=X(hpM?c0.ttk.hp:c0.engagement);g.strokeStyle=cssv('--line2');g.setLineDash([4,4]);g.lineWidth=1;g.beginPath();g.moveTo(ex,T);g.lineTo(ex,T+ph);g.stroke();g.setLineDash([]);}
   $('chartlegend').innerHTML=series.map(s=>`<span class="k"><span class="ln" style="background:${s.color}"></span>${s.name}</span>`).join('');
 }
 window.addEventListener('resize',()=>{clearTimeout(timer);timer=setTimeout(()=>drawChart(core(),named(),mags()),120);});
