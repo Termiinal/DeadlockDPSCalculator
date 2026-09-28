@@ -16,6 +16,10 @@
   html,body{margin:0;background:var(--bg);color:var(--tx);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-font-smoothing:antialiased;font-size:15px;line-height:1.5}
   .wrap{max-width:1080px;margin:0 auto;padding:22px 20px 60px}
   header h1{font-size:20px;font-weight:600;margin:0 0 3px;letter-spacing:.2px}
+  .hdrrow{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+  .heropick{font-size:12px;color:var(--mut);display:inline-flex;align-items:center;gap:8px}
+  .heropick select{background:var(--panel2);border:1px solid var(--line2);color:var(--tx);font-size:13px;font-weight:600;border-radius:8px;padding:5px 10px;font-family:inherit;cursor:pointer}
+  .heropick select:focus{outline:none;border-color:var(--gold)}
   header p{margin:0;color:var(--mut);font-size:13.5px}
   .card{background:var(--panel);border:1px solid var(--line);border-radius:12px;margin-top:18px}
   .card > h2{font-size:12px;text-transform:uppercase;letter-spacing:.09em;color:var(--faint);margin:0;padding:14px 18px 0;font-weight:600}
@@ -79,6 +83,9 @@
 
   .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;padding:14px 18px 18px}
   @media(max-width:720px){.grid2{grid-template-columns:1fr}}
+  .grid2.n3{grid-template-columns:repeat(3,1fr)}
+  @media(max-width:900px){.grid2.n3{grid-template-columns:1fr 1fr}}
+  @media(max-width:720px){.grid2.n3{grid-template-columns:1fr}}
   .subcard{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:13px 14px}
   .subcard h3{margin:0 0 3px;font-size:14px;font-weight:600;display:flex;align-items:center;gap:9px}
   .subcard .desc{color:var(--mut);font-size:12px;margin:0 0 11px;line-height:1.45}
@@ -109,7 +116,7 @@
   .tn{font-size:13px;font-weight:600;line-height:1.2}
   .td{font-size:11px;color:var(--mut);margin-top:2px;line-height:1.35}
   .minirow{display:flex;flex-wrap:wrap;gap:5px 15px;margin-top:7px}
-  .mini{font-size:10.5px;color:var(--faint);display:inline-flex;align-items:center;gap:5px;cursor:pointer}
+  .mini{font-size:10.5px;color:var(--faint);display:inline-flex;align-items:center;gap:5px;cursor:pointer;flex-wrap:wrap;min-width:0}
   .mini input[type=checkbox]{accent-color:var(--teal);width:12px;height:12px;margin:0;cursor:pointer}
   .mini input[type=number]{width:50px;background:var(--panel);border:1px solid var(--line2);color:var(--tx);font-family:var(--mono);font-size:11px;border-radius:5px;padding:2px 5px;text-align:right}
   .invsel{background:var(--panel);border:1px solid var(--line2);color:var(--tx);font-family:var(--mono);font-size:10.5px;border-radius:5px;padding:2px 4px;max-width:140px;min-width:0}
@@ -142,6 +149,7 @@
   .dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:9px;vertical-align:middle}
 
   .charthead{display:flex;align-items:center;justify-content:space-between;padding:14px 18px 0;flex-wrap:wrap;gap:10px;border-top:1px solid var(--line);margin-top:8px}
+  .busytag{visibility:hidden;margin-left:10px;font-size:11px;color:var(--faint);font-style:italic}
   .charthead .lbl{font-size:12px;text-transform:uppercase;letter-spacing:.09em;color:var(--faint);font-weight:600}
   .seg{display:inline-flex;border:1px solid var(--line2);border-radius:8px;overflow:hidden}
   .seg button{background:#141a23;color:var(--mut);border:none;padding:6px 13px;font-size:12px;cursor:pointer;font-family:inherit}
@@ -191,20 +199,20 @@
 <body>
 <div class="wrap">
   <header>
-    <h1>Wraith — DPS simulator</h1>
-    <p>Set up your Wraith, pick the items you're considering, and see which one adds the most damage or kills fastest. New here? <a href="#howto">How to use ↓</a></p>
+    <div class="hdrrow"><h1><span class="heroName">Wraith</span> — DPS simulator</h1><label class="heropick">Hero <select id="heroSel"></select></label></div>
+    <p>Set up your <span class="heroName">Wraith</span>, pick the items you're considering, and see which one adds the most damage or kills fastest. New here? <a href="#howto">How to use ↓</a></p>
   </header>
 
   <div class="card">
-    <h2>Base values <span class="note">Wraith &amp; the target — shared by every build</span></h2>
+    <h2>Base values <span class="note"><span class="heroName">Wraith</span> &amp; the target — shared by every build</span></h2>
     <div class="controls" id="baseGrid"></div>
     <div class="tgtrow">
       <label class="sw"><input type="checkbox" id="plated_on"><span class="track"></span></label>
-      <div><div class="tn">Enemy has Plated Armor</div><div class="td">Per bullet: 30% chance to deflect the bullet (weapon) damage, and a separate 50% chance to block that bullet's card generation and its Full Auto / Mercurial / Tesla spirit (not the Capacitor burst or thrown-card damage).</div></div>
+      <div><div class="tn">Enemy has Plated Armor</div><div class="td">Deflects 30% of your bullet damage and blocks half of your on-hit effects.</div></div>
     </div>
     <div class="tgtrow">
       <label class="sw"><input type="checkbox" id="dr_on"><span class="track"></span></label>
-      <div style="flex:1"><div class="tn">Enemy Debuff Remover <span class="mini" id="dr_wrap" style="margin-left:8px;font-weight:400">activates at <input type="number" id="dr_time" min="0" max="30" step="0.1" value="3"> s</span></div><div class="td">Removes active Diamond-card shred, all Escalating Exposure stacks (and its −8%), and Focus Lens's active shred — any damage Focus Lens has stored so far is dealt immediately.</div></div>
+      <div style="flex:1"><div class="tn">Enemy Debuff Remover <span class="mini" id="dr_wrap" style="margin-left:8px;font-weight:400">activates at <input type="number" id="dr_time" min="0" max="30" step="0.1" value="3"> s</span></div><div class="td">Clears your shred and debuff stacks off the target.</div></div>
     </div>
     <div class="tgtrow duo">
       <div class="duocell"><label class="sw"><input type="checkbox" id="sil_on"><span class="track"></span></label><div><div class="tn">Affected by Silencer</div><div class="td">Your spirit damage is reduced by 25%.</div></div></div>
@@ -212,13 +220,13 @@
     </div>
     <div class="tgtrow">
       <label class="sw"><input type="checkbox" id="ttk_on"><span class="track"></span></label>
-      <div style="flex:1"><div class="tn">Time to kill</div><div class="td">Run each fight until the target dies (60s cap) instead of a fixed engagement length. The comparison table and chart switch to kill time.</div>
+      <div style="flex:1"><div class="tn">Time to kill</div><div class="td">Fights last until the target dies instead of a set length.</div>
         <div class="ttkopts" id="ttkopts" style="display:none">
           <div class="ttkline"><span class="lab">Target HP</span><input type="range" id="ttk_hp_r" min="100" max="6000" step="10" value="2000"><input type="number" id="ttk_hp" min="100" max="20000" step="10" value="2000"></div>
           <label class="mini"><input type="checkbox" id="ttk_hsdr_on"> Target headshot damage reduction <input type="number" id="ttk_hsdr" min="0" max="100" step="1" value="40"> % <span id="ttk_hsdr_hint" style="color:var(--faint)"></span></label>
           <label class="mini"><input type="checkbox" id="ttk_spres"> Target has Spirit Resilience <span style="color:var(--faint)">+30% spirit resist, +45% below 50% HP</span></label>
           <label class="mini"><input type="checkbox" id="ttk_bures"> Target has Bullet Resilience <span style="color:var(--faint)">+30% bullet resist, +45% below 50% HP</span></label>
-          <label class="mini"><input type="checkbox" id="ttk_shiv"> Shiv Bloodletting <span style="color:var(--faint)">defers part of the damage taken over 6s; active cleanses part of what's pending</span></label>
+          <label class="mini"><input type="checkbox" id="ttk_shiv"> Shiv Bloodletting <span style="color:var(--faint)">delays part of the damage taken; its active clears some of it</span></label>
           <div class="shivopts" id="shivopts" style="display:none">
             <label class="mini"><input type="checkbox" id="shiv_rage"> Full Rage <span style="color:var(--faint)">+15% deferred</span></label>
             <label class="mini"><input type="checkbox" id="shiv_ap2"> 2AP <span style="color:var(--faint)">cleanse 30% → 70%</span></label>
@@ -233,35 +241,8 @@
 
   <div class="card">
     <h2>Abilities</h2>
-    <div class="grid2">
-      <div class="subcard">
-        <h3><label class="sw"><input type="checkbox" id="fa_on" checked><span class="track"></span></label> Full Auto</h3>
-        <p class="desc">+20% fire rate and <code>2 + 0.045·Spirit</code> spirit damage per bullet for 5s. Active from the start of the engagement; reverts to base afterward (single cast, no cooldown modeled).</p>
-        <div class="opts">
-          <div class="pill" data-cb="fa_ap2"><span class="t">2 AP</span><span class="s">+10% FR · +3s</span></div>
-          <div class="pill" data-cb="fa_ap5"><span class="t">5 AP</span><span class="s">spirit ×0.09</span></div>
-        </div>
-      </div>
-      <div class="subcard">
-        <h3><label class="sw"><input type="checkbox" id="ct_on" checked><span class="track"></span></label> Card Trick</h3>
-        <p class="desc">Shooting builds cards (body 3.4% / head 5.1% per hit); thrown for <code>45 + 0.55·Spirit</code> spirit dmg. 1/9 Joker chance else a 2-of-each stack draw. Spades ×1.6, Diamonds −7% both resists (5s), Joker = all suits.</p>
-        <div class="opts">
-          <div class="pill" data-cb="ct_ap2"><span class="t">2 AP</span><span class="s">+40 +0.4·Sp</span></div>
-          <div class="pill" data-cb="ct_ap5"><span class="t">5 AP</span><span class="s">Joker 1/5 · ×2 · −11%</span></div>
-          <div class="pill" data-cb="ct_rr"><span class="t">Rapid Recharge</span><span class="s">+14% CDR · cap 6 · +14 Sp→cards</span></div>
-        </div>
-        <div class="rrinv" id="rrinv">Rapid Recharge spirit invest <select id="rr_inv_from" class="invsel" title="tier before"></select> → <select id="rr_inv_to" class="invsel" title="tier after"></select></div>
-      </div>
-    </div>
-    <div class="startsec">
-      <div class="startsec-head">
-        <label class="sw"><input type="checkbox" id="sc_on"><span class="track"></span></label>
-        <div><div class="tn">Start with cards</div><div class="td">Begin the fight holding a pre-built hand — click a slot to pick its suit. Cards throw in order, left → right. Cap is 4 (6 with Rapid Recharge).</div></div>
-      </div>
-      <div class="cardslots" id="cardslots"></div>
-      <div class="throworder" id="throworder"></div>
-      <div class="cardlegend" id="cardlegend"></div>
-    </div>
+    <div class="grid2" id="abilityGrid"></div>
+    <div id="abilityExtra"></div>
   </div>
 
   <div class="card">
@@ -275,56 +256,56 @@
       <div class="togcell">
         <label class="sw"><input type="checkbox" id="merc_cmp"><span class="track"></span></label>
         <div class="body"><div class="tn">Mercurial Magnum</div>
-          <div class="td">+7 spirit · +22% fire rate · bullets deal spirit = <code>20%+0.38%·Sp</code> of pre-% base dmg</div>
-          <div class="minirow"><label class="mini"><input type="checkbox" id="merc_base"> <b>add to baseline</b></label><label class="mini"><input type="checkbox" id="merc_card"> card bonus</label><label class="mini">spirit invest <select id="merc_inv_from" class="invsel" title="tier before this purchase"></select> → <select id="merc_inv_to" class="invsel" title="tier after this purchase"></select></label></div>
+          <div class="td">+7 spirit and +22% fire rate; bullets also deal bonus spirit damage.</div>
+          <div class="minirow"><label class="mini"><input type="checkbox" id="merc_base"> <b>add to baseline</b></label><label class="mini"><input type="checkbox" id="merc_card"> imbue bonus</label><label class="mini">on <select id="merc_imbue" class="invsel imbsel"></select></label><label class="mini">spirit invest <select id="merc_inv_from" class="invsel" title="tier before this purchase"></select> → <select id="merc_inv_to" class="invsel" title="tier after this purchase"></select></label></div>
         </div>
       </div>
       <div class="togcell">
         <label class="sw"><input type="checkbox" id="tesla_cmp"><span class="track"></span></label>
         <div class="body"><div class="tn">Tesla Bullets</div>
-          <div class="td">15% of bullets proc <code>33+0.19·Sp</code> spirit shock (0.2s cd)</div>
+          <div class="td">15% of bullets shock the target for bonus spirit damage.</div>
           <div class="minirow"><label class="mini"><input type="checkbox" id="tesla_base"> <b>add to baseline</b></label><label class="mini"><input type="checkbox" id="tesla_cap"> Capacitor (+5% FR · 100 burst)</label><label class="mini">wpn invest <select id="tesla_inv_from" class="invsel" title="tier before this purchase"></select> → <select id="tesla_inv_to" class="invsel" title="tier after this purchase"></select></label></div>
         </div>
       </div>
       <div class="togcell">
         <label class="sw"><input type="checkbox" id="ee_cmp"><span class="track"></span></label>
         <div class="body"><div class="tn">Escalating Exposure</div>
-          <div class="td">−8% spirit resist · +4.5% spirit dmg per stack (0.7s cd, max 12)</div>
+          <div class="td">Spirit hits stack +4.5% spirit damage (up to 12) and shred 8% spirit resist.</div>
           <div class="minirow"><label class="mini"><input type="checkbox" id="ee_base"> <b>add to baseline</b></label><label class="mini">spirit invest <select id="ee_inv_from" class="invsel" title="tier before this purchase"></select> → <select id="ee_inv_to" class="invsel" title="tier after this purchase"></select></label></div>
         </div>
       </div>
       <div class="togcell">
         <label class="sw"><input type="checkbox" id="apr_cmp"><span class="track"></span></label>
         <div class="body"><div class="tn">Armor Piercing Rounds</div>
-          <div class="td">+8% weapon damage · 55% of bullets ignore Plated Armor and the enemy's bullet resistance</div>
+          <div class="td">+8% weapon damage; 55% of bullets ignore bullet resist and Plated Armor.</div>
           <div class="minirow"><label class="mini"><input type="checkbox" id="apr_base"> <b>add to baseline</b></label><label class="mini">wpn invest <select id="apr_inv_from" class="invsel" title="tier before this purchase"></select> → <select id="apr_inv_to" class="invsel" title="tier after this purchase"></select></label></div>
         </div>
       </div>
       <div class="togcell">
         <label class="sw"><input type="checkbox" id="so_cmp"><span class="track"></span></label>
         <div class="body"><div class="tn">Spiritual Overflow</div>
-          <div class="td">+6 spirit · +13% duration (Full Auto &amp; Diamond shred) · each bullet builds ~8.5%; at 100% gain +30 spirit &amp; +25% fire rate</div>
+          <div class="td">+6 spirit, +13% duration. After ~12 bullets: +30 spirit, +25% fire rate.</div>
           <div class="minirow"><label class="mini"><input type="checkbox" id="so_base"> <b>add to baseline</b></label><label class="mini">wpn invest <select id="so_inv_from" class="invsel" title="tier before this purchase"></select> → <select id="so_inv_to" class="invsel" title="tier after this purchase"></select></label></div>
         </div>
       </div>
       <div class="togcell">
         <label class="sw"><input type="checkbox" id="shw_cmp"><span class="track"></span></label>
         <div class="body"><div class="tn">Shadow Weave</div>
-          <div class="td">Start of combat: +25% fire rate and +25 spirit for 5s (extended by duration bonuses).</div>
+          <div class="td">+25% fire rate and +25 spirit for the first 5s of the fight.</div>
           <div class="minirow"><label class="mini"><input type="checkbox" id="shw_base"> <b>add to baseline</b></label><label class="mini">wpn invest <select id="shw_inv_from" class="invsel" title="tier before this purchase"></select> → <select id="shw_inv_to" class="invsel" title="tier after this purchase"></select></label></div>
         </div>
       </div>
       <div class="togcell">
         <label class="sw"><input type="checkbox" id="sop_cmp"><span class="track"></span></label>
         <div class="body"><div class="tn">Surge of Power</div>
-          <div class="td">+28 spirit to cards. Throwing a card grants +20% fire rate for 8s (scales with duration); 14s cooldown.</div>
-          <div class="minirow"><label class="mini"><input type="checkbox" id="sop_base"> <b>add to baseline</b></label><label class="mini">spirit invest <select id="sop_inv_from" class="invsel" title="tier before this purchase"></select> → <select id="sop_inv_to" class="invsel" title="tier after this purchase"></select></label></div>
+          <div class="td">The imbued ability gets +28 spirit; using it gives +20% fire rate for 8s.</div>
+          <div class="minirow"><label class="mini"><input type="checkbox" id="sop_base"> <b>add to baseline</b></label><label class="mini">spirit invest <select id="sop_inv_from" class="invsel" title="tier before this purchase"></select> → <select id="sop_inv_to" class="invsel" title="tier after this purchase"></select></label><label class="mini">imbue <select id="sop_imbue" class="invsel imbsel"></select></label></div>
         </div>
       </div>
       <div class="togcell">
         <label class="sw"><input type="checkbox" id="spl_cmp"><span class="track"></span></label>
         <div class="body"><div class="tn">Spellslinger</div>
-          <div class="td">+11% fire rate per ability or active-item use, up to 6 stacks. Counts the Full Auto cast, the Capacitor burst, the Fury Trance and Focus Lens activations, and every card thrown.</div>
+          <div class="td">+11% fire rate per ability or active item used, up to 6 stacks.</div>
           <div class="minirow"><label class="mini"><input type="checkbox" id="spl_base"> <b>add to baseline</b></label><label class="mini">wpn invest <select id="spl_inv_from" class="invsel" title="tier before this purchase"></select> → <select id="spl_inv_to" class="invsel" title="tier after this purchase"></select></label></div>
           <div class="minirow"><label class="mini"><input type="checkbox" id="spl_pre"> pre-stacked</label><select id="spl_pre_n" class="invsel" title="stacks at start of combat"><option value="1">1 stack</option><option value="2">2 stacks</option><option value="3" selected>3 stacks</option><option value="4">4 stacks</option><option value="5">5 stacks</option><option value="6">6 stacks</option></select></div>
         </div>
@@ -332,14 +313,14 @@
       <div class="togcell">
         <label class="sw"><input type="checkbox" id="bf_cmp"><span class="track"></span></label>
         <div class="body"><div class="tn">Burst Fire</div>
-          <div class="td">+10% fire rate. Shooting an enemy grants +32% fire rate for 4.5s (scales with duration); 9s cooldown from trigger.</div>
+          <div class="td">+10% fire rate, plus +32% for 4.5s every 9s while shooting.</div>
           <div class="minirow"><label class="mini"><input type="checkbox" id="bf_base"> <b>add to baseline</b></label><label class="mini">wpn invest <select id="bf_inv_from" class="invsel" title="tier before this purchase"></select> → <select id="bf_inv_to" class="invsel" title="tier after this purchase"></select></label></div>
         </div>
       </div>
       <div class="togcell">
         <label class="sw"><input type="checkbox" id="ft_cmp"><span class="track"></span></label>
         <div class="body"><div class="tn">Fury Trance <span style="color:var(--faint);font-weight:400;font-size:11px">active</span></div>
-          <div class="td">+6% weapon damage. Active: +32% fire rate for 6.5s (scales with duration), but abilities are disabled until it expires — no card throws or Full Auto cast.</div>
+          <div class="td">+6% weapon damage. Active: +32% fire rate for 6.5s, but no abilities.</div>
           <div class="minirow"><label class="mini"><input type="checkbox" id="ft_base"> <b>add to baseline</b></label></div>
           <div class="minirow"><label class="mini"><input type="checkbox" id="ft_delay"> time before activation</label><label class="mini" id="ft_delay_wrap"><input type="number" id="ft_delay_s" min="0" max="30" step="0.1" value="2"> s</label></div>
           <div class="td" id="ft_hint" style="margin-top:4px"></div>
@@ -348,35 +329,35 @@
       <div class="togcell">
         <label class="sw"><input type="checkbox" id="ls_cmp"><span class="track"></span></label>
         <div class="body"><div class="tn">Lucky Shot</div>
-          <div class="td">25% chance per bullet to add +100% of its body-shot damage (after Weapon Damage % and shred; headshot bonus and spirit on-hit not doubled).</div>
+          <div class="td">25% of bullets deal double damage.</div>
           <div class="minirow"><label class="mini"><input type="checkbox" id="ls_base"> <b>add to baseline</b></label><label class="mini">wpn invest <select id="ls_inv_from" class="invsel" title="tier before this purchase"></select> → <select id="ls_inv_to" class="invsel" title="tier after this purchase"></select></label></div>
         </div>
       </div>
       <div class="togcell">
         <label class="sw"><input type="checkbox" id="fl_cmp"><span class="track"></span></label>
         <div class="body"><div class="tn">Focus Lens <span style="color:var(--faint);font-weight:400;font-size:11px">active</span></div>
-          <div class="td">+10% fire rate. Active at 0s: −9% enemy spirit resist for 12s, and stores 35% of all damage dealt over 4.5s, then deals it again ignoring resists (both durations scale).</div>
+          <div class="td">+10% fire rate. Active: −9% spirit resist; 35% of damage over 4.5s repeats.</div>
           <div class="minirow"><label class="mini"><input type="checkbox" id="fl_base"> <b>add to baseline</b></label><label class="mini">spirit invest <select id="fl_inv_from" class="invsel" title="tier before this purchase"></select> → <select id="fl_inv_to" class="invsel" title="tier after this purchase"></select></label></div>
         </div>
       </div>
       <div class="togcell">
         <label class="sw"><input type="checkbox" id="rush_cmp"><span class="track"></span></label>
         <div class="body"><div class="tn">Recharging Rush</div>
-          <div class="td">+10% weapon damage. Dealing 200 weapon damage within 3.5s refills 1 charge (Wraith: generates a card); 25s cooldown.</div>
+          <div class="td" id="rushTxt">+10% weapon damage; 200 weapon damage in 3.5s refills a card (25s cooldown).</div>
           <div class="minirow"><label class="mini"><input type="checkbox" id="rush_base"> <b>add to baseline</b></label><label class="mini">wpn invest <select id="rush_inv_from" class="invsel" title="tier before this purchase"></select> → <select id="rush_inv_to" class="invsel" title="tier after this purchase"></select></label></div>
         </div>
       </div>
       <div class="togcell">
         <label class="sw"><input type="checkbox" id="im_cmp"><span class="track"></span></label>
         <div class="body"><div class="tn">Intensifying Magazine</div>
-          <div class="td">While firing, weapon damage ramps linearly from +0% to +45% over 2.5s.</div>
+          <div class="td">Weapon damage ramps up to +45% over 2.5s of firing.</div>
           <div class="minirow"><label class="mini"><input type="checkbox" id="im_base"> <b>add to baseline</b></label><label class="mini">wpn invest <select id="im_inv_from" class="invsel" title="tier before this purchase"></select> → <select id="im_inv_to" class="invsel" title="tier after this purchase"></select></label></div>
         </div>
       </div>
       <div class="togcell">
         <label class="sw"><input type="checkbox" id="ss_cmp"><span class="track"></span></label>
         <div class="body"><div class="tn">Sharpshooter</div>
-          <div class="td">+10% weapon damage, plus +60% more vs targets 15m+ away. Falloff range +20% (21.6–62.4m instead of 18–52m).</div>
+          <div class="td">+10% weapon damage (+70% at 15m+) and 20% longer falloff range.</div>
           <div class="minirow"><label class="mini"><input type="checkbox" id="ss_base"> <b>add to baseline</b></label><label class="mini">wpn invest <select id="ss_inv_from" class="invsel" title="tier before this purchase"></select> → <select id="ss_inv_to" class="invsel" title="tier after this purchase"></select></label></div>
         </div>
       </div>
@@ -397,7 +378,7 @@
     </div>
 
     <div class="charthead">
-      <span class="lbl" id="chartLbl">DPS vs fight length</span>
+      <span class="lbl" id="chartLbl">DPS vs fight length</span><span id="chartBusy" class="busytag">updating…</span>
       <div class="seg" id="xseg"><button data-x="eng" class="on" id="xEngBtn">vs engagement</button><button data-x="boons">vs boons</button></div>
     </div>
     <div class="chartwrap"><canvas id="chart" height="320"></canvas></div>
@@ -407,26 +388,34 @@
   <div class="card" id="howto">
     <div class="notes">
       <h2>How to use</h2>
-      <p class="lead">This tool answers one question: <b>which item should Wraith buy next?</b> Describe your build, pick the items you're considering, and it simulates fights to show which one adds the most damage.</p>
+      <p class="lead">This tool answers one question: <b>which item should <span class="heroName">Wraith</span> buy next?</b> Describe your build, pick the items you're considering, and it simulates fights to show which one adds the most damage.</p>
       <ol class="steps">
         <li><b>Set your baseline stats.</b> In <i>Base values</i>, enter your boons, headshot rate, and any weapon damage, fire rate, or spirit you already have.</li>
-        <li><b>Toggle abilities.</b> Turn Full Auto and Card Trick on or off, and tick any AP upgrades you have leveled. You can also click the card slots to start the fight holding cards.</li>
+        <li><b>Toggle abilities.</b> Turn <span id="howtoAbilities">Full Auto and Card Trick</span> on or off, and tick any AP upgrades you have leveled.<span data-ability="cardTrick"> You can also click the card slots to start the fight holding cards.</span></li>
         <li><b>Choose what items/stats to compare.</b> Each stat slider in <i>Comparison items</i> set above 0, and each item you switch on, adds its own row to the table. If you already own an item, tick its <i>add to baseline</i> box instead: every row then includes it, so the table shows what's best to buy next.</li>
         <li><b>Table explanation.</b> Each row is your build plus that one item or stat, and the highlighted cell in each column is the best result. <i>DPS @3s</i> is a short burst, the next column uses your engagement length, and <i>Total dmg</i> is the damage dealt over that fight. With <i>Time to kill</i> on, the table shows seconds to kill instead, where lower is better.</li>
       </ol>
       <details class="model"><summary>Modeling details</summary>
         <ul class="tips">
           <li>Weapon damage is reduced by bullet resist and spirit damage by spirit resist; shred subtracts from resist, which can go negative and amplify.</li>
-          <li>Bullet damage is <code>(5.64 + 0.14·boons) × (1 + Weapon Damage %)</code>; headshots deal ×1.65 on bullet damage only. Boons also give 1.1 spirit each.</li>
+          <li id="mdWeapon" style="display:none"></li>
+          <li id="mdStats">Bullet damage is <code>(5.64 + 0.14·boons) × (1 + Weapon Damage %)</code>; headshots deal ×1.65 on bullet damage only. Boons also give 1.1 spirit each.</li>
           <li>Numbers are averages over many seeded simulated fights, so the same inputs always give the same results.</li>
-          <li>Abilities and active items are used once per fight at the start (Full Auto first), unless an item lets you set its timing. No recasts.</li>
-          <li>Cards are thrown as soon as they're ready (0.6s apart); a starting hand throws left to right. Suits come from a 2-of-each deck plus a Joker chance.</li>
+          <li>Abilities and active items are used once per fight at the start<span data-ability="fullAuto"> (Full Auto first)</span><span data-ability="sleepDagger"> (Sleep Dagger first, then Bullet Dance)</span>, unless an item lets you set its timing. No recasts.</li>
+          <li data-ability="sleepDagger">Sleep Dagger lands before the first bullet; it isn't a bullet, so no falloff or Plated Armor. Its 1AP shred lowers bullet resist only, for 6s (extended by duration bonuses).</li>
+          <li data-ability="fixation">Fixation stacks build by their average per bullet (1, or 3 on a headshot), and each bullet's bonus uses the stacks already on the target before it hits. The bonus can headshot and gets Lucky Shot and falloff; its per-stack value grows with Weapon Damage % (including Intensifying Magazine's ramp) but isn't multiplied by it. The 1AP bursts trigger at every 20 stacks up to and including max, then stop while you stay at max; they're spirit damage and fall off with range like other on-hit effects.</li>
+          <li data-ability="bulletDance">Bullet Dance's duration uses your spirit when it's cast. While it lasts, every bullet is a body shot and adds 1 Fixation stack; its flat damage gets Lucky Shot but not Weapon Damage %.</li>
+          <li data-ability="cardTrick">Cards build 3.4% per body hit and 5.1% per headshot, and are thrown as soon as they're ready (0.6s apart); a starting hand throws left to right. Suits come from a 2-of-each deck plus a 1/9 Joker chance (1/5 at 5AP): Spades ×1.6, Diamonds −7% both resists for 5s, and a Joker counts as every suit.</li>
           <li>Fire-rate bonuses add together; separate damage reductions multiply.</li>
-          <li>Lucky Shot, Plated Armor, and Armor Piercing Rounds use their average effect rather than rolling each bullet.</li>
-          <li>Past 18m, bullet damage and on-hit effects (Full Auto, Mercurial, Tesla/Capacitor) fall off linearly to 10% at 52m (21.6m and 62.4m with Sharpshooter). Cards and the Capacitor burst don't fall off.</li>
-          <li>Mercurial's card bonus is added after the suit multiplier, and its bullet damage uses base damage before Weapon Damage %.</li>
+          <li>Lucky Shot, Plated Armor, and Armor Piercing Rounds use their average effect rather than rolling each bullet. Lucky Shot doubles body-shot damage only; the headshot bonus and spirit on-hit effects aren't doubled.</li>
+          <li id="mdPlated"></li>
+          <li id="mdCleanse"></li>
+          <li id="mdSpell"></li>
+          <li>Mercurial Magnum's bullets deal <code>20% + 0.38%·Spirit</code> of base bullet damage as spirit; Tesla's shock deals <code>33 + 0.19·Spirit</code> (0.2s cooldown); Escalating Exposure stacks at most every 0.7s. Duration bonuses extend ability and item durations, including shred.</li>
+          <li><span id="mdFalloff">Past 18m, bullet damage and on-hit effects fall off linearly to 10% at 52m (21.6m and 62.4m with Sharpshooter).</span><span id="mdNoFall"></span></li>
+          <li data-ability="cardTrick">Mercurial's card bonus is added after the suit multiplier, and its bullet damage uses base damage before Weapon Damage %.</li>
           <li>Focus Lens's echo only counts if it lands before the fight ends. Time to kill caps at 60s; a <code>*</code> marks rows that sometimes don't kill in time.</li>
-          <li>Each item's own mechanics are described next to its toggle.</li>
+          <li>Each item's key numbers are listed next to its toggle.</li>
         </ul>
       </details>
     </div>
@@ -446,31 +435,239 @@
 "use strict";
 /* ================= ENGINE (verified in Node) ================= */
 function mulberry32(a){return function(){a|=0;a=(a+0x6D2B79F5)|0;let t=Math.imul(a^(a>>>15),1|a);t=(t+Math.imul(t^(t>>>7),61|t))^t;return((t^(t>>>14))>>>0)/4294967296;};}
-const CAP_BOONS=35, TTK_CAP=60;
+const TTK_CAP=60;
+
+/* ======================= HEROES ======================= */
+// Everything hero-specific lives here. Shared items never reference a hero directly;
+// they act through generic hooks (charge ability, ability used, abilities locked, debuff cleanse).
+const HEROES={
+  wraith:{
+    id:'wraith', name:'Wraith',
+    stats:{bullet:5.64, bulletPerBoon:0.14, spiritPerBoon:1.1, boonCap:35, fireRate:10.6,
+           headshotBonus:0.65,                 // headshots deal x1.65 bullet damage
+           falloffStart:18, falloffEnd:52},    // metres: full damage to start, linear to 10% at end
+    weapon:{type:'auto'},
+    abilities:['fullAuto','cardTrick'],
+    chargeAbility:'cardTrick',                 // charge-based ability: Rapid Recharge, Recharging Rush
+    imbueDefault:'cardTrick'                   // default imbue target: Surge of Power, Mercurial's ability bonus
+  },
+  seven:{
+    id:'seven', name:'Seven',
+    stats:{bullet:10.8, bulletPerBoon:0.24, spiritPerBoon:1.1,
+           falloffStart:20, falloffEnd:58,
+           boonCap:35, headshotBonus:0.65,     // not yet specified for Seven: Wraith's values
+           fireRate:3/(3*0.084+0.2625)},       // average shots/s of the burst pattern (readouts only)
+    weapon:{type:'burst', shots:3, shotDelay:0.084, burstDelay:0.2625},
+    abilities:['powerSurge'],
+    chargeAbility:null,
+    imbueDefault:'powerSurge'
+  },
+  haze:{
+    id:'haze', name:'Haze',
+    stats:{bullet:5.26, bulletPerBoon:0.143, spiritPerBoon:0.5, boonCap:35, fireRate:9.52,
+           headshotBonus:0.65, falloffStart:20, falloffEnd:46},
+    weapon:{type:'auto'},
+    abilities:['sleepDagger','fixation','bulletDance'],
+    chargeAbility:null,
+    imbueDefault:'sleepDagger'
+  }
+};
+// Hero-specific wording for the shared item notes in Modeling details and the Fury Trance hint (see renderHeroShell).
+//   casts    abilities used at the start of the fight;  uses  what Spellslinger counts
+//   plated   what Plated Armor's separate 50% roll blocks;  cleanse  what Debuff Remover strips
+//   heldNote Fury Trance with a delay
+const HERO_TEXT={
+  wraith:{casts:['Full Auto'], uses:['the Full Auto cast','the Capacitor burst','the Fury Trance and Focus Lens activations','every card thrown'],
+    plated:"that bullet's card generation and its Full Auto / Mercurial / Tesla spirit (not the Capacitor burst or thrown-card damage)",
+    cleanse:['active Diamond-card shred'], heldNote:'cards held until then can be thrown first'},
+  seven:{casts:['Power Surge'], uses:['the Power Surge cast','the Capacitor burst','the Fury Trance and Focus Lens activations'],
+    plated:"that bullet's Power Surge / Mercurial / Tesla spirit (not the Capacitor burst)",
+    cleanse:["Power Surge's spirit resist shred"], heldNote:''},
+  haze:{casts:['Sleep Dagger','Bullet Dance'], uses:['the Sleep Dagger and Bullet Dance casts','the Capacitor burst','the Fury Trance and Focus Lens activations'],
+    plated:"that bullet's Fixation stack and Fixation damage, and its Mercurial / Tesla spirit (not the Capacitor burst or Sleep Dagger)",
+    cleanse:["Sleep Dagger's bullet resist shred",'all Fixation stacks (they rebuild as you keep shooting)'], heldNote:''}
+};
+
+/* ======================= WEAPON MODELS ======================= */
+// create(weapon) -> per-fight {gap(fr,mult), first()}:
+//   gap   seconds until the next shot (fr = shots/s for auto weapons, mult = 1 + all fire-rate bonuses)
+//   first true if the shot being fired opens a burst (every shot, for auto weapons)
+// rate(weapon, baseFR, mult) -> average shots/s, for readouts.
+// New firing patterns plug in here without touching items or abilities.
+const WEAPON_MODELS={
+  auto:{create:()=>({gap:fr=>1/fr, first:()=>true, reset(){}}),
+        rate:(w,base,m)=>base*m},
+  burst:{create:w=>{const s={i:0};   // index of the shot about to fire within its burst
+          return{reset(){s.i=0;}, first:()=>s.i===0,
+                 gap(fr,m){const g=s.i===w.shots-1?w.shotDelay+w.burstDelay/m:w.shotDelay; s.i=(s.i+1)%w.shots; return g;}};},   // fire rate shortens only the pause between bursts
+         rate:(w,base,m)=>w.shots/(w.shots*w.shotDelay+w.burstDelay/m)}
+};
+
+/* ======================= ABILITIES ======================= */
+// Each ability:
+//   channel         its damage channel {id,label,onHit}; onHit = applied per bullet (falloff, Plated block)
+//   resolve(a,env)  -> fixed params for a fight, or null when switched off (a = its settings)
+//   peak(P)         optional peak fire-rate bonus for the build readout
+//   create(P,run)   -> hooks, built once per simulation; reset() starts each fight. The engine calls them each shot in this order:
+//     cast(t,sp)     start-of-fight use (sp = current spirit); calls run.abilityUsed(P.id,t)
+//     noHs(t)        true while headshots are impossible (every bullet is a body shot)
+//     fireRate(t)    additive fire-rate bonus
+//     shred(t)       shred on both resists
+//     spShred(t)     shred on spirit resist only
+//     buShred(t)     shred on bullet resist only
+//     onHit(t,x)     per-bullet damage; returns true if spirit damage was dealt.
+//                    Bullet-type bonus damage uses x.wf (or x.wfBlk when Plated's 50% roll also blocks it), x.hsMult,
+//                    R.luckyFrac and x.wdFrac, and adds itself to x.wExtra so weapon-damage items count it
+//     afterShot(t)   per-bullet upkeep (e.g. building charges)
+//     act(t,x)       discrete uses (e.g. throwing a card); returns a shooting lockout in seconds
+//     cleanse()      enemy debuff remover strips this ability's debuffs
+//     canRefill()/refill()   charge abilities only (Recharging Rush)
+//     stats()        per-fight counters for the readout
+// imbuable:false marks abilities (passives) that imbue items can't target; they're left out of the imbue dropdowns.
+// Imbue items reach an ability through P.imbueSp (extra spirit for its scaling) and P.hit (charged hit bonus),
+// set by the engine for whichever ability each item is imbued to.
+const isSpadesLike=s=>s==='S'||s==='J';
+const isDiamondLike=s=>s==='D'||s==='J';
+const ABILITIES={
+  fullAuto:{
+    name:'Full Auto', channel:{id:'fa',label:'Full Auto',onHit:true},
+    resolve(a,env){ if(!a||!a.on)return null;
+      return {fr:0.20+(a.ap2?0.10:0), dur:(5+(a.ap2?3:0))*env.durMult, scale:a.ap5?0.09:0.045}; },
+    peak(P){ return {fr:P.fr,tag:'FA'}; },
+    create(P,run){ const R=run.R; const st={cast:false,on:false,lastHit:-1e9};
+      return{
+        reset(){ st.cast=false; st.on=false; st.lastHit=-1e9; },
+        cast(t){ if(!st.cast&&t>=R.abilityStart){st.cast=true;run.abilityUsed(P.id,t);} st.on=st.cast&&t<R.abilityStart+P.dur; },
+        fireRate(){ return st.on?P.fr:0; },
+        onHit(t,x){ if(!st.on)return false;
+          const sp=x.curSp+P.imbueSp[0]+P.imbueSp[1];
+          const hb=P.hit, bonus=hb?(hb.base+hb.perSp*x.curSp)*Math.min(1,(t-st.lastHit)/hb.charge):0; if(hb)st.lastHit=t;
+          run.chv[P.ci]+=(2+P.scale*sp+bonus)*x.spiritMult*x.ampMult*R.platedBlock*R.outS*R.fall; return true; }
+      };}
+  },
+  cardTrick:{
+    name:'Card Trick', channel:{id:'card',label:'cards',onHit:false},
+    resolve(a,env){ if(!a||!a.on)return null; const im=env.imbue, maxCards=4+im.extraCharges;
+      return {cardConst:45+(a.ap2?40:0), cardCoef:0.55+(a.ap2?0.4:0), spades:a.ap5?2.0:1.6, dShred:a.ap5?0.11:0.07, pJoker:a.ap5?0.20:(1/9),
+        genPerShot:(env.headshotRate*0.051+(1-env.headshotRate)*0.034)*(1/(1-im.cdr))*env.platedBlock,
+        maxCards, startSuits:(a.startSuits||[]).slice(0,maxCards), diamondDur:5*env.durMult}; },
+    create(P,run){ const R=run.R, rng=run.rng; const q=[]; let stack=[]; const st={prog:0,lastThrow:-1e9,nextThrow:0,diamondUntil:-1e9,throws:0};
+      const addCard=()=>{if(q.length<P.maxCards){let suit;if(rng()<P.pJoker)suit='J';else{if(stack.length===0)stack=['S','S','D','D','C','C','H','H'];const idx=(rng()*stack.length)|0;suit=stack.splice(idx,1)[0];}q.push(suit);}};
+      return{
+        reset(){ q.length=0; for(let i=0;i<P.startSuits.length;i++)q.push(P.startSuits[i]); stack.length=0; st.prog=0; st.lastThrow=-1e9; st.nextThrow=0; st.diamondUntil=-1e9; st.throws=0; },
+        shred(t){ return t<st.diamondUntil?P.dShred:0; },
+        afterShot(){ st.prog+=P.genPerShot; while(st.prog>=1){st.prog-=1;addCard();} },
+        canRefill(){ return q.length<P.maxCards; },
+        refill(){ addCard(); },
+        act(t,x){ if(q.length===0||t<st.nextThrow||x.locked)return 0;
+          const suit=q.shift();
+          const sp=x.curSp+P.imbueSp[0]+P.imbueSp[1];                             // imbue items add spirit to this ability only
+          const hb=P.hit, bonus=hb?(hb.base+hb.perSp*x.curSp)*Math.min(1,(t-st.lastThrow)/hb.charge):0;   // charged hit bonus (Mercurial)
+          const base=(P.cardConst+P.cardCoef*sp)*(isSpadesLike(suit)?P.spades:1)+bonus;
+          run.chv[P.ci]+=base*x.spiritMult*x.ampMult*R.outS;
+          if(isDiamondLike(suit))st.diamondUntil=t+P.diamondDur;
+          run.spiritHit(t); st.lastThrow=t; st.nextThrow=t+0.6; st.throws++;
+          run.abilityUsed(P.id,t);
+          return 0.1; },
+        cleanse(){ st.diamondUntil=-1e9; },
+        stats(){ return {throws:st.throws}; }
+      };}
+  },
+  powerSurge:{
+    name:'Power Surge', channel:{id:'ps',label:'Power Surge',onHit:true},
+    resolve(a,env){ if(!a||!a.on)return null;
+      return {base:a.ap2?18:10, perSp:a.ap2?0.37:0.14, dur:(10+(a.ap5?10:0))*env.durMult, spShred:a.ap5?0.15:0}; },
+    create(P,run){ const R=run.R; const st={cast:false,on:false,stripped:false,lastHit:-1e9};
+      return{
+        reset(){ st.cast=false; st.on=false; st.stripped=false; st.lastHit=-1e9; },
+        cast(t){ if(!st.cast&&t>=R.abilityStart){st.cast=true;run.abilityUsed(P.id,t);} st.on=st.cast&&t<R.abilityStart+P.dur; },
+        spShred(){ return st.on&&!st.stripped?P.spShred:0; },           // 5AP: target's spirit resist -15 points while active
+        onHit(t,x){ if(!st.on||!x.first)return false;                    // first bullet of each burst
+          const sp=x.curSp+P.imbueSp[0]+P.imbueSp[1];
+          const hb=P.hit, bonus=hb?(hb.base+hb.perSp*x.curSp)*Math.min(1,(t-st.lastHit)/hb.charge):0; if(hb)st.lastHit=t;
+          run.chv[P.ci]+=(P.base+P.perSp*sp+bonus)*x.spiritMult*x.ampMult*R.platedBlock*R.outS*R.fall; return true; },
+        cleanse(){ st.stripped=true; }                                    // debuff remover strips the shred, not Seven's buff
+      };}
+  },
+  sleepDagger:{
+    name:'Sleep Dagger', channel:{id:'sd',label:'Sleep Dagger',onHit:false},
+    resolve(a,env){ if(!a||!a.on)return null;
+      return {base:65, perSp:2.2, shred:a.ap1?0.10:0, shredDur:6*env.durMult, stacks:a.ap2?15:0}; },
+    create(P,run){ const R=run.R; const st={cast:false,pending:false,until:-1e9};
+      return{
+        reset(){ st.cast=false; st.pending=false; st.until=-1e9; },
+        cast(t){ if(!st.cast&&t>=R.abilityStart){ st.cast=true; st.pending=true;     // lands before the first bullet
+            if(P.shred>0)st.until=t+P.shredDur;                                         // 1AP: bullet resist shred
+            if(P.stacks>0)run.addStacks(P.stacks);                                      // 2AP: Fixation stacks
+            run.abilityUsed(P.id,t);} },
+        buShred(t){ return t<st.until?P.shred:0; },
+        onHit(t,x){ if(!st.pending)return false; st.pending=false;                      // the dagger itself: thrown, so no falloff or Plated roll
+          const sp=x.curSp+P.imbueSp[0]+P.imbueSp[1], hb=P.hit, bonus=hb?hb.base+hb.perSp*x.curSp:0;   // single cast: imbue bonus fully charged
+          run.chv[P.ci]+=(P.base+P.perSp*sp+bonus)*x.spiritMult*x.ampMult*R.outS; return true; },
+        cleanse(){ st.until=-1e9; }
+      };}
+  },
+  fixation:{
+    name:'Fixation', channel:{id:'fix',label:'Fixation',onHit:true},
+    imbuable:false,                                                    // passive: Mercurial / Surge of Power can't be imbued on it
+    resolve(a,env){ if(!a||!a.on)return null;
+      return {perStack:0.2+(a.ap5?0.11:0), max:a.ap2?80:40, proc:!!a.ap1}; },
+    create(P,run){ const R=run.R; const st={stacks:0,fullT:-1,procs:0};
+      run.addStacks=n=>{st.stacks=Math.min(P.max,st.stacks+n);};    // other abilities apply stacks through this (Sleep Dagger 2AP)
+      const hsGain=1+2*R.hsRate;                                       // expected stacks per bullet: 1, or 3 on a headshot
+      return{
+        reset(){ st.stacks=0; st.fullT=-1; st.procs=0; },
+        onHit(t,x){ const c=run.chv, s0=st.stacks; let sp=false;
+          // bonus bullet damage from the stacks already on the target: can headshot, boosted by Lucky Shot, not multiplied by Weapon Damage %
+          if(s0>0){const d=s0*(P.perStack+0.035*x.wdFrac)*(x.hsMult+R.luckyFrac)*x.wfBlk; c[P.ci]+=d; x.wExtra+=d;}
+          // then this bullet's stacks (Plated's 50% roll blocks them unless Armor Piercing procs)
+          let s1=s0+(x.noHs?1:hsGain)*R.platedBlock; if(s1>P.max)s1=P.max; st.stacks=s1;
+          if(P.proc&&s1>s0){   // 1AP: each 20-stack threshold deals spirit damage, including the one that reaches max;
+                               // stacks are capped, so shooting at max adds nothing and never triggers another burst
+            for(let k=Math.floor(s0/20)+1,k1=Math.floor(s1/20);k<=k1;k++){
+              c[P.ci]+=(40+0.8*x.curSp)*x.spiritMult*x.ampMult*R.outS*R.fall; st.procs++; sp=true;}}
+          if(st.fullT<0&&s1>=P.max)st.fullT=t;
+          return sp; },
+        cleanse(){ st.stacks=0; },                                     // debuff remover clears the stacks; they rebuild
+        stats(){ return {fixStacks:st.stacks, fixCap:P.max, fixFull:st.fullT>=0?1:0, fixFullT:st.fullT>=0?st.fullT:0, fixProcs:st.procs}; }
+      };}
+  },
+  bulletDance:{
+    name:'Bullet Dance', channel:{id:'bd',label:'Bullet Dance',onHit:true},
+    resolve(a,env){ if(!a||!a.on)return null;
+      return {fr:a.ap2?0.35:0.25, flat:a.ap1?14:7, durMult:env.durMult}; },
+    peak(P){ return {fr:P.fr,tag:'BD'}; },
+    create(P,run){ const R=run.R; const st={cast:false,on:false,end:0,dur:0,lastHit:-1e9};
+      return{
+        reset(){ st.cast=false; st.on=false; st.end=0; st.dur=0; st.lastHit=-1e9; },
+        cast(t,sp){ if(!st.cast&&t>=R.abilityStart){ st.cast=true;
+            st.dur=(3.5+0.03*(sp+P.imbueSp[0]+P.imbueSp[1]))*P.durMult; st.end=t+st.dur; run.abilityUsed(P.id,t);}   // duration from spirit at cast
+          st.on=st.cast&&t<st.end; },
+        noHs(){ return st.on; },                                       // 100% accuracy, but no headshots
+        fireRate(){ return st.on?P.fr:0; },
+        onHit(t,x){ if(!st.on)return false;
+          const d=P.flat*(1+R.luckyFrac)*x.wf; run.chv[P.ci]+=d; x.wExtra+=d;   // flat bullet damage: Lucky Shot yes, Weapon Damage % no
+          const hb=P.hit; if(!hb)return false;
+          run.chv[P.ci]+=(hb.base+hb.perSp*x.curSp)*Math.min(1,(t-st.lastHit)/hb.charge)*x.spiritMult*x.ampMult*R.platedBlock*R.outS*R.fall; st.lastHit=t; return true; },
+        stats(){ return {bdDur:st.dur}; }
+      };}
+  }
+};
+
+/* ======================= ENGINE ======================= */
 function resolve(cfg){
-  const boons=Math.min(cfg.boons,CAP_BOONS);
+  const H=HEROES[cfg.hero]||HEROES.wraith, S=H.stats;
+  const boons=Math.min(cfg.boons,S.boonCap);
   const merc=cfg.mercurial;
-  const spirit=cfg.baseSpirit+1.1*boons+(merc.on?7:0);
-  const flatWeapon=5.64+0.14*boons;
+  const spirit=cfg.baseSpirit+S.spiritPerBoon*boons+(merc.on?7:0);
+  const flatWeapon=S.bullet+S.bulletPerBoon*boons;
   const rangeM=+cfg.range||0, ssOn=!!(cfg.sharpshooter&&cfg.sharpshooter.on);   // Sharpshooter: +10% wpn dmg, +60% more at 15m+, falloff range +20%
   const wdPctEff=cfg.weaponDamagePct+(ssOn?10+(rangeM>=15?60:0):0);
   const weaponDmg=flatWeapon*(1+wdPctEff/100);
   const so=cfg.spiritOverflow||{}, soOn=!!so.on;
   const sw=cfg.shadowWeave||{}, swOn=!!sw.on;
   const durMult=soOn?1.13:1;
-  const fa=cfg.fullAuto;
-  const faFR=fa.on?(0.20+(fa.ap2?0.10:0)):0;
-  const faDur=(5+(fa.ap2?3:0))*durMult;
-  const faScale=fa.ap5?0.09:0.045;
-  const ct=cfg.cardTrick;
-  const rrCardSp=ct.rapidRecharge?14:0;
-  const cardConst=45+(ct.ap2?40:0), cardCoef=0.55+(ct.ap2?0.4:0);
-  const spadesMult=ct.ap5?2.0:1.6;
-  const cardDiamondShred=ct.ap5?0.11:0.07;
-  const pJoker=ct.ap5?0.20:(1/9);
-  const cdr=ct.rapidRecharge?0.14:0;
-  const cardGenMult=1/(1-cdr);
-  const maxCards=ct.rapidRecharge?6:4;
+  const rrOn=!!(cfg.rapidRecharge&&cfg.rapidRecharge.on), rrCardSp=rrOn?14:0;   // Rapid Recharge: imbues the charge ability
   const mercFR=merc.on?0.22:0;
   const tesla=cfg.tesla;
   const teslaProc=tesla.on?(tesla.capacitor?0.20:0.15):0;
@@ -481,21 +678,21 @@ function resolve(cfg){
   const plated=cfg.platedArmor;
   const aprIgnore=cfg.apr?0.55:0;
   const platedBlock=plated?(aprIgnore+(1-aprIgnore)*0.5):1;
-  const genPerShot=(cfg.headshotRate*0.051+(1-cfg.headshotRate)*0.034)*cardGenMult*platedBlock;
   const tk=cfg.ttk||{}, ttkOn=!!tk.on, ttkHP=ttkOn?Math.max(1,+tk.hp||1):0;
   const hsDR=(ttkOn&&tk.hsDROn)?Math.min(1,Math.max(0,(+tk.hsDR||0)/100)):0;
   const spRes=ttkOn&&!!tk.spiritRes, buRes=ttkOn&&!!tk.bulletRes;   // Resilience: +30% resist, +45% below 50% HP
   const sv=tk.shiv||{}, bl=ttkOn&&!!sv.on;   // Shiv Bloodletting: defers part of damage taken over 6s; active cleanses part of the pending pool
   const blDefer=bl?0.25+(sv.rage?0.15:0)+(sv.ap5?0.15:0):0, blCleanse=bl?(sv.ap2?0.70:0.30):0, blTime=bl?Math.max(0,+sv.time||0):1e9;
-  const wdPerBullet=weaponDmg*(1+cfg.headshotRate*0.65*(1-hsDR));
+  const wdPerBullet=weaponDmg*(1+cfg.headshotRate*S.headshotBonus*(1-hsDR));
   const luckyBonus=(cfg.luckyShot&&cfg.luckyShot.on)?0.25*weaponDmg:0;   // expected +100% of pre-headshot bullet dmg on 25% of bullets
-  const fs0=ssOn?21.6:18, fs1=ssOn?62.4:52, fall=1-0.9*Math.min(1,Math.max(0,(rangeM-fs0)/(fs1-fs0)));   // range falloff: 100% to fs0, linear to 10% at fs1
+  const fs0=ssOn?S.falloffStart*(100+20)/100:S.falloffStart, fs1=ssOn?S.falloffEnd*(100+20)/100:S.falloffEnd;   // Sharpshooter: falloff range +20%
+  const fall=1-0.9*Math.min(1,Math.max(0,(rangeM-fs0)/(fs1-fs0)));   // range falloff: 100% to fs0, linear to 10% at fs1
   const imOn=!!(cfg.intensifyingMag&&cfg.intensifyingMag.on), wdFrac=wdPctEff/100;   // Intensifying Magazine: +0%->+45% weapon damage over 2.5s of firing
-  const rushOn=!!(cfg.rechargingRush&&cfg.rechargingRush.on);   // Recharging Rush: 200 weapon dmg within 3.5s -> +1 card, 25s cd
+  const rushOn=!!(cfg.rechargingRush&&cfg.rechargingRush.on);   // Recharging Rush: 200 weapon dmg within 3.5s -> refill 1 charge, 25s cd
   const flOn=!!(cfg.focusLens&&cfg.focusLens.on), flFR=flOn?0.10:0, flShred=flOn?0.09:0, flShredDur=flOn?12*durMult:0, flWin=flOn?4.5*durMult:0, flStore=flOn?0.35:0;
   const outW=cfg.inhibitor?0.70:1, outS=outW*(cfg.silencer?0.75:1);   // Inhibitor: all dmg -30%; Silencer: spirit dmg -25%
   const drTime=(cfg.debuffRemover&&cfg.debuffRemover.on)?Math.max(0,+cfg.debuffRemover.time||0):1e9;   // enemy cleanse time
-  const soFR=soOn?0.25:0, soSpirit=soOn?30:0, soBuild=soOn?0.115/1.35:0, diamondDur=5*durMult;
+  const soFR=soOn?0.25:0, soSpirit=soOn?30:0, soBuild=soOn?0.115/1.35:0;
   const swFR=swOn?0.25:0, swSpirit=swOn?25:0, swDur=swOn?5*durMult:0;
   const surge=cfg.surge||{}, surgeOn=!!surge.on;
   const spellOn=!!(cfg.spellslinger&&cfg.spellslinger.on), spellFR=spellOn?0.11:0, spellMax=6;
@@ -503,114 +700,346 @@ function resolve(cfg){
   const bfOn=!!(cfg.burstFire&&cfg.burstFire.on), bfPassive=bfOn?0.10:0, bfFR=bfOn?0.32:0, bfDur=bfOn?4.5*durMult:0, bfCd=9;
   const ftc=cfg.furyTrance||{}, ftOn=!!ftc.on, ftFR=ftOn?0.32:0, ftDur=ftOn?6.5*durMult:0;
   const ftStart=ftOn?(ftc.delayOn?Math.max(0,+ftc.delay||0):0):1e9;
-  const ftFirst=ftOn&&ftc.delayOn&&ftStart<=0;   // delay ticked at 0s: Fury Trance before Full Auto
-  const faStart=ftFirst?ftDur:0;                  // Full Auto cast as soon as abilities are available
-  const surgeCardSp=surgeOn?28:0, surgeFR=surgeOn?0.20:0, surgeDur=surgeOn?8*durMult:0;
-  return{boons,spirit,flatWeapon,weaponDmg,wdPerBullet,plated,aprIgnore,platedBlock,faScale,rrCardSp,cardConst,cardCoef,teslaDmgBase,
-    soFR,soSpirit,soBuild,diamondDur,swFR,swSpirit,swDur,surgeCardSp,surgeFR,surgeDur,spellFR,spellMax,spellPre,bfPassive,bfFR,bfDur,bfCd,ftFR,ftDur,ftStart,faStart,luckyBonus,flFR,flShred,flShredDur,flWin,flStore,drTime,rushOn,imOn,wdFrac,fall,outW,outS,ttk:ttkOn,hp:ttkHP,spRes,buRes,bl,blDefer,blCleanse,blTime,
-    fa:{on:fa.on,fr:faFR,dur:faDur},
-    ct:{on:ct.on,spades:spadesMult,dShred:cardDiamondShred,pJoker,genPerShot,maxCards,startSuits:(ct.startSuits||[]).slice(0,maxCards)},
-    merc:{on:merc.on,fr:mercFR,cardBonus:!!merc.cardBonus},
+  const ftFirst=ftOn&&ftc.delayOn&&ftStart<=0;   // delay ticked at 0s: Fury Trance before abilities
+  const abilityStart=ftFirst?ftDur:0;             // abilities are first usable once any opening lockout ends
+  const surgeCardSp=surgeOn?28:0, surgeFR=surgeOn?0.20:0, surgeDur=surgeOn?8*durMult:0;   // Surge of Power: imbues the charge ability
+  // abilities
+  const env={durMult, headshotRate:cfg.headshotRate, platedBlock, imbue:{cdr:rrOn?0.14:0, extraCharges:rrOn?2:0}};
+  // imbue items attach to one ability each (default: the hero's imbueDefault); Rapid Recharge always targets the charge ability
+  const surgeTarget=surge.imbue||H.imbueDefault, mercTarget=merc.imbue||H.imbueDefault;
+  const mercHit=(merc.on&&merc.cardBonus)?{base:60,perSp:0.16,charge:14}:null;
+  const abCfg=cfg.abilities||{}, abilities=[], channels=[];
+  for(const id of H.abilities){const def=ABILITIES[id]; channels.push(def.channel); const P=def.resolve(abCfg[id],env);
+    if(P){const imb=def.imbuable!==false;   // passives can't take imbue items
+      P.id=id; P.ci=channels.length-1; P.imbueSp=[id===H.chargeAbility?rrCardSp:0, imb&&id===surgeTarget?surgeCardSp:0]; P.hit=imb&&id===mercTarget?mercHit:null; abilities.push({id,def,P});}}
+  const onHitIds=channels.filter(c=>c.onHit).map(c=>c.id), otherIds=channels.filter(c=>!c.onHit).map(c=>c.id);
+  const onHitIdx=channels.map((c,i)=>c.onHit?i:-1).filter(i=>i>=0), otherIdx=channels.map((c,i)=>c.onHit?-1:i).filter(i=>i>=0);
+  let peakFR=0, peakTag=''; for(const a of abilities)if(a.def.peak){const pk=a.def.peak(a.P);peakFR+=pk.fr;peakTag=pk.tag;}
+  const hsMult=1+cfg.headshotRate*S.headshotBonus*(1-hsDR);   // average headshot multiplier on bullet damage (wdPerBullet = weaponDmg·hsMult)
+  return{H,boons,spirit,flatWeapon,weaponDmg,wdPerBullet,wdBody:weaponDmg,hsRate:cfg.headshotRate,hsMult,luckyFrac:luckyBonus>0?0.25:0,plated,aprIgnore,platedBlock,teslaDmgBase,
+    soFR,soSpirit,soBuild,swFR,swSpirit,swDur,surgeFR,surgeDur,spellFR,spellMax,spellPre,bfPassive,bfFR,bfDur,bfCd,ftFR,ftDur,ftStart,abilityStart,luckyBonus,flFR,flShred,flShredDur,flWin,flStore,drTime,rushOn,imOn,wdFrac,fall,outW,outS,ttk:ttkOn,hp:ttkHP,spRes,buRes,bl,blDefer,blCleanse,blTime,
+    abilities, channels, onHitIds, otherIds, onHitIdx, otherIdx, chargeId:H.chargeAbility, peakFR, peakTag,
+    surgeTarget,
+    merc:{on:merc.on,fr:mercFR},
     tesla:{on:tesla.on,proc:teslaProc},ee,teslaFR,teslaBurst,
-    baseFR:10.6,firePct:cfg.fireRatePct/100,tBulletRes:cfg.targetBulletResist/100,baseBulletShred:cfg.baseBulletShred/100,
+    baseFR:S.fireRate,firePct:cfg.fireRatePct/100,tBulletRes:cfg.targetBulletResist/100,baseBulletShred:cfg.baseBulletShred/100,
     tSpiritRes:cfg.targetSpiritResist/100,baseSpiritShred:cfg.baseSpiritShred/100,
+    rateAt:m=>WEAPON_MODELS[H.weapon.type].rate(H.weapon,S.fireRate,m),
     engagement:ttkOn?TTK_CAP:cfg.engagement,extraFR:cfg.extraFireRate||0};
 }
-const isSpadesLike=s=>s==='S'||s==='J';
-const isDiamondLike=s=>s==='D'||s==='J';
-function runOnce(R,rng,acc){
-  let t=0;const q=[];for(const s of R.ct.startSuits)q.push(s);
-  let stack=[],prog=0,lastThrow=-1e9,eeStacks=0,lastEE=-1e9,eeActive=false,diamondUntil=-1e9,teslaCd=-1e9,nextThrow=0,guard=0,throws=0,overflow=0,overflowActive=false,surgeUntil=-1e9,surgeCd=-1e9,spellStacks=0,bfUntil=-1e9,bfNext=0,faCast=false,ftCast=false;
-  const dealtNow=()=>acc.weapon+acc.fa+acc.merc+acc.tesla+acc.card;
-  const addCard=()=>{if(q.length<R.ct.maxCards){let suit;if(rng()<R.ct.pJoker)suit='J';else{if(stack.length===0)stack=['S','S','D','D','C','C','H','H'];const idx=(rng()*stack.length)|0;suit=stack.splice(idx,1)[0];}q.push(suit);}};
-  const rushQ=[]; let rushHead=0, rushSum=0, rushCd=0;
-  const flStart=dealtNow(); let flDone=!(R.flStore>0);   // Focus Lens activates first at t=0
-  let drDone=!(R.drTime<1e9), flCleansed=false;
-  const dealtAll=()=>dealtNow()+acc.focus, runStart=dealtAll();
+function makeRunner(R,rng,acc){
+  // Built once per simulation; runOnce() resets per-fight state, so neither a fight nor a shot allocates.
+  const S={eeStacks:0,lastEE:-1e9,eeActive:false,surgeUntil:-1e9,surgeCd:-1e9,spellStacks:0};   // item state touched by ability events
+  // generic events items listen to; abilities call these
+  const run={R,acc,rng,chv:acc.chv,
+    abilityUsed(id,tt){   // any ability / active-item use (id = ability, omitted for items)
+      if(id!==undefined&&id===R.surgeTarget&&R.surgeFR>0&&tt>=S.surgeCd){S.surgeUntil=tt+R.surgeDur;S.surgeCd=tt+14;}   // Surge of Power: its imbued ability was used
+      if(R.spellFR>0&&S.spellStacks<R.spellMax)S.spellStacks++; },                                                     // Spellslinger
+    spiritHit(tt){ if(R.ee){S.eeActive=true;if(tt>=S.lastEE+0.7&&S.eeStacks<12){S.eeStacks++;S.lastEE=tt;}} },         // Escalating Exposure
+    addStacks(){}   // stack-based abilities replace this (Haze: Fixation), so other abilities can apply stacks
+  };
+  const abs=[]; let chargeAb=null;
+  for(const a of R.abilities){const inst=a.def.create(a.P,run);abs.push(inst);if(a.id===R.chargeId)chargeAb=inst;}
+  // hook lists (ability order preserved); indexed loops keep the per-shot path allocation-free
+  const hk=n=>abs.filter(a=>a[n]), hCast=hk('cast'), hNoHs=hk('noHs'), hFR=hk('fireRate'), hShred=hk('shred'), hSp=hk('spShred'), hBu=hk('buShred'), hHit=hk('onHit'), hAfter=hk('afterShot'), hAct=hk('act'), hClean=hk('cleanse'), hStats=hk('stats');
+  const x={curSp:0,spiritMult:0,ampMult:0,locked:false,first:true,noHs:false,hsMult:1,wf:0,wfBlk:0,wdFrac:0,wExtra:0};   // per-shot context, reused
+  const wpn=WEAPON_MODELS[R.H.weapon.type].create(R.H.weapon);
+  // damage dealt so far, summed in canonical order: weapon, on-hit ability channels, Mercurial, Tesla, other ability channels
+  const chv=acc.chv, OH=R.onHitIdx, OT=R.otherIdx;
+  const dealtNow=()=>{let s=acc.weapon;for(let i=0;i<OH.length;i++)s+=chv[OH[i]];s+=acc.merc;s+=acc.tesla;for(let i=0;i<OT.length;i++)s+=chv[OT[i]];return s;};
+  const dealtAll=()=>dealtNow()+acc.focus;
+  const rushQ=[];
   // Bloodletting HP model: hpDmg = HP actually lost; each hit's deferred share bleeds in linearly over 6s (FIFO chunks, piecewise-constant rate)
-  let hpDmg=0, blLast=runStart, dT=0, rate=0, bqi=0, cleansed=false, crossT=0; const blq=[];
+  const B={hpDmg:0,blLast:0,dT:0,rate:0,bqi:0,cleansed:false,crossT:0,blq:[]};
   const adv=to=>{for(;;){
-      if(!cleansed&&dT>=R.blTime){for(let i=bqi;i<blq.length;i++)blq[i].r*=(1-R.blCleanse);rate*=(1-R.blCleanse);cleansed=true;}
-      if(dT>=to)return false;
-      let nx=to; if(!cleansed&&R.blTime<nx)nx=R.blTime; if(bqi<blq.length&&blq[bqi].end<nx)nx=blq[bqi].end;
-      const sg=nx-dT; if(rate>0&&hpDmg+rate*sg>=R.hp){crossT=dT+(R.hp-hpDmg)/rate;hpDmg=R.hp;return true;}
-      hpDmg+=rate*sg; dT=nx;
-      while(bqi<blq.length&&blq[bqi].end<=dT){rate-=blq[bqi].r;bqi++;} if(bqi>=blq.length||rate<1e-12)rate=bqi>=blq.length?0:Math.max(0,rate);}};
-  const lowHP=()=>R.ttk&&(R.bl?hpDmg:dealtAll()-runStart)>0.5*R.hp;   // target below 50% HP
-  let endT=R.engagement, killed=false;
-  if(R.spellFR>0){spellStacks=Math.min(R.spellPre+(R.teslaBurst>0?1:0)+(R.flStore>0?1:0),R.spellMax);}
-  if(R.teslaBurst>0){
-    acc.tesla+=R.outS*R.teslaBurst*(1-(R.tSpiritRes+(R.spRes?0.30:0)-R.baseSpiritShred-(R.flShredDur>0?R.flShred:0)));
-    if(R.ee){eeActive=true;if(eeStacks<12){eeStacks++;lastEE=0;}}
-  }
-  while(t<R.engagement){
-    if(++guard>200000)break;
-    if(R.bl&&adv(t)){endT=crossT;killed=true;break;}
-    if(!drDone&&t>=R.drTime){drDone=true;
-      diamondUntil=-1e9;                    // strip active Diamond shred
-      eeStacks=0;eeActive=false;            // strip EE stacks + its -8% (re-applied by next spirit damage)
-      if(!flDone){acc.focus+=R.flStore*(dealtNow()-flStart);flDone=true;}   // Focus Lens: stored damage dealt early
-      flCleansed=true;}                     // Focus Lens: shred removed
-    if(!flDone&&t>=R.flWin){acc.focus+=R.flStore*(dealtNow()-flStart);flDone=true;}
-    if(!faCast&&R.fa.on&&t>=R.faStart){faCast=true;if(R.spellFR>0&&spellStacks<R.spellMax)spellStacks++;}
-    if(!ftCast&&R.ftFR>0&&t>=R.ftStart){ftCast=true;if(R.spellFR>0&&spellStacks<R.spellMax)spellStacks++;}
-    const ftActive=ftCast&&t<R.ftStart+R.ftDur;
-    const faOn=faCast&&t<R.faStart+R.fa.dur;
-    if(R.bfFR>0&&t>=bfNext){bfUntil=t+R.bfDur;bfNext=t+R.bfCd;}
-    const swActive=t<R.swDur;
-    const fr=R.baseFR*(1+R.firePct+(faOn?R.fa.fr:0)+R.merc.fr+R.extraFR+R.teslaFR+(overflowActive?R.soFR:0)+(swActive?R.swFR:0)+(t<surgeUntil?R.surgeFR:0)+spellStacks*R.spellFR+R.bfPassive+(t<bfUntil?R.bfFR:0)+(ftActive?R.ftFR:0)+R.flFR);
-    if(fr<=0)break;
-    const dActive=t<diamondUntil, dShred=dActive?R.ct.dShred:0;
-    const low=lowHP(), resSp=R.spRes?(low?0.45:0.30):0, resBu=R.buRes?(low?0.45:0.30):0;
-    const multNormal=1-(R.tBulletRes+resBu-R.baseBulletShred-dShred);
-    const multIgnore=1-(-R.baseBulletShred-dShred);
-    const deflect=R.plated?0.7:1;
-    const weaponFactor=R.aprIgnore*multIgnore+(1-R.aprIgnore)*multNormal*deflect;
-    const eeShred=(R.ee&&eeActive)?0.08:0;
-    const spiritMult=1-(R.tSpiritRes+resSp-R.baseSpiritShred-dShred-eeShred-(t<R.flShredDur&&!flCleansed?R.flShred:0));
-    const ampMult=1+eeStacks*0.045;
-    const curSp=R.spirit+(overflowActive?R.soSpirit:0)+(swActive?R.swSpirit:0);
-    const faSpb=2+R.faScale*curSp, mSpb=R.merc.on?R.flatWeapon*(0.20+0.0038*curSp):0, tDmg=R.teslaDmgBase+0.19*curSp, cBase=R.cardConst+R.cardCoef*(curSp+R.rrCardSp+R.surgeCardSp), mCardFull=60+0.16*curSp;
-    const imMul=R.imOn?(1+R.wdFrac+0.45*Math.min(1,t/2.5))/(1+R.wdFrac):1;   // ramp adds to Weapon Damage %
-    const wHit=(R.wdPerBullet+R.luckyBonus)*weaponFactor*R.outW*imMul*R.fall; acc.weapon+=wHit;
-    let dealt=false;
-    if(faOn){acc.fa+=faSpb*spiritMult*ampMult*R.platedBlock*R.outS*R.fall;dealt=true;}
-    if(R.merc.on){acc.merc+=mSpb*spiritMult*ampMult*R.platedBlock*R.outS*R.fall;dealt=true;}
-    if(R.tesla.on&&t>=teslaCd){if(rng()<R.tesla.proc){acc.tesla+=tDmg*spiritMult*ampMult*R.platedBlock*R.outS*R.fall;teslaCd=t+0.2;dealt=true;}}
-    if(R.ee&&dealt){eeActive=true;if(t>=lastEE+0.7&&eeStacks<12){eeStacks++;lastEE=t;}}
-    if(R.ct.on){prog+=R.ct.genPerShot;while(prog>=1){prog-=1;addCard();}}
-    if(R.rushOn){rushQ.push([t,wHit]);rushSum+=wHit;while(rushQ[rushHead][0]<=t-3.5){rushSum-=rushQ[rushHead][1];rushHead++;}
-      if(t>=rushCd&&rushSum>=200&&R.ct.on&&q.length<R.ct.maxCards){rushCd=t+25;addCard();}}   // full hand: no refill, cooldown not consumed
-    let threw=false;
-    if(R.ct.on&&q.length>0&&t>=nextThrow&&!ftActive){const suit=q.shift();const charge=Math.min(1,(t-lastThrow)/14);const mercBonus=(R.merc.on&&R.merc.cardBonus)?mCardFull*charge:0;const base=cBase*(isSpadesLike(suit)?R.ct.spades:1)+mercBonus;acc.card+=base*spiritMult*ampMult*R.outS;if(isDiamondLike(suit))diamondUntil=t+R.diamondDur;if(R.ee){eeActive=true;if(t>=lastEE+0.7&&eeStacks<12){eeStacks++;lastEE=t;}}lastThrow=t;nextThrow=t+0.6;threw=true;throws++;if(R.surgeFR>0&&t>=surgeCd){surgeUntil=t+R.surgeDur;surgeCd=t+14;}if(R.spellFR>0&&spellStacks<R.spellMax)spellStacks++;}
-    if(!overflowActive&&R.soBuild>0){overflow+=R.soBuild*(R.plated?0.5:1);if(overflow>=1)overflowActive=true;}
-    if(R.bl){const cur=dealtAll(),d=cur-blLast;blLast=cur;
-      if(d>0){hpDmg+=d*(1-R.blDefer);if(R.blDefer>0){const r=d*R.blDefer/6;blq.push({r,end:t+6});rate+=r;}}
-      if(hpDmg>=R.hp){endT=t;killed=true;break;}}
-    else if(R.ttk&&dealtAll()-runStart>=R.hp){endT=t;killed=true;break;}
-    t+=threw?Math.max(1/fr,0.1):1/fr;
-  }
-  if(!flDone&&!killed&&R.flWin<=R.engagement)acc.focus+=R.flStore*(dealtNow()-flStart);
-  acc.throws+=throws;acc.stacks+=eeStacks;acc.time+=endT;
-  if(R.ttk){acc.ttks.push(endT);if(killed)acc.kills++;}
+      if(!B.cleansed&&B.dT>=R.blTime){for(let i=B.bqi;i<B.blq.length;i++)B.blq[i].r*=(1-R.blCleanse);B.rate*=(1-R.blCleanse);B.cleansed=true;}
+      if(B.dT>=to)return false;
+      let nx=to; if(!B.cleansed&&R.blTime<nx)nx=R.blTime; if(B.bqi<B.blq.length&&B.blq[B.bqi].end<nx)nx=B.blq[B.bqi].end;
+      const sg=nx-B.dT; if(B.rate>0&&B.hpDmg+B.rate*sg>=R.hp){B.crossT=B.dT+(R.hp-B.hpDmg)/B.rate;B.hpDmg=R.hp;return true;}
+      B.hpDmg+=B.rate*sg; B.dT=nx;
+      while(B.bqi<B.blq.length&&B.blq[B.bqi].end<=B.dT){B.rate-=B.blq[B.bqi].r;B.bqi++;} if(B.bqi>=B.blq.length||B.rate<1e-12)B.rate=B.bqi>=B.blq.length?0:Math.max(0,B.rate);}};
+  return function runOnce(){
+    let t=0, teslaCd=-1e9, guard=0, overflow=0, overflowActive=false, bfUntil=-1e9, bfNext=0, ftCast=false;
+    S.eeStacks=0; S.lastEE=-1e9; S.eeActive=false; S.surgeUntil=-1e9; S.surgeCd=-1e9; S.spellStacks=0;
+    for(let i=0;i<abs.length;i++)abs[i].reset();
+    wpn.reset();
+    rushQ.length=0; let rushHead=0, rushSum=0, rushCd=0;
+    const flStart=dealtNow(); let flDone=!(R.flStore>0);   // Focus Lens activates first at t=0
+    let drDone=!(R.drTime<1e9), flCleansed=false;
+    const runStart=dealtAll();
+    B.hpDmg=0; B.blLast=runStart; B.dT=0; B.rate=0; B.bqi=0; B.cleansed=false; B.crossT=0; B.blq.length=0;
+    let endT=R.engagement, killed=false;
+    if(R.spellFR>0){S.spellStacks=Math.min(R.spellPre+(R.teslaBurst>0?1:0)+(R.flStore>0?1:0),R.spellMax);}
+    if(R.teslaBurst>0){
+      acc.tesla+=R.outS*R.teslaBurst*(1-(R.tSpiritRes+(R.spRes?0.30:0)-R.baseSpiritShred-(R.flShredDur>0?R.flShred:0)));
+      if(R.ee){S.eeActive=true;if(S.eeStacks<12){S.eeStacks++;S.lastEE=0;}}
+    }
+    while(t<R.engagement){
+      if(++guard>200000)break;
+      if(R.bl&&adv(t)){endT=B.crossT;killed=true;break;}
+      if(!drDone&&t>=R.drTime){drDone=true;
+        for(let i=0;i<hClean.length;i++)hClean[i].cleanse();   // strip ability debuffs (e.g. Diamond shred)
+        S.eeStacks=0;S.eeActive=false;            // strip EE stacks + its -8% (re-applied by next spirit damage)
+        if(!flDone){acc.focus+=R.flStore*(dealtNow()-flStart);flDone=true;}   // Focus Lens: stored damage dealt early
+        flCleansed=true;}                     // Focus Lens: shred removed
+      if(!flDone&&t>=R.flWin){acc.focus+=R.flStore*(dealtNow()-flStart);flDone=true;}
+      const swActive=t<R.swDur;
+      const curSp=R.spirit+(overflowActive?R.soSpirit:0)+(swActive?R.swSpirit:0);
+      for(let i=0;i<hCast.length;i++)hCast[i].cast(t,curSp);
+      let noHs=false; for(let i=0;i<hNoHs.length;i++)if(hNoHs[i].noHs(t))noHs=true;
+      if(!ftCast&&R.ftFR>0&&t>=R.ftStart){ftCast=true;run.abilityUsed();}
+      const ftActive=ftCast&&t<R.ftStart+R.ftDur;
+      if(R.bfFR>0&&t>=bfNext){bfUntil=t+R.bfDur;bfNext=t+R.bfCd;}
+      let abFR=0; for(let i=0;i<hFR.length;i++)abFR+=hFR[i].fireRate(t);
+      const frMult=1+R.firePct+abFR+R.merc.fr+R.extraFR+R.teslaFR+(overflowActive?R.soFR:0)+(swActive?R.swFR:0)+(t<S.surgeUntil?R.surgeFR:0)+S.spellStacks*R.spellFR+R.bfPassive+(t<bfUntil?R.bfFR:0)+(ftActive?R.ftFR:0)+R.flFR, fr=R.baseFR*frMult;
+      if(fr<=0)break;
+      let dShred=0,abSp=0,abBu=0; for(let i=0;i<hShred.length;i++)dShred+=hShred[i].shred(t); for(let i=0;i<hSp.length;i++)abSp+=hSp[i].spShred(t); for(let i=0;i<hBu.length;i++)abBu+=hBu[i].buShred(t);
+      const low=R.ttk&&(R.bl?B.hpDmg:dealtAll()-runStart)>0.5*R.hp, resSp=R.spRes?(low?0.45:0.30):0, resBu=R.buRes?(low?0.45:0.30):0;
+      const multNormal=1-(R.tBulletRes+resBu-R.baseBulletShred-dShred-abBu);
+      const multIgnore=1-(-R.baseBulletShred-dShred-abBu);
+      const deflect=R.plated?0.7:1;
+      const weaponFactor=R.aprIgnore*multIgnore+(1-R.aprIgnore)*multNormal*deflect;
+      const eeShred=(R.ee&&S.eeActive)?0.08:0;
+      const spiritMult=1-(R.tSpiritRes+resSp-R.baseSpiritShred-dShred-abSp-eeShred-(t<R.flShredDur&&!flCleansed?R.flShred:0));
+      const ampMult=1+S.eeStacks*0.045;
+      const mSpb=R.merc.on?R.flatWeapon*(0.20+0.0038*curSp):0, tDmg=R.teslaDmgBase+0.19*curSp;
+      const imRamp=R.imOn?0.45*Math.min(1,t/2.5):0;
+      const imMul=R.imOn?(1+R.wdFrac+imRamp)/(1+R.wdFrac):1;   // ramp adds to Weapon Damage %
+      const wHit=((noHs?R.wdBody:R.wdPerBullet)+R.luckyBonus)*weaponFactor*R.outW*imMul*R.fall; acc.weapon+=wHit;
+      x.curSp=curSp; x.spiritMult=spiritMult; x.ampMult=ampMult; x.locked=ftActive; x.first=wpn.first();
+      x.noHs=noHs; x.hsMult=noHs?1:R.hsMult; x.wdFrac=R.wdFrac+imRamp; x.wExtra=0;
+      x.wf=weaponFactor*R.outW*R.fall;                                                                                  // bullet damage that isn't Weapon Damage %-scaled
+      x.wfBlk=(R.aprIgnore*multIgnore+(1-R.aprIgnore)*multNormal*deflect*(R.plated?0.5:1))*R.outW*R.fall;                 // ...that Plated's 50% roll also blocks
+      let dealt=false;
+      for(let i=0;i<hHit.length;i++)if(hHit[i].onHit(t,x))dealt=true;
+      if(R.merc.on){acc.merc+=mSpb*spiritMult*ampMult*R.platedBlock*R.outS*R.fall;dealt=true;}
+      if(R.tesla.on&&t>=teslaCd){if(rng()<R.tesla.proc){acc.tesla+=tDmg*spiritMult*ampMult*R.platedBlock*R.outS*R.fall;teslaCd=t+0.2;dealt=true;}}
+      if(dealt)run.spiritHit(t);
+      for(let i=0;i<hAfter.length;i++)hAfter[i].afterShot(t);
+      if(R.rushOn){const wAll=wHit+x.wExtra;rushQ.push([t,wAll]);rushSum+=wAll;while(rushQ[rushHead][0]<=t-3.5){rushSum-=rushQ[rushHead][1];rushHead++;}
+        if(t>=rushCd&&rushSum>=200&&chargeAb&&chargeAb.canRefill()){rushCd=t+25;chargeAb.refill();}}   // full charges: no refill, cooldown not consumed
+      let lock=0; for(let i=0;i<hAct.length;i++){const l=hAct[i].act(t,x);if(l>lock)lock=l;}
+      if(!overflowActive&&R.soBuild>0){overflow+=R.soBuild*(R.plated?0.5:1);if(overflow>=1)overflowActive=true;}
+      if(R.bl){const cur=dealtAll(),d=cur-B.blLast;B.blLast=cur;
+        if(d>0){B.hpDmg+=d*(1-R.blDefer);if(R.blDefer>0){const r=d*R.blDefer/6;B.blq.push({r,end:t+6});B.rate+=r;}}
+        if(B.hpDmg>=R.hp){endT=t;killed=true;break;}}
+      else if(R.ttk&&dealtAll()-runStart>=R.hp){endT=t;killed=true;break;}
+      const gap=wpn.gap(fr,frMult); t+=lock>0?Math.max(gap,lock):gap;
+    }
+    if(!flDone&&!killed&&R.flWin<=R.engagement)acc.focus+=R.flStore*(dealtNow()-flStart);
+    for(let i=0;i<hStats.length;i++){const st=hStats[i].stats();for(const k in st)acc.abStats[k]=(acc.abStats[k]||0)+st[k];}
+    acc.stacks+=S.eeStacks;acc.time+=endT;
+    if(R.ttk){acc.ttks.push(endT);if(killed)acc.kills++;}
+  };
 }
 function simulate(cfg,iters,seed){
   const R=resolve(cfg),rng=mulberry32(seed>>>0);
-  const acc={weapon:0,fa:0,merc:0,tesla:0,card:0,focus:0,throws:0,stacks:0,time:0,kills:0,ttks:[]};
-  for(let i=0;i<iters;i++)runOnce(R,rng,acc);
+  const acc={weapon:0,merc:0,tesla:0,focus:0,stacks:0,time:0,kills:0,ttks:[],abStats:{},chv:new Float64Array(R.channels.length)};
+  const runOnce=makeRunner(R,rng,acc);
+  for(let i=0;i<iters;i++)runOnce();
   const eng=R.engagement,n=iters,T=R.ttk?acc.time:n*eng,dps=k=>acc[k]/T;   // TTK: DPS over the actual kill time
   const srt=R.ttk?acc.ttks.slice().sort((a,b)=>a-b):[], pct=q=>srt.length?srt[Math.min(n-1,Math.floor(q*(n-1)+0.5))]:0;
-  const weapon=dps('weapon'),fa=dps('fa'),merc=dps('merc'),tesla=dps('tesla'),card=dps('card'),focus=dps('focus');
-  return{total:weapon+fa+merc+tesla+card+focus,focusEcho:focus,weapon,spirit:fa+merc+tesla+card,
-    faSpirit:fa,mercSpirit:merc,teslaSpirit:tesla,cardSpirit:card,
+  const weapon=dps('weapon'),merc=dps('merc'),tesla=dps('tesla'),focus=dps('focus');
+  const ch={}; R.channels.forEach((c,i)=>{ch[c.id]=acc.chv[i]/T;});
+  // canonical order: weapon, on-hit ability channels, Mercurial, Tesla, other ability channels, Focus Lens echo
+  let spirit=0; for(const id of R.onHitIds)spirit+=ch[id]; spirit+=merc; spirit+=tesla; for(const id of R.otherIds)spirit+=ch[id];
+  let total=weapon; for(const id of R.onHitIds)total+=ch[id]; total+=merc; total+=tesla; for(const id of R.otherIds)total+=ch[id]; total+=focus;
+  const abStats={}; for(const k in acc.abStats)abStats[k]=acc.abStats[k]/n;
+  return{total,focusEcho:focus,weapon,spirit,ch,channels:R.channels,mercSpirit:merc,teslaSpirit:tesla,abStats,
     ttk:acc.time/n,killRate:acc.kills/n,ttkP10:pct(0.10),ttkP90:pct(0.90),
-    effWeaponDmg:R.weaponDmg,spiritStat:R.spirit,throws:acc.throws/n,stacks:acc.stacks/n,
-    frBase:R.baseFR*(1+R.firePct+R.merc.fr+R.extraFR+R.teslaFR+R.bfPassive+R.flFR),frFA:R.baseFR*(1+R.firePct+(R.fa.on?R.fa.fr:0)+R.merc.fr+R.extraFR+R.teslaFR+R.bfPassive+R.flFR),faOn:R.fa.on};
+    effWeaponDmg:R.weaponDmg,spiritStat:R.spirit,stacks:acc.stacks/n,
+    frBase:R.rateAt(1+R.firePct+R.merc.fr+R.extraFR+R.teslaFR+R.bfPassive+R.flFR),frPeak:R.rateAt(1+R.firePct+R.peakFR+R.merc.fr+R.extraFR+R.teslaFR+R.bfPassive+R.flFR),peakTag:R.peakTag};
 }
+
 const SEED=1234567, ITER=600, CHART_ITER=180, CHART_PTS=20;
 
 /* ================= UI ================= */
 const $=id=>document.getElementById(id);
+
+/* ================= HERO SETUP ================= */
+let HERO=HEROES.wraith;
+// UI for each ability: html() = its panel, extra() = optional full-width section below the panels,
+// bind() once, read() -> its settings for the engine, sync() on every recompute, statText() for the build line.
+const ABILITY_UI={
+  fullAuto:{
+    html:()=>`<div class="subcard">
+        <h3><label class="sw"><input type="checkbox" id="fa_on" checked><span class="track"></span></label> Full Auto</h3>
+        <p class="desc">For 5s: +20% fire rate, and bullets deal <code>2 + 0.045·Spirit</code> spirit damage.</p>
+        <div class="opts">
+          <div class="pill" data-cb="fa_ap2"><span class="t">2 AP</span><span class="s">+10% FR · +3s</span></div>
+          <div class="pill" data-cb="fa_ap5"><span class="t">5 AP</span><span class="s">spirit ×0.09</span></div>
+        </div>
+      </div>`,
+    bind(){ $('fa_on').addEventListener('change',schedule); },
+    read:()=>({on:$('fa_on').checked,ap2:pillOn('fa_ap2'),ap5:pillOn('fa_ap5')}),
+    sync(){ const off=!$('fa_on').checked; ['fa_ap2','fa_ap5'].forEach(cb=>pillEl(cb).classList.toggle('dim',off)); }
+  },
+  cardTrick:(()=>{
+    // start-with-cards slot picker
+    const SUITS=['S','D','C','H','J'];
+    const SUIT_GLYPH={S:'\u2660',D:'\u2666',C:'\u2663',H:'\u2665',J:'\u2605'};
+    const SUIT_COLOR={S:'#e8ebf0',D:'#f2ab4b',C:'#5fd39a',H:'#e06d8f',J:'#ab88ea'};
+    const SUIT_NAME={S:'Spades',D:'Diamonds',C:'Clubs',H:'Hearts',J:'Joker'};
+    let startSlots=[null,null,null,null,null,null], pickerOpen=-1, docBound=false;
+    const maxCards=()=>pillOn('ct_rr')?6:4;
+    function renderCardSlots(){
+      const on=$('sc_on').checked, mx=maxCards(), host=$('cardslots'), leg=$('cardlegend'), ord=$('throworder');
+      host.style.display=on?'flex':'none'; leg.style.display=on?'flex':'none'; ord.style.display=on?'flex':'none';
+      host.innerHTML=''; leg.innerHTML=''; ord.innerHTML='';
+      if(!on){pickerOpen=-1;return;}
+      let seq=0;
+      for(let i=0;i<mx;i++){
+        const s=startSlots[i];
+        const wrap=document.createElement('div');wrap.className='cardwrap';
+        const el=document.createElement('div');
+        el.className='cardslot '+(s?'filled':'empty')+(pickerOpen===i?' active':'');
+        if(s){el.style.color=SUIT_COLOR[s];seq++;el.innerHTML=`<span class="ord">${seq}</span>${SUIT_GLYPH[s]}`;}
+        el.addEventListener('click',e=>{e.stopPropagation();pickerOpen=(pickerOpen===i?-1:i);renderCardSlots();});
+        wrap.appendChild(el);
+        if(pickerOpen===i){
+          const pk=document.createElement('div');pk.className='picker';
+          SUITS.forEach(su=>{const btn=document.createElement('button');btn.textContent=SUIT_GLYPH[su];btn.style.color=SUIT_COLOR[su];btn.title=SUIT_NAME[su];
+            btn.addEventListener('click',e=>{e.stopPropagation();startSlots[i]=su;pickerOpen=-1;renderCardSlots();schedule();});pk.appendChild(btn);});
+          const rm=document.createElement('button');rm.className='rm';rm.textContent='\u2715';rm.title='Empty';
+          rm.addEventListener('click',e=>{e.stopPropagation();startSlots[i]=null;pickerOpen=-1;renderCardSlots();schedule();});pk.appendChild(rm);
+          wrap.appendChild(pk);
+        }
+        host.appendChild(wrap);
+      }
+      const hand=startSlots.slice(0,mx).filter(Boolean);
+      if(hand.length){
+        ord.innerHTML=`<span class="lab">Throw order</span><span>left \u2192 right \u00b7 ${hand.length} card${hand.length>1?'s':''}</span>`;
+      } else {
+        ord.innerHTML=`<span class="lab">Throw order</span><span style="color:var(--faint)">no cards — click a slot to add one</span>`;
+      }
+      const ap5=pillOn('ct_ap5');
+      const spM=ap5?'\u00d72':'\u00d71.6', diS=ap5?'\u221211%':'\u22127%', jkP=ap5?'1/5':'1/9';
+      leg.innerHTML=`<span style="color:${SUIT_COLOR.S}"><b>\u2660</b> Spades ${spM}</span><span style="color:${SUIT_COLOR.D}"><b>\u2666</b> Diamonds ${diS} res</span><span style="color:${SUIT_COLOR.C}"><b>\u2663</b> Clubs</span><span style="color:${SUIT_COLOR.H}"><b>\u2665</b> Hearts</span><span style="color:${SUIT_COLOR.J}"><b>\u2605</b> Joker = all (drawn ${jkP})</span>`;
+    }
+    return{
+      html:()=>`<div class="subcard">
+        <h3><label class="sw"><input type="checkbox" id="ct_on" checked><span class="track"></span></label> Card Trick</h3>
+        <p class="desc">Shooting builds cards; each throw deals <code>45 + 0.55·Spirit</code> spirit damage plus its suit's bonus.</p>
+        <div class="opts">
+          <div class="pill" data-cb="ct_ap2"><span class="t">2 AP</span><span class="s">+40 +0.4·Sp</span></div>
+          <div class="pill" data-cb="ct_ap5"><span class="t">5 AP</span><span class="s">Joker 1/5 · ×2 · −11%</span></div>
+          <div class="pill" data-cb="ct_rr"><span class="t">Rapid Recharge</span><span class="s">+14% CDR · cap 6 · +14 Sp→cards</span></div>
+        </div>
+        <div class="rrinv" id="rrinv">Rapid Recharge spirit invest <select id="rr_inv_from" class="invsel" title="tier before"></select> → <select id="rr_inv_to" class="invsel" title="tier after"></select></div>
+      </div>`,
+      extra:()=>`<div class="startsec">
+      <div class="startsec-head">
+        <label class="sw"><input type="checkbox" id="sc_on"><span class="track"></span></label>
+        <div><div class="tn">Start with cards</div><div class="td">Begin the fight holding cards; click a slot to pick its suit.</div></div>
+      </div>
+      <div class="cardslots" id="cardslots"></div>
+      <div class="throworder" id="throworder"></div>
+      <div class="cardlegend" id="cardlegend"></div>
+    </div>`,
+      bind(){
+        $('ct_on').addEventListener('change',schedule);
+        if(!docBound){docBound=true;document.addEventListener('click',()=>{if(pickerOpen!==-1&&$('cardslots')){pickerOpen=-1;renderCardSlots();}});}
+        $('sc_on').addEventListener('change',()=>{renderCardSlots();schedule();});
+        pillEl('ct_rr').addEventListener('click',()=>setTimeout(renderCardSlots,0));
+        fillInvest('rr_inv',SPIRIT_INVEST,' Sp');
+        $('rr_inv_from').addEventListener('change',schedule);
+        $('rr_inv_to').addEventListener('change',schedule);
+      },
+      read:()=>({on:$('ct_on').checked,ap2:pillOn('ct_ap2'),ap5:pillOn('ct_ap5'),startSuits:$('sc_on').checked?startSlots.slice(0,maxCards()).filter(Boolean):[]}),
+      sync(){ const off=!$('ct_on').checked;
+        ['ct_ap2','ct_ap5','ct_rr'].forEach(cb=>pillEl(cb).classList.toggle('dim',off));
+        const ss=document.querySelector('.startsec');if(ss)ss.style.opacity=off?'.45':'1';
+        const rr=$('rrinv');if(rr)rr.style.opacity=(!off&&pillOn('ct_rr'))?'1':'.4';
+        renderCardSlots(); },
+      statText:(st,ttk)=>{const n=st.throws||0;return `~${n.toFixed(n<10?1:0)} cards thrown${ttk?' per kill':''}`;}
+    };
+  })(),
+  powerSurge:{
+    html:()=>`<div class="subcard">
+        <h3><label class="sw"><input type="checkbox" id="ps_on" checked><span class="track"></span></label> Power Surge</h3>
+        <p class="desc">For 10s, the first bullet of each burst deals <code>10 + 0.14·Spirit</code> bonus spirit damage.</p>
+        <div class="opts">
+          <div class="pill" data-cb="ps_ap2"><span class="t">2 AP</span><span class="s">18 + 0.37·Sp</span></div>
+          <div class="pill" data-cb="ps_ap5"><span class="t">5 AP</span><span class="s">+10s · −15% spirit res</span></div>
+        </div>
+      </div>`,
+    bind(){ $('ps_on').addEventListener('change',schedule); },
+    read:()=>({on:$('ps_on').checked,ap2:pillOn('ps_ap2'),ap5:pillOn('ps_ap5')}),
+    sync(){ const off=!$('ps_on').checked; ['ps_ap2','ps_ap5'].forEach(cb=>pillEl(cb).classList.toggle('dim',off)); }
+  },
+  sleepDagger:{
+    html:()=>`<div class="subcard">
+        <h3><label class="sw"><input type="checkbox" id="sd_on" checked><span class="track"></span></label> Sleep Dagger</h3>
+        <p class="desc">Deals <code>65 + 2.2·Spirit</code> spirit damage at the start of the fight.</p>
+        <div class="opts">
+          <div class="pill" data-cb="sd_ap1"><span class="t">1 AP</span><span class="s">−10% bullet res · 6s</span></div>
+          <div class="pill" data-cb="sd_ap2"><span class="t">2 AP</span><span class="s">+15 Fixation stacks</span></div>
+        </div>
+      </div>`,
+    bind(){ $('sd_on').addEventListener('change',schedule); },
+    read:()=>({on:$('sd_on').checked,ap1:pillOn('sd_ap1'),ap2:pillOn('sd_ap2')}),
+    sync(){ const off=!$('sd_on').checked; ['sd_ap1','sd_ap2'].forEach(cb=>pillEl(cb).classList.toggle('dim',off)); }
+  },
+  fixation:{
+    html:()=>`<div class="subcard">
+        <h3><label class="sw"><input type="checkbox" id="fx_on" checked><span class="track"></span></label> Fixation</h3>
+        <p class="desc">Bullets add a stack (3 on headshots, max 40); each stack adds <code>0.2 + 0.00035·WD%</code> damage per bullet.</p>
+        <div class="opts">
+          <div class="pill" data-cb="fx_ap1"><span class="t">1 AP</span><span class="s">per 20: 40+0.8·Sp</span></div>
+          <div class="pill" data-cb="fx_ap2"><span class="t">2 AP</span><span class="s">max 80 stacks</span></div>
+          <div class="pill" data-cb="fx_ap5"><span class="t">5 AP</span><span class="s">+0.11 per stack</span></div>
+        </div>
+      </div>`,
+    bind(){ $('fx_on').addEventListener('change',schedule); },
+    read:()=>({on:$('fx_on').checked,ap1:pillOn('fx_ap1'),ap2:pillOn('fx_ap2'),ap5:pillOn('fx_ap5')}),
+    sync(){ const off=!$('fx_on').checked; ['fx_ap1','fx_ap2','fx_ap5'].forEach(cb=>pillEl(cb).classList.toggle('dim',off)); },
+    statText:(st,ttk)=>{const cap=Math.round(st.fixCap||0), f=st.fixFull||0; if(!cap)return '';
+      return f>=0.5?`Fixation ${cap} stacks by ${(st.fixFullT/f).toFixed(1)}s`:`Fixation ${Math.round(st.fixStacks)}/${cap} stacks at ${ttk?'kill':'end'}`;}
+  },
+  bulletDance:{
+    html:()=>`<div class="subcard">
+        <h3><label class="sw"><input type="checkbox" id="bd_on"><span class="track"></span></label> Bullet Dance</h3>
+        <p class="desc">For <code>3.5 + 0.03·Spirit</code> s: +25% fire rate and +7 damage per bullet, but no headshots.</p>
+        <div class="opts">
+          <div class="pill" data-cb="bd_ap1"><span class="t">1 AP</span><span class="s">+7 flat (14)</span></div>
+          <div class="pill" data-cb="bd_ap2"><span class="t">2 AP</span><span class="s">+10% FR (35%)</span></div>
+        </div>
+      </div>`,
+    bind(){ $('bd_on').addEventListener('change',schedule); },
+    read:()=>({on:$('bd_on').checked,ap1:pillOn('bd_ap1'),ap2:pillOn('bd_ap2')}),
+    sync(){ const off=!$('bd_on').checked; ['bd_ap1','bd_ap2'].forEach(cb=>pillEl(cb).classList.toggle('dim',off)); },
+    statText:st=>st.bdDur?`Bullet Dance ${st.bdDur.toFixed(1)}s`:''
+  }
+};
+const joinList=a=>a.length<2?(a[0]||''):a.slice(0,-1).join(', ')+(a.length>2?',':'')+' and '+a[a.length-1];
+function renderHeroShell(){
+  const H=HERO, S=H.stats;
+  document.title=`${H.name} DPS — abilities & item comparison`;
+  document.querySelectorAll('.heroName').forEach(e=>e.textContent=H.name);
+  $('abilityGrid').innerHTML=H.abilities.map(id=>ABILITY_UI[id].html()).join('\n');
+  $('abilityGrid').classList.toggle('n3',H.abilities.length===3);
+  $('abilityExtra').innerHTML=H.abilities.map(id=>ABILITY_UI[id].extra?ABILITY_UI[id].extra():'').join('');
+  const names=H.abilities.map(id=>ABILITIES[id].name);
+  $('howtoAbilities').textContent=names.length>1?names.slice(0,-1).join(', ')+' and '+names[names.length-1]:(names[0]||'');
+  document.querySelectorAll('[data-ability]').forEach(e=>{e.style.display=H.abilities.includes(e.dataset.ability)?'':'none';});
+  const imbOpts=H.abilities.filter(id=>ABILITIES[id].imbuable!==false).map(id=>`<option value="${id}">${ABILITIES[id].name}</option>`).join('');   // imbue targets: this hero's non-passive abilities
+  for(const sid of ['merc_imbue','sop_imbue']){$(sid).innerHTML=imbOpts;$(sid).value=H.imbueDefault;}
+  const W=H.weapon; $('mdWeapon').style.display=W.type==='burst'?'':'none';
+  if(W.type==='burst')$('mdWeapon').textContent=`${H.name} fires ${W.shots}-round bursts: shots are ${W.shotDelay}s apart, then a ${W.burstDelay}s pause before the next burst. Fire-rate bonuses shorten only the pause.`;
+  const f0=S.falloffStart, f1=S.falloffEnd, g0=f0*120/100, g1=f1*120/100;
+  $('mdFalloff').textContent=`Past ${f0}m, bullet damage and on-hit effects fall off linearly to 10% at ${f1}m (${g0}m and ${g1}m with Sharpshooter).`;
+  const exempt=H.abilities.map(id=>ABILITIES[id].channel).filter(c=>!c.onHit).map(c=>c.label);   // non-bullet ability damage (e.g. cards)
+  $('mdNoFall').textContent=exempt.length?` ${exempt.map((l,i)=>i?l:l[0].toUpperCase()+l.slice(1)).join(', ')} and the Capacitor burst don't fall off.`:` The Capacitor burst doesn't fall off.`;
+  $('mdStats').innerHTML=`Bullet damage is <code>(${S.bullet} + ${S.bulletPerBoon}·boons) × (1 + Weapon Damage %)</code>; headshots deal ×${(1+S.headshotBonus).toFixed(2)} on bullet damage only. Boons also give ${S.spiritPerBoon} spirit each.`;
+  // shared item descriptions that mention this hero's abilities
+  const T=HERO_TEXT[H.id];
+  $('mdPlated').textContent=`Plated Armor: each bullet has a 30% chance to deflect its bullet damage, and a separate 50% chance to block ${T.plated}.`;
+  $('mdCleanse').textContent=`Debuff Remover clears ${T.cleanse.join(', ')}, all Escalating Exposure stacks (and its −8%), and Focus Lens's shred; damage Focus Lens has stored so far is dealt immediately.`;
+  $('mdSpell').textContent=`Spellslinger counts ${joinList(T.uses)}.`;
+  $('rushTxt').textContent=H.chargeAbility?`+10% weapon damage; 200 weapon damage in 3.5s refills ${H.chargeAbility==='cardTrick'?'a card':'a charge'} (25s cooldown).`
+    :`+10% weapon damage (${H.name} has no charges to refill).`;
+}
+renderHeroShell();
 const clone=o=>JSON.parse(JSON.stringify(o));
 function makeSlider(gridEl,b){
   const d=document.createElement('div');d.className='ctl';
@@ -626,7 +1055,7 @@ function makeSlider(gridEl,b){
   show(b.val);
 }
 const BASE=[
-  {id:'boons',label:'Boons',min:0,max:35,step:1,val:20,sub:1},
+  {id:'boons',label:'Boons',min:0,max:HERO.stats.boonCap,step:1,val:20,sub:1},
   {id:'hs',label:'Headshot rate',min:0,max:100,step:1,val:18,suffix:'%',sub:1},
   {id:'wd',label:'Weapon Damage',min:0,max:200,step:1,val:0,suffix:'%',sub:1},
   {id:'fr',label:'Fire Rate',min:0,max:150,step:1,val:0,suffix:'%',sub:1},
@@ -652,7 +1081,7 @@ const getB=id=>+$(`r_${id}`).value;
 // Spirit base slider shows TOTAL spirit; its floor is the spirit granted by boons (1.1/boon).
 // We track the item portion (above the floor) so total tracks boons while staying editable.
 let spiritItem=0;
-const spiritFloor=()=>Math.round(1.1*getB('boons'));
+const spiritFloor=()=>Math.round(HERO.stats.spiritPerBoon*getB('boons'));
 function syncSpiritSlider(){
   const floor=spiritFloor(), total=Math.min(floor+spiritItem,200);
   const r=$('r_spr'),n=$('n_spr');
@@ -670,65 +1099,20 @@ $('r_boons').addEventListener('input',syncSpiritSlider);
 $('n_boons').addEventListener('input',syncSpiritSlider);
 syncSpiritSlider();
 
-document.querySelectorAll('.pill[data-cb]').forEach(p=>{p.addEventListener('click',()=>{p.classList.toggle('on');schedule();});});
-const pillOn=cb=>document.querySelector(`.pill[data-cb="${cb}"]`).classList.contains('on');
-function updateDim(){
-  const faOff=!$('fa_on').checked, ctOff=!$('ct_on').checked;
-  ['fa_ap2','fa_ap5'].forEach(cb=>document.querySelector(`.pill[data-cb="${cb}"]`).classList.toggle('dim',faOff));
-  ['ct_ap2','ct_ap5','ct_rr'].forEach(cb=>document.querySelector(`.pill[data-cb="${cb}"]`).classList.toggle('dim',ctOff));
-  const ss=document.querySelector('.startsec');if(ss)ss.style.opacity=ctOff?'.45':'1';
-  const rr=$('rrinv');if(rr)rr.style.opacity=(!ctOff&&pillOn('ct_rr'))?'1':'.4';
-}
-// start-with-cards slot picker
-const SUITS=['S','D','C','H','J'];
-const SUIT_GLYPH={S:'\u2660',D:'\u2666',C:'\u2663',H:'\u2665',J:'\u2605'};
-const SUIT_COLOR={S:'#e8ebf0',D:'#f2ab4b',C:'#5fd39a',H:'#e06d8f',J:'#ab88ea'};
-const SUIT_NAME={S:'Spades',D:'Diamonds',C:'Clubs',H:'Hearts',J:'Joker'};
-let startSlots=[null,null,null,null,null,null];
-let pickerOpen=-1;
-const maxCards=()=>pillOn('ct_rr')?6:4;
-function renderCardSlots(){
-  const on=$('sc_on').checked, mx=maxCards(), host=$('cardslots'), leg=$('cardlegend'), ord=$('throworder');
-  host.style.display=on?'flex':'none'; leg.style.display=on?'flex':'none'; ord.style.display=on?'flex':'none';
-  host.innerHTML=''; leg.innerHTML=''; ord.innerHTML='';
-  if(!on){pickerOpen=-1;return;}
-  let seq=0;
-  for(let i=0;i<mx;i++){
-    const s=startSlots[i];
-    const wrap=document.createElement('div');wrap.className='cardwrap';
-    const el=document.createElement('div');
-    el.className='cardslot '+(s?'filled':'empty')+(pickerOpen===i?' active':'');
-    if(s){el.style.color=SUIT_COLOR[s];seq++;el.innerHTML=`<span class="ord">${seq}</span>${SUIT_GLYPH[s]}`;}
-    el.addEventListener('click',e=>{e.stopPropagation();pickerOpen=(pickerOpen===i?-1:i);renderCardSlots();});
-    wrap.appendChild(el);
-    if(pickerOpen===i){
-      const pk=document.createElement('div');pk.className='picker';
-      SUITS.forEach(su=>{const btn=document.createElement('button');btn.textContent=SUIT_GLYPH[su];btn.style.color=SUIT_COLOR[su];btn.title=SUIT_NAME[su];
-        btn.addEventListener('click',e=>{e.stopPropagation();startSlots[i]=su;pickerOpen=-1;renderCardSlots();schedule();});pk.appendChild(btn);});
-      const rm=document.createElement('button');rm.className='rm';rm.textContent='\u2715';rm.title='Empty';
-      rm.addEventListener('click',e=>{e.stopPropagation();startSlots[i]=null;pickerOpen=-1;renderCardSlots();schedule();});pk.appendChild(rm);
-      wrap.appendChild(pk);
-    }
-    host.appendChild(wrap);
-  }
-  const hand=startSlots.slice(0,mx).filter(Boolean);
-  if(hand.length){
-    ord.innerHTML=`<span class="lab">Throw order</span><span>left \u2192 right \u00b7 ${hand.length} card${hand.length>1?'s':''}</span>`;
-  } else {
-    ord.innerHTML=`<span class="lab">Throw order</span><span style="color:var(--faint)">no cards — click a slot to add one</span>`;
-  }
-  const ap5=pillOn('ct_ap5');
-  const spM=ap5?'\u00d72':'\u00d71.6', diS=ap5?'\u221211%':'\u22127%', jkP=ap5?'1/5':'1/9';
-  leg.innerHTML=`<span style="color:${SUIT_COLOR.S}"><b>\u2660</b> Spades ${spM}</span><span style="color:${SUIT_COLOR.D}"><b>\u2666</b> Diamonds ${diS} res</span><span style="color:${SUIT_COLOR.C}"><b>\u2663</b> Clubs</span><span style="color:${SUIT_COLOR.H}"><b>\u2665</b> Hearts</span><span style="color:${SUIT_COLOR.J}"><b>\u2605</b> Joker = all (drawn ${jkP})</span>`;
-}
-document.addEventListener('click',()=>{if(pickerOpen!==-1){pickerOpen=-1;renderCardSlots();}});
-$('sc_on').addEventListener('change',()=>{renderCardSlots();schedule();});
-document.querySelector('.pill[data-cb="ct_rr"]').addEventListener('click',()=>setTimeout(renderCardSlots,0));
-['fa_on','ct_on','plated_on','dr_on','sil_on','inh_on','merc_cmp','merc_base','merc_card','merc_inv_from','merc_inv_to','tesla_cmp','tesla_base','tesla_cap','tesla_inv_from','tesla_inv_to','ee_cmp','ee_base','ee_inv_from','ee_inv_to','apr_cmp','apr_base','apr_inv_from','apr_inv_to','so_cmp','so_base','so_inv_from','so_inv_to','shw_cmp','shw_base','shw_inv_from','shw_inv_to','sop_cmp','sop_base','sop_inv_from','sop_inv_to','spl_cmp','spl_base','spl_inv_from','spl_inv_to','spl_pre','spl_pre_n','bf_cmp','bf_base','bf_inv_from','bf_inv_to','ft_cmp','ft_base','ft_delay','ls_cmp','ls_base','ls_inv_from','ls_inv_to','fl_cmp','fl_base','fl_inv_from','fl_inv_to','rush_cmp','rush_base','rush_inv_from','rush_inv_to','im_cmp','im_base','im_inv_from','im_inv_to','ss_cmp','ss_base','ss_inv_from','ss_inv_to'].forEach(id=>$(id).addEventListener('change',schedule));
+document.addEventListener('click',e=>{const p=e.target.closest&&e.target.closest('.pill[data-cb]');if(p){p.classList.toggle('on');schedule();}});   // delegated: works for panels rendered later
+const pillEl=cb=>document.querySelector(`.pill[data-cb="${cb}"]`);
+const pillOn=cb=>{const e=pillEl(cb);return !!e&&e.classList.contains('on');};
+const forAbilityUI=fn=>{for(const id of HERO.abilities){const u=ABILITY_UI[id];if(u)fn(u,id);}};
+const bindAbilities=()=>forAbilityUI(u=>{if(u.bind)u.bind();});
+const syncAbilities=()=>forAbilityUI(u=>{if(u.sync)u.sync();});
+const readAbilities=()=>{const o={};forAbilityUI((u,id)=>{o[id]=u.read();});return o;};
+const abilityStatText=(bl,ttk)=>{let t='';forAbilityUI(u=>{if(u.statText){const s=u.statText(bl.abStats,ttk);if(s)t+=' · '+s;}});return t;};
+['plated_on','dr_on','sil_on','inh_on','merc_cmp','merc_base','merc_card','merc_imbue','sop_imbue','merc_inv_from','merc_inv_to','tesla_cmp','tesla_base','tesla_cap','tesla_inv_from','tesla_inv_to','ee_cmp','ee_base','ee_inv_from','ee_inv_to','apr_cmp','apr_base','apr_inv_from','apr_inv_to','so_cmp','so_base','so_inv_from','so_inv_to','shw_cmp','shw_base','shw_inv_from','shw_inv_to','sop_cmp','sop_base','sop_inv_from','sop_inv_to','spl_cmp','spl_base','spl_inv_from','spl_inv_to','spl_pre','spl_pre_n','bf_cmp','bf_base','bf_inv_from','bf_inv_to','ft_cmp','ft_base','ft_delay','ls_cmp','ls_base','ls_inv_from','ls_inv_to','fl_cmp','fl_base','fl_inv_from','fl_inv_to','rush_cmp','rush_base','rush_inv_from','rush_inv_to','im_cmp','im_base','im_inv_from','im_inv_to','ss_cmp','ss_base','ss_inv_from','ss_inv_to'].forEach(id=>$(id).addEventListener('change',schedule));
 $('ft_delay_s').addEventListener('input',schedule);
 function syncFtHint(){const on=$('ft_delay').checked, d=+$('ft_delay_s').value||0;
+  const T=HERO_TEXT[HERO.id], c=joinList(T.casts), v=T.casts.length>1?'are':'is';
   $('ft_delay_wrap').style.opacity=on?'1':'.4';
-  $('ft_hint').textContent=!on?'Activates at 0s, right after Full Auto is cast.':(d<=0?'Activates at 0s before Full Auto — Full Auto is cast when Fury Trance expires.':'Activates at '+d.toFixed(1)+'s; cards held until then can be thrown first.');}
+  $('ft_hint').textContent=!on?`Activates at 0s, right after ${c} ${v} cast.`:(d<=0?`Activates at 0s before ${c} — ${c} ${v} cast when Fury Trance expires.`:`Activates at ${d.toFixed(1)}s${T.heldNote?'; '+T.heldNote:''}.`);}
 $('ft_delay').addEventListener('change',syncFtHint);$('ft_delay_s').addEventListener('input',syncFtHint);syncFtHint();
 
 // souls-invested category bonuses (cumulative totals), from the item tier table
@@ -765,16 +1149,23 @@ $('ttk_hsdr').addEventListener('input',schedule);
 function syncTtk(){const on=$('ttk_on').checked;$('ttkopts').style.display=on?'flex':'none';
   const sv=$('ttk_shiv').checked;$('shivopts').style.display=sv?'flex':'none';
   if(sv){const df=25+($('shiv_rage').checked?15:0)+($('shiv_ap5').checked?15:0),cl=$('shiv_ap2').checked?70:30,tm=Math.max(0,+$('shiv_time').value||0);
-    $('shiv_hint').textContent=`${df}% of damage taken is deferred over 6s · at ${tm.toFixed(1)}s the active cleanses ${cl}% of what's still pending`;}
-  const dr=Math.min(100,Math.max(0,+$('ttk_hsdr').value||0));$('ttk_hsdr_hint').textContent=`(headshots ×${(1+0.65*(1-dr/100)).toFixed(2)})`;
+    $('shiv_hint').textContent=`${df}% of damage taken is delayed over 6s · the active at ${tm.toFixed(1)}s clears ${cl}% of what's still delayed`;}
+  const dr=Math.min(100,Math.max(0,+$('ttk_hsdr').value||0));$('ttk_hsdr_hint').textContent=`(headshots ×${(1+HERO.stats.headshotBonus*(1-dr/100)).toFixed(2)})`;
   const e=$('r_eng').closest('.ctl');e.style.opacity=on?'.4':'1';e.title=on?'Replaced by time to kill':'';
   $('chartLbl').textContent=on?'Time to kill (s) — lower is better':'DPS vs fight length';$('xEngBtn').textContent=on?'vs target HP':'vs engagement';}
 const syncDr=()=>{$('dr_wrap').style.opacity=$('dr_on').checked?'1':'.45';};$('dr_on').addEventListener('change',syncDr);syncDr();
 const syncSplPre=()=>{$('spl_pre_n').style.opacity=$('spl_pre').checked?'1':'.4';};
 $('spl_pre').addEventListener('change',syncSplPre);syncSplPre();
-fillInvest('rr_inv',SPIRIT_INVEST,' Sp');
-$('rr_inv_from').addEventListener('change',schedule);
-$('rr_inv_to').addEventListener('change',schedule);
+bindAbilities();   // ability panels bind once the investment tables exist
+// hero picker: rebuilds the ability panels; shared settings (boons, items, target) carry over
+$('heroSel').innerHTML=Object.values(HEROES).map(h=>`<option value="${h.id}">${h.name}</option>`).join('');
+$('heroSel').value=HERO.id;
+function setHero(id){
+  HERO=HEROES[id]; renderHeroShell(); bindAbilities();
+  const cap=HERO.stats.boonCap, rb=$('r_boons'), nb=$('n_boons'); rb.max=nb.max=cap; if(+rb.value>cap){rb.value=nb.value=cap;}
+  syncSpiritSlider(); syncFtHint(); paintRanges(); schedule();
+}
+$('heroSel').addEventListener('change',e=>setHero(e.target.value));
 
 // ---- dynamic custom items ----
 const CUSTOM_STATS=[['wd','Wpn dmg %',150],['fr','Fire rate %',100],['bbs','Bullet shred %',60],['spr','Spirit',200],['sss','Spirit shred %',60]];
@@ -807,21 +1198,20 @@ function core(){
   return{
     boons:getB('boons'),range:getB('range'),headshotRate:getB('hs')/100,weaponDamagePct:getB('wd'),fireRatePct:getB('fr'),
     targetBulletResist:getB('tbr'),baseBulletShred:getB('bbs'),engagement:getB('eng'),
-    baseSpirit:getB('spr')-1.1*getB('boons')+(pillOn('ct_rr')?readInvest('rr_inv'):0),targetSpiritResist:getB('tsr'),baseSpiritShred:getB('bss'),extraFireRate:0,platedArmor:$('plated_on').checked,debuffRemover:{on:$('dr_on').checked,time:+$('dr_time').value||0},silencer:$('sil_on').checked,inhibitor:$('inh_on').checked,ttk:{on:$('ttk_on').checked,hp:Math.max(1,+$('ttk_hp').value||1),hsDROn:$('ttk_hsdr_on').checked,hsDR:+$('ttk_hsdr').value||0,spiritRes:$('ttk_spres').checked,bulletRes:$('ttk_bures').checked,shiv:{on:$('ttk_shiv').checked,rage:$('shiv_rage').checked,ap2:$('shiv_ap2').checked,ap5:$('shiv_ap5').checked,time:+$('shiv_time').value||0}},
-    fullAuto:{on:$('fa_on').checked,ap2:pillOn('fa_ap2'),ap5:pillOn('fa_ap5')},
-    cardTrick:{on:$('ct_on').checked,ap2:pillOn('ct_ap2'),ap5:pillOn('ct_ap5'),startSuits:$('sc_on').checked?startSlots.slice(0,maxCards()).filter(Boolean):[],rapidRecharge:pillOn('ct_rr')},
+    baseSpirit:getB('spr')-HERO.stats.spiritPerBoon*getB('boons')+(pillOn('ct_rr')?readInvest('rr_inv'):0),targetSpiritResist:getB('tsr'),baseSpiritShred:getB('bss'),extraFireRate:0,platedArmor:$('plated_on').checked,debuffRemover:{on:$('dr_on').checked,time:+$('dr_time').value||0},silencer:$('sil_on').checked,inhibitor:$('inh_on').checked,ttk:{on:$('ttk_on').checked,hp:Math.max(1,+$('ttk_hp').value||1),hsDROn:$('ttk_hsdr_on').checked,hsDR:+$('ttk_hsdr').value||0,spiritRes:$('ttk_spres').checked,bulletRes:$('ttk_bures').checked,shiv:{on:$('ttk_shiv').checked,rage:$('shiv_rage').checked,ap2:$('shiv_ap2').checked,ap5:$('shiv_ap5').checked,time:+$('shiv_time').value||0}},
+    hero:HERO.id,abilities:readAbilities(),rapidRecharge:{on:pillOn('ct_rr')},
     mercurial:{on:false,cardBonus:false},tesla:{on:false,capacitor:false},escalatingExposure:{on:false}
   };
 }
 const mags=()=>({wd:getB('cwd'),fr:getB('cfr'),bbs:getB('cbbs'),spirit:getB('cspr'),sss:getB('csss')});
 const named=()=>({
-  merc:{cmp:$('merc_cmp').checked,base:$('merc_base').checked,card:$('merc_card').checked,inv:readInvest('merc_inv')},
+  merc:{cmp:$('merc_cmp').checked,base:$('merc_base').checked,card:$('merc_card').checked,imbue:$('merc_imbue').value,inv:readInvest('merc_inv')},
   tesla:{cmp:$('tesla_cmp').checked,base:$('tesla_base').checked,cap:$('tesla_cap').checked,inv:readInvest('tesla_inv')},
   ee:{cmp:$('ee_cmp').checked,base:$('ee_base').checked,inv:readInvest('ee_inv')},
   apr:{cmp:$('apr_cmp').checked,base:$('apr_base').checked,inv:readInvest('apr_inv')},
   so:{cmp:$('so_cmp').checked,base:$('so_base').checked,inv:readInvest('so_inv')},
   shw:{cmp:$('shw_cmp').checked,base:$('shw_base').checked,inv:readInvest('shw_inv')},
-  sop:{cmp:$('sop_cmp').checked,base:$('sop_base').checked,inv:readInvest('sop_inv')},
+  sop:{cmp:$('sop_cmp').checked,base:$('sop_base').checked,imbue:$('sop_imbue').value,inv:readInvest('sop_inv')},
   spl:{cmp:$('spl_cmp').checked,base:$('spl_base').checked,inv:readInvest('spl_inv'),pre:$('spl_pre').checked?+$('spl_pre_n').value:0},
   bf:{cmp:$('bf_cmp').checked,base:$('bf_base').checked,inv:readInvest('bf_inv')},
   ft:{cmp:$('ft_cmp').checked,base:$('ft_base').checked,delayOn:$('ft_delay').checked,delay:+$('ft_delay_s').value||0},
@@ -833,13 +1223,13 @@ const named=()=>({
 });
 function baselineCfg(c0,nm){
   const c=clone(c0);
-  if(nm.merc.base){c.mercurial={on:true,cardBonus:nm.merc.card};c.baseSpirit+=nm.merc.inv;}
+  if(nm.merc.base){c.mercurial={on:true,cardBonus:nm.merc.card,imbue:nm.merc.imbue};c.baseSpirit+=nm.merc.inv;}
   if(nm.tesla.base){c.tesla={on:true,capacitor:nm.tesla.cap};c.weaponDamagePct+=nm.tesla.inv;}
   if(nm.ee.base){c.escalatingExposure={on:true};c.baseSpirit+=nm.ee.inv;}
   if(nm.apr.base){c.weaponDamagePct+=8+nm.apr.inv;c.apr=true;}
   if(nm.so.base){c.baseSpirit+=6;c.weaponDamagePct+=nm.so.inv;c.spiritOverflow={on:true};}
   if(nm.shw.base){c.weaponDamagePct+=nm.shw.inv;c.shadowWeave={on:true};}
-  if(nm.sop.base){c.baseSpirit+=nm.sop.inv;c.surge={on:true};}
+  if(nm.sop.base){c.baseSpirit+=nm.sop.inv;c.surge={on:true,imbue:nm.sop.imbue};}
   if(nm.spl.base){c.weaponDamagePct+=nm.spl.inv;c.spellslinger={on:true,pre:nm.spl.pre};}
   if(nm.bf.base){c.weaponDamagePct+=nm.bf.inv;c.burstFire={on:true};}
   if(nm.ft.base){c.weaponDamagePct+=6;c.furyTrance={on:true,delayOn:nm.ft.delayOn,delay:nm.ft.delay};}
@@ -861,13 +1251,13 @@ function buildRows(c0,nm,mg){
   stat(mg.spirit>0,'cspr','+ Spirit','--orange',c=>c.baseSpirit+=mg.spirit);
   stat(mg.sss>0,'csss','+ Spirit Res. Shred','--rose',c=>c.baseSpiritShred+=mg.sss);
   const nrow=(n,key,name,color,fn)=>{if(n.cmp&&!n.base){const c=clone(bc);fn(c);rows.push({key,name,color,cfg:c});}};
-  nrow(nm.merc,'merc','+ Mercurial','--violet',c=>{c.mercurial={on:true,cardBonus:nm.merc.card};c.baseSpirit+=nm.merc.inv;});
+  nrow(nm.merc,'merc','+ Mercurial','--violet',c=>{c.mercurial={on:true,cardBonus:nm.merc.card,imbue:nm.merc.imbue};c.baseSpirit+=nm.merc.inv;});
   nrow(nm.tesla,'tesla','+ Tesla','--lime',c=>{c.tesla={on:true,capacitor:nm.tesla.cap};c.weaponDamagePct+=nm.tesla.inv;});
   nrow(nm.ee,'ee','+ Escalating Exp.','--green',c=>{c.escalatingExposure={on:true};c.baseSpirit+=nm.ee.inv;});
   nrow(nm.apr,'apr','+ Armor Piercing','--pink',c=>{c.weaponDamagePct+=8+nm.apr.inv;c.apr=true;});
   nrow(nm.so,'so','+ Spiritual Overflow','--magenta',c=>{c.baseSpirit+=6;c.weaponDamagePct+=nm.so.inv;c.spiritOverflow={on:true};});
   nrow(nm.shw,'shw','+ Shadow Weave','--indigo',c=>{c.weaponDamagePct+=nm.shw.inv;c.shadowWeave={on:true};});
-  nrow(nm.sop,'sop','+ Surge of Power','--crimson',c=>{c.baseSpirit+=nm.sop.inv;c.surge={on:true};});
+  nrow(nm.sop,'sop','+ Surge of Power','--crimson',c=>{c.baseSpirit+=nm.sop.inv;c.surge={on:true,imbue:nm.sop.imbue};});
   nrow(nm.spl,'spl','+ Spellslinger','--ivory',c=>{c.weaponDamagePct+=nm.spl.inv;c.spellslinger={on:true,pre:nm.spl.pre};});
   nrow(nm.bf,'bf','+ Burst Fire','--tan',c=>{c.weaponDamagePct+=nm.bf.inv;c.burstFire={on:true};});
   nrow(nm.ft,'ft','+ Fury Trance','--olive',c=>{c.weaponDamagePct+=6;c.furyTrance={on:true,delayOn:nm.ft.delayOn,delay:nm.ft.delay};});
@@ -885,16 +1275,16 @@ const cssv=v=>getComputedStyle(document.documentElement).getPropertyValue(v).tri
 const setSub=(id,t)=>{const e=$('sub_'+id);if(e)e.textContent=t;};
 function updateSubLabels(){
   const boons=getB('boons'),hr=getB('hs')/100,wd=getB('wd'),fr=getB('fr'),tbr=getB('tbr'),bbs=getB('bbs'),spr=getB('spr'),tsr=getB('tsr'),bss=getB('bss');
-  const flatW=5.64+0.14*boons, wdmg=flatW*(1+wd/100), boonSp=1.1*boons;
+  const S=HERO.stats, flatW=S.bullet+S.bulletPerBoon*boons, wdmg=flatW*(1+wd/100), boonSp=S.spiritPerBoon*boons;
   setSub('boons',`${wdmg.toFixed(2)} dmg/bullet · +${boonSp.toFixed(1)} spirit`);
-  setSub('hs',`avg ×${(1+hr*0.65).toFixed(2)} bullet dmg`);
+  setSub('hs',`avg ×${(1+hr*S.headshotBonus).toFixed(2)} bullet dmg`);
   setSub('wd',`×${(1+wd/100).toFixed(2)} on base ${flatW.toFixed(2)}`);
-  setSub('fr',`${(10.6*(1+fr/100)).toFixed(2)} /s · base 10.60`);
+  {const WM=WEAPON_MODELS[HERO.weapon.type];setSub('fr',`${WM.rate(HERO.weapon,S.fireRate,1+fr/100).toFixed(2)} /s · base ${S.fireRate.toFixed(2)}`);}
   setSub('tbr',`×${(1-tbr/100).toFixed(2)} weapon dmg`);
   setSub('bbs',`eff resist ${Math.round(tbr-bbs)}% → ×${(1-(tbr-bbs)/100).toFixed(2)}`);
   setSub('spr',`${boonSp.toFixed(1)} from boons \u00b7 ${Math.max(0,spr-boonSp).toFixed(1)} from items`);
   setSub('tsr',`×${(1-tsr/100).toFixed(2)} spirit dmg`);
-  {const rg=getB('range'),ss=$('ss_base').checked,a=ss?21.6:18,z=ss?62.4:52,f=1-0.9*Math.min(1,Math.max(0,(rg-a)/(z-a)));setSub('range',rg<=a?`×1.00 · falloff starts past ${a}m`:`×${f.toFixed(2)} bullet & on-hit damage`);}
+  {const rg=getB('range'),ss=$('ss_base').checked,a=ss?S.falloffStart*120/100:S.falloffStart,z=ss?S.falloffEnd*120/100:S.falloffEnd,f=1-0.9*Math.min(1,Math.max(0,(rg-a)/(z-a)));setSub('range',rg<=a?`×1.00 · falloff starts past ${a}m`:`×${f.toFixed(2)} bullet & on-hit damage`);}
   setSub('bss',`eff resist ${Math.round(tsr-bss)}% → ×${(1-(tsr-bss)/100).toFixed(2)}`);
 }
 
@@ -905,7 +1295,7 @@ function paintRanges(){document.querySelectorAll('input[type=range]').forEach(el
   el.style.setProperty('--a',Math.min(z,p)+'%');el.style.setProperty('--b',Math.max(z,p)+'%');});}
 document.addEventListener('input',paintRanges);
 function recompute(){
-  paintRanges();renderCardSlots();updateDim();updateSubLabels();syncTtk();
+  paintRanges();syncAbilities();updateSubLabels();syncTtk();
   const c0=core(), nm=named(), mg=mags();
   const rows=buildRows(c0,nm,mg);
   if(c0.ttk.on){recomputeTTK(c0,nm,rows);drawChart(c0,nm,mg);return;}
@@ -931,15 +1321,14 @@ function recompute(){
   if(data.length>1){
     let bi=1;for(let i=2;i<data.length;i++)if(data[i].avg>data[bi].avg)bi=i;
     const best=data[bi], dB=best.avg-data[0].avg, pB=data[0].avg>0?100*dB/data[0].avg:0;
-    const chans=[['weapon fire',bl.weapon],['Full Auto',bl.faSpirit],['cards',bl.cardSpirit],['Mercurial bullets',bl.mercSpirit],['Tesla',bl.teslaSpirit],['Focus Lens echo',bl.focusEcho]].filter(c=>c[1]>0.05).sort((a,b)=>b[1]-a[1]);
+    const chans=[['weapon fire',bl.weapon],...bl.channels.map(c=>[c.label,bl.ch[c.id]]),['Mercurial bullets',bl.mercSpirit],['Tesla',bl.teslaSpirit],['Focus Lens echo',bl.focusEcho]].filter(c=>c[1]>0.05).sort((a,b)=>b[1]-a[1]);
     const top=chans[0]||['weapon fire',bl.weapon];
     const sg=dB>=0?'+':'−';
     $('verdict').innerHTML=`Over a <b>${c0.engagement.toFixed(1)}s</b> fight your biggest damage source is <b>${top[0]}</b> (${fmtN(top[1])} DPS). Of the ${data.length-1} pick${data.length-1>1?'s':''}, <b>${best.r.name.replace('+ ','')}</b> adds the most — <b>${sg}${fmtN(Math.abs(dB))} DPS</b> (${pB>=0?'+':''}${pB.toFixed(1)}%). Highlighted cells win each column.`;
   } else {
     $('verdict').innerHTML=`Baseline only — raise a <b>stat purchase</b> slider above 0 or toggle a <b>named item</b> to add comparison rows.`;
   }
-  const cards=bl.throws.toFixed(bl.throws<10?1:0);
-  $('buildline').textContent=`Fire rate ${bl.frBase.toFixed(1)}${bl.faOn?`→${bl.frFA.toFixed(1)} FA`:''}/s · Spirit ${bl.spiritStat.toFixed(0)} · ~${cards} cards thrown${nm.ee.base?` · EE ${bl.stacks.toFixed(1)}/12`:''}`;
+  $('buildline').textContent=`Fire rate ${bl.frBase.toFixed(1)}${bl.peakTag?`→${bl.frPeak.toFixed(1)} ${bl.peakTag}`:''}/s · Spirit ${bl.spiritStat.toFixed(0)}${abilityStatText(bl,false)}${nm.ee.base?` · EE ${bl.stacks.toFixed(1)}/12`:''}`;
 
   drawChart(c0,nm,mg);
 }
@@ -962,8 +1351,7 @@ function recomputeTTK(c0,nm,rows){
     v+=d<0?` <b>${data[bi].r.name.replace('+ ','')}</b> kills fastest — <b>${Math.abs(d).toFixed(2)}s sooner</b> (−${Math.abs(100*d/b0).toFixed(1)}%).`:' None of the picks kill faster than the baseline.';
   }else v+=' Raise a stat purchase or toggle a named item to compare kill times.';
   $('verdict').innerHTML=v;
-  const cards=bl.throws.toFixed(bl.throws<10?1:0);
-  $('buildline').textContent=`Fire rate ${bl.frBase.toFixed(1)}${bl.faOn?`→${bl.frFA.toFixed(1)} FA`:''}/s · Spirit ${bl.spiritStat.toFixed(0)} · ~${cards} cards thrown per kill`;
+  $('buildline').textContent=`Fire rate ${bl.frBase.toFixed(1)}${bl.peakTag?`→${bl.frPeak.toFixed(1)} ${bl.peakTag}`:''}/s · Spirit ${bl.spiritStat.toFixed(0)}${abilityStatText(bl,true)}`;
 }
 
 /* -------- floating comparison dock -------- */
@@ -1002,14 +1390,39 @@ document.querySelectorAll('#xseg button').forEach(b=>b.addEventListener('click',
   document.querySelectorAll('#xseg button').forEach(x=>x.classList.remove('on'));b.classList.add('on');X_MODE=b.dataset.x;recompute();
 }));
 function niceStep(range,ticks){const raw=range/ticks,mag=Math.pow(10,Math.floor(Math.log10(raw))),n=raw/mag;const s=n<1.5?1:n<3?2:n<7?5:10;return s*mag;}
+// The chart is computed incrementally (a few simulations per slice, yielding to the page in between) so the
+// table and dock update immediately and inputs stay responsive. A newer recompute cancels a stale job.
+let chartJob=0, chartData=null;
+// yield to the page between slices without the ~4ms clamp that chained setTimeout calls get
+const yieldQ=[], yieldCh=typeof MessageChannel!=='undefined'?new MessageChannel():null;
+if(yieldCh)yieldCh.port1.onmessage=()=>{const f=yieldQ.shift();if(f)f();};
+const nextSlice=f=>{if(!yieldCh){setTimeout(f,0);return;}yieldQ.push(f);yieldCh.port2.postMessage(0);};   // falls back to timers where MessageChannel is missing
 function drawChart(c0,nm,mg){
+  const job=++chartJob;
   const base=buildRows(c0,nm,mg).slice(0,8);
   const series=base.map(r=>({name:r.name,color:cssv(r.color),pts:[]}));
   const tm=!!(c0.ttk&&c0.ttk.on), hpM=tm&&X_MODE==='eng';
-  const xr=hpM?[100,Math.max(500,2*c0.ttk.hp)]:(X_MODE==='eng'?[1,30]:[0,35]);
+  const xr=hpM?[100,Math.max(500,2*c0.ttk.hp)]:(X_MODE==='eng'?[1,30]:[0,HERO.stats.boonCap]);
   const xs=[];for(let i=0;i<CHART_PTS;i++)xs.push(xr[0]+(xr[1]-xr[0])*i/(CHART_PTS-1));
-  let ymax=0;
-  xs.forEach(x=>{const cc=clone(c0);if(hpM)cc.ttk.hp=x;else if(X_MODE==='eng')cc.engagement=x;else cc.boons=x;const rr=buildRows(cc,nm,mg);rr.slice(0,8).forEach((row,i)=>{const sm=simulate(row.cfg,CHART_ITER,SEED),y=tm?sm.ttk:sm.total;ymax=Math.max(ymax,y);series[i].pts.push({x,y});});});
+  let ymax=0, xi=0, ri=0, rr=null;
+  $('chartBusy').style.visibility='visible';
+  const slice=()=>{
+    if(job!==chartJob)return;                       // superseded by a newer recompute
+    const t0=performance.now();
+    while(xi<xs.length&&performance.now()-t0<12){
+      const x=xs[xi];
+      if(!rr){const cc=clone(c0);if(hpM)cc.ttk.hp=x;else if(X_MODE==='eng')cc.engagement=x;else cc.boons=x;rr=buildRows(cc,nm,mg).slice(0,8);}
+      const sm=simulate(rr[ri].cfg,CHART_ITER,SEED),y=tm?sm.ttk:sm.total;ymax=Math.max(ymax,y);series[ri].pts.push({x,y});
+      if(++ri>=rr.length){ri=0;rr=null;xi++;}
+    }
+    if(xi<xs.length){nextSlice(slice);return;}
+    chartData={c0,series,tm,hpM,xr,ymax}; paintChart(); $('chartBusy').style.visibility='hidden';
+  };
+  nextSlice(slice);
+}
+function paintChart(){
+  if(!chartData)return;
+  const {c0,series,hpM,xr}=chartData; let ymax=chartData.ymax;
   const cv=$('chart'),dpr=window.devicePixelRatio||1;
   const W=cv.clientWidth,H=320;cv.width=W*dpr;cv.height=H*dpr;
   const g=cv.getContext('2d');g.setTransform(dpr,0,0,dpr,0,0);g.clearRect(0,0,W,H);
@@ -1026,7 +1439,7 @@ function drawChart(c0,nm,mg){
   if(X_MODE==='eng'){const ex=X(hpM?c0.ttk.hp:c0.engagement);g.strokeStyle=cssv('--line2');g.setLineDash([4,4]);g.lineWidth=1;g.beginPath();g.moveTo(ex,T);g.lineTo(ex,T+ph);g.stroke();g.setLineDash([]);}
   $('chartlegend').innerHTML=series.map(s=>`<span class="k"><span class="ln" style="background:${s.color}"></span>${s.name}</span>`).join('');
 }
-window.addEventListener('resize',()=>{clearTimeout(timer);timer=setTimeout(()=>drawChart(core(),named(),mags()),120);});
+let resizeT=null; window.addEventListener('resize',()=>{clearTimeout(resizeT);resizeT=setTimeout(paintChart,120);});   // redraw only; no re-simulation
 recompute();
 </script>
 </body>
