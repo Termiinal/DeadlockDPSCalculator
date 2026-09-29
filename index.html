@@ -9,17 +9,20 @@
     --bg:#0d1117; --panel:#151b25; --panel2:#1a212d; --line:#232c39; --line2:#33404f;
     --tx:#e8ebf0; --mut:#9aa4b2; --faint:#69737f; --grid:#1d2530;
     --gold:#f2ab4b; --teal:#3fc7cf; --violet:#ab88ea; --slate:#7c8898;
-    --green:#5fd39a; --orange:#e0744d; --rose:#e06d8f; --blue:#6ea8fe; --lime:#c3e88d; --pink:#e884c4; --yellow:#e6d24a; --cyan:#4fd0d8; --magenta:#cf5ae0; --indigo:#7a86f0; --crimson:#e34d5c; --ivory:#dfe3ea; --tan:#c49a6c; --olive:#a4a632; --sky:#9ad4ff; --emerald:#1fa67a; --coral:#ff7f66; --lavender:#cdb8ff; --mint:#9df0cf;
+    --green:#5fd39a; --orange:#e0744d; --rose:#e06d8f; --blue:#6ea8fe; --lime:#c3e88d; --pink:#e884c4; --yellow:#e6d24a; --cyan:#4fd0d8; --magenta:#cf5ae0; --indigo:#7a86f0; --crimson:#e34d5c; --ivory:#dfe3ea; --tan:#c49a6c; --olive:#a4a632; --sky:#9ad4ff; --emerald:#1fa67a; --coral:#ff7f66; --lavender:#cdb8ff; --mint:#9df0cf; --grass:#7dd13b; --plum:#b0579a;
     --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
   }
   *{box-sizing:border-box}
   html,body{margin:0;background:var(--bg);color:var(--tx);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-font-smoothing:antialiased;font-size:15px;line-height:1.5}
   .wrap{max-width:1080px;margin:0 auto;padding:22px 20px 60px}
   header h1{font-size:20px;font-weight:600;margin:0 0 3px;letter-spacing:.2px}
-  .hdrrow{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
-  .heropick{font-size:12px;color:var(--mut);display:inline-flex;align-items:center;gap:8px}
-  .heropick select{background:var(--panel2);border:1px solid var(--line2);color:var(--tx);font-size:13px;font-weight:600;border-radius:8px;padding:5px 10px;font-family:inherit;cursor:pointer}
-  .heropick select:focus{outline:none;border-color:var(--gold)}
+  .hdrrow{display:flex;align-items:center;justify-content:space-between;gap:10px 12px;flex-wrap:wrap;margin-bottom:6px}
+  .heropick{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.09em;color:var(--mut);display:inline-flex;align-items:center;gap:10px}
+  .heropick select{appearance:none;-webkit-appearance:none;background:#241d10 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5l5 5 5-5' fill='none' stroke='%23f2ab4b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat right 14px center;
+    border:1.5px solid var(--gold);color:var(--tx);font-size:17px;font-weight:700;letter-spacing:.2px;text-transform:none;border-radius:10px;padding:9px 42px 9px 16px;min-width:170px;font-family:inherit;cursor:pointer;transition:.12s;box-shadow:0 0 0 3px rgba(242,171,75,.12)}
+  .heropick select:hover{background-color:#2d2413;box-shadow:0 0 0 4px rgba(242,171,75,.2)}
+  .heropick select:focus{outline:none;box-shadow:0 0 0 4px rgba(242,171,75,.35)}
+  .heropick select option{background:var(--panel2);color:var(--tx);font-size:14px}
   header p{margin:0;color:var(--mut);font-size:13.5px}
   .card{background:var(--panel);border:1px solid var(--line);border-radius:12px;margin-top:18px}
   .card > h2{font-size:12px;text-transform:uppercase;letter-spacing:.09em;color:var(--faint);margin:0;padding:14px 18px 0;font-weight:600}
@@ -330,7 +333,7 @@
         <label class="sw"><input type="checkbox" id="ls_cmp"><span class="track"></span></label>
         <div class="body"><div class="tn">Lucky Shot</div>
           <div class="td">25% of bullets deal double damage.</div>
-          <div class="minirow"><label class="mini"><input type="checkbox" id="ls_base"> <b>add to baseline</b></label><label class="mini">wpn invest <select id="ls_inv_from" class="invsel" title="tier before this purchase"></select> → <select id="ls_inv_to" class="invsel" title="tier after this purchase"></select></label></div>
+          <div class="minirow"><label class="mini"><input type="checkbox" id="ls_base"> <b>add to baseline</b></label><label class="mini" title="Lucky bullets skip Plated Armor entirely. Only matters when the enemy has Plated Armor."><input type="checkbox" id="ls_plated"> Ignore Plated (potential bug)</label><label class="mini">wpn invest <select id="ls_inv_from" class="invsel" title="tier before this purchase"></select> → <select id="ls_inv_to" class="invsel" title="tier after this purchase"></select></label></div>
         </div>
       </div>
       <div class="togcell">
@@ -359,6 +362,20 @@
         <div class="body"><div class="tn">Sharpshooter</div>
           <div class="td">+10% weapon damage (+70% at 15m+) and 20% longer falloff range.</div>
           <div class="minirow"><label class="mini"><input type="checkbox" id="ss_base"> <b>add to baseline</b></label><label class="mini">wpn invest <select id="ss_inv_from" class="invsel" title="tier before this purchase"></select> → <select id="ss_inv_to" class="invsel" title="tier after this purchase"></select></label></div>
+        </div>
+      </div>
+      <div class="togcell">
+        <label class="sw"><input type="checkbox" id="hh_cmp"><span class="track"></span></label>
+        <div class="body"><div class="tn">Headhunter</div>
+          <div class="td">+5% weapon damage; headshots add <code>75 + 4·boons</code> damage (8s cooldown).</div>
+          <div class="minirow"><label class="mini"><input type="checkbox" id="hh_base"> <b>add to baseline</b></label><label class="mini">wpn invest <select id="hh_inv_from" class="invsel" title="tier before this purchase"></select> → <select id="hh_inv_to" class="invsel" title="tier after this purchase"></select></label></div>
+        </div>
+      </div>
+      <div class="togcell">
+        <label class="sw"><input type="checkbox" id="sr_cmp"><span class="track"></span></label>
+        <div class="body"><div class="tn">Spirit Rend</div>
+          <div class="td">Bullets shred 8% spirit resist; headshots add 7% for 8s (max 4, 2s cooldown).</div>
+          <div class="minirow"><label class="mini"><input type="checkbox" id="sr_base"> <b>add to baseline</b></label><label class="mini">wpn invest <select id="sr_inv_from" class="invsel" title="tier before this purchase"></select> → <select id="sr_inv_to" class="invsel" title="tier after this purchase"></select></label></div>
         </div>
       </div>
     </div>
@@ -407,7 +424,9 @@
           <li data-ability="bulletDance">Bullet Dance's duration uses your spirit when it's cast. While it lasts, every bullet is a body shot and adds 1 Fixation stack; its flat damage gets Lucky Shot but not Weapon Damage %.</li>
           <li data-ability="cardTrick">Cards build 3.4% per body hit and 5.1% per headshot, and are thrown as soon as they're ready (0.6s apart); a starting hand throws left to right. Suits come from a 2-of-each deck plus a 1/9 Joker chance (1/5 at 5AP): Spades ×1.6, Diamonds −7% both resists for 5s, and a Joker counts as every suit.</li>
           <li>Fire-rate bonuses add together; separate damage reductions multiply.</li>
-          <li>Lucky Shot, Plated Armor, and Armor Piercing Rounds use their average effect rather than rolling each bullet. Lucky Shot doubles body-shot damage only; the headshot bonus and spirit on-hit effects aren't doubled.</li>
+          <li>Lucky Shot, Plated Armor, and Armor Piercing Rounds use their average effect rather than rolling each bullet. Lucky Shot doubles body-shot damage only; the headshot bonus and spirit on-hit effects aren't doubled. With its <i>Ignore Plated</i> option on, lucky bullets skip Plated Armor entirely: no deflect and no 50% block.</li>
+          <li>Headhunter's bonus goes on the first headshot after its cooldown (each bullet rolls your headshot rate; no headshots during Bullet Dance). It's weapon damage reduced by bullet resist and raised by shred, and Inhibitor still reduces it; Weapon Damage %, the headshot multiplier, Lucky Shot, falloff, Armor Piercing and Plated's deflect don't touch it. Plated's 50% roll can block it, leaving it ready for the next headshot.</li>
+          <li>Spirit Rend's 8% shred starts once your first bullet hits and refreshes with every bullet. Headshot stacks (+7% each, up to 4 for 36% total) share one 8s timer (extended by duration bonuses): each headshot off the 2s cooldown adds a stack and refreshes the timer, even at 4 stacks, and all stacks drop if it runs out. Headshots roll your headshot rate per bullet (none during Bullet Dance), and Plated's 50% roll can block the shred or a stack.</li>
           <li id="mdPlated"></li>
           <li id="mdCleanse"></li>
           <li id="mdSpell"></li>
@@ -516,8 +535,8 @@ const WEAPON_MODELS={
 //     spShred(t)     shred on spirit resist only
 //     buShred(t)     shred on bullet resist only
 //     onHit(t,x)     per-bullet damage; returns true if spirit damage was dealt.
-//                    Bullet-type bonus damage uses x.wf (or x.wfBlk when Plated's 50% roll also blocks it), x.hsMult,
-//                    R.luckyFrac and x.wdFrac, and adds itself to x.wExtra so weapon-damage items count it
+//                    Bullet-type bonus damage goes through run.bulletBonus (headshots, Lucky Shot, resists, Plated) and
+//                    adds itself to x.wExtra so weapon-damage items count it; x.wdFrac is the current Weapon Damage %
 //     afterShot(t)   per-bullet upkeep (e.g. building charges)
 //     act(t,x)       discrete uses (e.g. throwing a card); returns a shooting lockout in seconds
 //     cleanse()      enemy debuff remover strips this ability's debuffs
@@ -619,7 +638,7 @@ const ABILITIES={
         reset(){ st.stacks=0; st.fullT=-1; st.procs=0; },
         onHit(t,x){ const c=run.chv, s0=st.stacks; let sp=false;
           // bonus bullet damage from the stacks already on the target: can headshot, boosted by Lucky Shot, not multiplied by Weapon Damage %
-          if(s0>0){const d=s0*(P.perStack+0.035*x.wdFrac)*(x.hsMult+R.luckyFrac)*x.wfBlk; c[P.ci]+=d; x.wExtra+=d;}
+          if(s0>0){const d=run.bulletBonus(s0*(P.perStack+0.035*x.wdFrac),x.hsMult,true,x); c[P.ci]+=d; x.wExtra+=d;}
           // then this bullet's stacks (Plated's 50% roll blocks them unless Armor Piercing procs)
           let s1=s0+(x.noHs?1:hsGain)*R.platedBlock; if(s1>P.max)s1=P.max; st.stacks=s1;
           if(P.proc&&s1>s0){   // 1AP: each 20-stack threshold deals spirit damage, including the one that reaches max;
@@ -646,7 +665,7 @@ const ABILITIES={
         noHs(){ return st.on; },                                       // 100% accuracy, but no headshots
         fireRate(){ return st.on?P.fr:0; },
         onHit(t,x){ if(!st.on)return false;
-          const d=P.flat*(1+R.luckyFrac)*x.wf; run.chv[P.ci]+=d; x.wExtra+=d;   // flat bullet damage: Lucky Shot yes, Weapon Damage % no
+          const d=run.bulletBonus(P.flat,1,false,x); run.chv[P.ci]+=d; x.wExtra+=d;   // flat bullet damage: Lucky Shot yes, Weapon Damage % no
           const hb=P.hit; if(!hb)return false;
           run.chv[P.ci]+=(hb.base+hb.perSp*x.curSp)*Math.min(1,(t-st.lastHit)/hb.charge)*x.spiritMult*x.ampMult*R.platedBlock*R.outS*R.fall; st.lastHit=t; return true; },
         stats(){ return {bdDur:st.dur}; }
@@ -677,7 +696,8 @@ function resolve(cfg){
   const ee=cfg.escalatingExposure.on;
   const plated=cfg.platedArmor;
   const aprIgnore=cfg.apr?0.55:0;
-  const platedBlock=plated?(aprIgnore+(1-aprIgnore)*0.5):1;
+  const lsIgnore=!!(plated&&cfg.luckyShot&&cfg.luckyShot.on&&cfg.luckyShot.ignorePlated);   // Lucky Shot option: lucky bullets skip Plated Armor entirely (possible game bug)
+  const platedBlock=plated?(lsIgnore?0.75*(aprIgnore+(1-aprIgnore)*0.5)+0.25:(aprIgnore+(1-aprIgnore)*0.5)):1;   // share of bullets whose on-hit effects get through
   const tk=cfg.ttk||{}, ttkOn=!!tk.on, ttkHP=ttkOn?Math.max(1,+tk.hp||1):0;
   const hsDR=(ttkOn&&tk.hsDROn)?Math.min(1,Math.max(0,(+tk.hsDR||0)/100)):0;
   const spRes=ttkOn&&!!tk.spiritRes, buRes=ttkOn&&!!tk.bulletRes;   // Resilience: +30% resist, +45% below 50% HP
@@ -702,6 +722,8 @@ function resolve(cfg){
   const ftStart=ftOn?(ftc.delayOn?Math.max(0,+ftc.delay||0):0):1e9;
   const ftFirst=ftOn&&ftc.delayOn&&ftStart<=0;   // delay ticked at 0s: Fury Trance before abilities
   const abilityStart=ftFirst?ftDur:0;             // abilities are first usable once any opening lockout ends
+  const hhOn=!!(cfg.headhunter&&cfg.headhunter.on), hhDmg=hhOn?75+4*boons:0;   // Headhunter: next headshot deals bonus weapon damage, 8s cooldown
+  const srOn=!!(cfg.spiritRend&&cfg.spiritRend.on);   // Spirit Rend: bullets shred 8% spirit resist; headshots +7% per stack (max 4, 2s cooldown)
   const surgeCardSp=surgeOn?28:0, surgeFR=surgeOn?0.20:0, surgeDur=surgeOn?8*durMult:0;   // Surge of Power: imbues the charge ability
   // abilities
   const env={durMult, headshotRate:cfg.headshotRate, platedBlock, imbue:{cdr:rrOn?0.14:0, extraCharges:rrOn?2:0}};
@@ -716,10 +738,10 @@ function resolve(cfg){
   const onHitIdx=channels.map((c,i)=>c.onHit?i:-1).filter(i=>i>=0), otherIdx=channels.map((c,i)=>c.onHit?-1:i).filter(i=>i>=0);
   let peakFR=0, peakTag=''; for(const a of abilities)if(a.def.peak){const pk=a.def.peak(a.P);peakFR+=pk.fr;peakTag=pk.tag;}
   const hsMult=1+cfg.headshotRate*S.headshotBonus*(1-hsDR);   // average headshot multiplier on bullet damage (wdPerBullet = weaponDmg·hsMult)
-  return{H,boons,spirit,flatWeapon,weaponDmg,wdPerBullet,wdBody:weaponDmg,hsRate:cfg.headshotRate,hsMult,luckyFrac:luckyBonus>0?0.25:0,plated,aprIgnore,platedBlock,teslaDmgBase,
+  return{H,boons,spirit,flatWeapon,weaponDmg,wdPerBullet,wdBody:weaponDmg,hsRate:cfg.headshotRate,hsMult,luckyFrac:luckyBonus>0?0.25:0,lsIgnore,soPlated:plated?(lsIgnore?0.625:0.5):1,plated,aprIgnore,platedBlock,teslaDmgBase,
     soFR,soSpirit,soBuild,swFR,swSpirit,swDur,surgeFR,surgeDur,spellFR,spellMax,spellPre,bfPassive,bfFR,bfDur,bfCd,ftFR,ftDur,ftStart,abilityStart,luckyBonus,flFR,flShred,flShredDur,flWin,flStore,drTime,rushOn,imOn,wdFrac,fall,outW,outS,ttk:ttkOn,hp:ttkHP,spRes,buRes,bl,blDefer,blCleanse,blTime,
     abilities, channels, onHitIds, otherIds, onHitIdx, otherIdx, chargeId:H.chargeAbility, peakFR, peakTag,
-    surgeTarget,
+    surgeTarget, hhOn, hhDmg, hhCd:8, srOn, srBase:0.08, srStack:0.07, srMax:4, srCd:2, srDur:8*durMult,
     merc:{on:merc.on,fr:mercFR},
     tesla:{on:tesla.on,proc:teslaProc},ee,teslaFR,teslaBurst,
     baseFR:S.fireRate,firePct:cfg.fireRatePct/100,tBulletRes:cfg.targetBulletResist/100,baseBulletShred:cfg.baseBulletShred/100,
@@ -736,17 +758,19 @@ function makeRunner(R,rng,acc){
       if(id!==undefined&&id===R.surgeTarget&&R.surgeFR>0&&tt>=S.surgeCd){S.surgeUntil=tt+R.surgeDur;S.surgeCd=tt+14;}   // Surge of Power: its imbued ability was used
       if(R.spellFR>0&&S.spellStacks<R.spellMax)S.spellStacks++; },                                                     // Spellslinger
     spiritHit(tt){ if(R.ee){S.eeActive=true;if(tt>=S.lastEE+0.7&&S.eeStacks<12){S.eeStacks++;S.lastEE=tt;}} },         // Escalating Exposure
-    addStacks(){}   // stack-based abilities replace this (Haze: Fixation), so other abilities can apply stacks
+    addStacks(){},  // stack-based abilities replace this (Haze: Fixation), so other abilities can apply stacks
+    // expected damage of a bullet-type bonus D per bullet (h = headshot multiplier, blk = Plated's 50% roll also blocks it); Lucky Shot doubles the body-shot part
+    bulletBonus(D,h,blk,x){ return R.lsIgnore?D*((1-R.luckyFrac)*h*(blk?x.wfBlk:x.wf)+R.luckyFrac*(h+1)*x.wfNP):D*(h+R.luckyFrac)*(blk?x.wfBlk:x.wf); }
   };
   const abs=[]; let chargeAb=null;
   for(const a of R.abilities){const inst=a.def.create(a.P,run);abs.push(inst);if(a.id===R.chargeId)chargeAb=inst;}
   // hook lists (ability order preserved); indexed loops keep the per-shot path allocation-free
-  const hk=n=>abs.filter(a=>a[n]), hCast=hk('cast'), hNoHs=hk('noHs'), hFR=hk('fireRate'), hShred=hk('shred'), hSp=hk('spShred'), hBu=hk('buShred'), hHit=hk('onHit'), hAfter=hk('afterShot'), hAct=hk('act'), hClean=hk('cleanse'), hStats=hk('stats');
-  const x={curSp:0,spiritMult:0,ampMult:0,locked:false,first:true,noHs:false,hsMult:1,wf:0,wfBlk:0,wdFrac:0,wExtra:0};   // per-shot context, reused
+  const hk=n=>abs.filter(a=>a[n]), hCast=hk('cast'), hNoHs=hk('noHs'), hFR=hk('fireRate'), hShred=hk('shred'), hSp=hk('spShred'), hBu=hk('buShred'), hHit=hk('onHit'), hAfter=hk('afterShot'), hAct=hk('act'), hClean=hk('cleanse'), hStats=hk('stats'), hHH=hk('hhAmp');   // hhAmp(t): additive amplification of Headhunter's bonus (none yet)
+  const x={curSp:0,spiritMult:0,ampMult:0,locked:false,first:true,noHs:false,hsMult:1,wf:0,wfBlk:0,wdFrac:0,wExtra:0,wfNP:0};   // per-shot context, reused
   const wpn=WEAPON_MODELS[R.H.weapon.type].create(R.H.weapon);
   // damage dealt so far, summed in canonical order: weapon, on-hit ability channels, Mercurial, Tesla, other ability channels
   const chv=acc.chv, OH=R.onHitIdx, OT=R.otherIdx;
-  const dealtNow=()=>{let s=acc.weapon;for(let i=0;i<OH.length;i++)s+=chv[OH[i]];s+=acc.merc;s+=acc.tesla;for(let i=0;i<OT.length;i++)s+=chv[OT[i]];return s;};
+  const dealtNow=()=>{let s=acc.weapon;for(let i=0;i<OH.length;i++)s+=chv[OH[i]];s+=acc.merc;s+=acc.tesla;for(let i=0;i<OT.length;i++)s+=chv[OT[i]];s+=acc.hh;return s;};
   const dealtAll=()=>dealtNow()+acc.focus;
   const rushQ=[];
   // Bloodletting HP model: hpDmg = HP actually lost; each hit's deferred share bleeds in linearly over 6s (FIFO chunks, piecewise-constant rate)
@@ -759,7 +783,7 @@ function makeRunner(R,rng,acc){
       B.hpDmg+=B.rate*sg; B.dT=nx;
       while(B.bqi<B.blq.length&&B.blq[B.bqi].end<=B.dT){B.rate-=B.blq[B.bqi].r;B.bqi++;} if(B.bqi>=B.blq.length||B.rate<1e-12)B.rate=B.bqi>=B.blq.length?0:Math.max(0,B.rate);}};
   return function runOnce(){
-    let t=0, teslaCd=-1e9, guard=0, overflow=0, overflowActive=false, bfUntil=-1e9, bfNext=0, ftCast=false;
+    let t=0, teslaCd=-1e9, hhReady=0, srApplied=false, srStacks=0, srNext=0, srExpire=0, guard=0, overflow=0, overflowActive=false, bfUntil=-1e9, bfNext=0, ftCast=false;
     S.eeStacks=0; S.lastEE=-1e9; S.eeActive=false; S.surgeUntil=-1e9; S.surgeCd=-1e9; S.spellStacks=0;
     for(let i=0;i<abs.length;i++)abs[i].reset();
     wpn.reset();
@@ -780,6 +804,7 @@ function makeRunner(R,rng,acc){
       if(!drDone&&t>=R.drTime){drDone=true;
         for(let i=0;i<hClean.length;i++)hClean[i].cleanse();   // strip ability debuffs (e.g. Diamond shred)
         S.eeStacks=0;S.eeActive=false;            // strip EE stacks + its -8% (re-applied by next spirit damage)
+        srApplied=false;srStacks=0;               // strip Spirit Rend (its 8% returns with the next bullet)
         if(!flDone){acc.focus+=R.flStore*(dealtNow()-flStart);flDone=true;}   // Focus Lens: stored damage dealt early
         flCleansed=true;}                     // Focus Lens: shred removed
       if(!flDone&&t>=R.flWin){acc.focus+=R.flStore*(dealtNow()-flStart);flDone=true;}
@@ -800,26 +825,37 @@ function makeRunner(R,rng,acc){
       const deflect=R.plated?0.7:1;
       const weaponFactor=R.aprIgnore*multIgnore+(1-R.aprIgnore)*multNormal*deflect;
       const eeShred=(R.ee&&S.eeActive)?0.08:0;
-      const spiritMult=1-(R.tSpiritRes+resSp-R.baseSpiritShred-dShred-abSp-eeShred-(t<R.flShredDur&&!flCleansed?R.flShred:0));
+      if(srStacks>0&&t>=srExpire)srStacks=0;   // Spirit Rend: headshot stacks share one timer; all drop when it runs out
+      const spiritMult=1-(R.tSpiritRes+resSp-R.baseSpiritShred-dShred-abSp-eeShred-(t<R.flShredDur&&!flCleansed?R.flShred:0)-(srApplied?R.srBase+srStacks*R.srStack:0));
       const ampMult=1+S.eeStacks*0.045;
       const mSpb=R.merc.on?R.flatWeapon*(0.20+0.0038*curSp):0, tDmg=R.teslaDmgBase+0.19*curSp;
       const imRamp=R.imOn?0.45*Math.min(1,t/2.5):0;
       const imMul=R.imOn?(1+R.wdFrac+imRamp)/(1+R.wdFrac):1;   // ramp adds to Weapon Damage %
-      const wHit=((noHs?R.wdBody:R.wdPerBullet)+R.luckyBonus)*weaponFactor*R.outW*imMul*R.fall; acc.weapon+=wHit;
+      const wBase=noHs?R.wdBody:R.wdPerBullet, plainFactor=R.aprIgnore*multIgnore+(1-R.aprIgnore)*multNormal;   // plainFactor: no Plated at all
+      const wHit=(R.lsIgnore?(1-R.luckyFrac)*wBase*weaponFactor+R.luckyFrac*(wBase+R.wdBody)*plainFactor   // lucky bullets skip Plated
+                            :(wBase+R.luckyBonus)*weaponFactor)*R.outW*imMul*R.fall; acc.weapon+=wHit;
       x.curSp=curSp; x.spiritMult=spiritMult; x.ampMult=ampMult; x.locked=ftActive; x.first=wpn.first();
       x.noHs=noHs; x.hsMult=noHs?1:R.hsMult; x.wdFrac=R.wdFrac+imRamp; x.wExtra=0;
       x.wf=weaponFactor*R.outW*R.fall;                                                                                  // bullet damage that isn't Weapon Damage %-scaled
       x.wfBlk=(R.aprIgnore*multIgnore+(1-R.aprIgnore)*multNormal*deflect*(R.plated?0.5:1))*R.outW*R.fall;                 // ...that Plated's 50% roll also blocks
+      x.wfNP=plainFactor*R.outW*R.fall;                                                                                  // ...on a lucky bullet that skips Plated
       let dealt=false;
       for(let i=0;i<hHit.length;i++)if(hHit[i].onHit(t,x))dealt=true;
       if(R.merc.on){acc.merc+=mSpb*spiritMult*ampMult*R.platedBlock*R.outS*R.fall;dealt=true;}
       if(R.tesla.on&&t>=teslaCd){if(rng()<R.tesla.proc){acc.tesla+=tDmg*spiritMult*ampMult*R.platedBlock*R.outS*R.fall;teslaCd=t+0.2;dealt=true;}}
+      if(R.hhOn&&!noHs&&t>=hhReady&&rng()<R.hsRate&&(!R.plated||rng()<R.platedBlock)){   // Headhunter: this bullet is a headshot (and Plated's 50% roll didn't block it)
+        let amp=1; for(let i=0;i<hHH.length;i++)amp+=hHH[i].hhAmp(t);
+        const d=R.hhDmg*multNormal*R.outW*amp; acc.hh+=d; x.wExtra+=d; acc.hhProcs++; hhReady=t+R.hhCd;}   // bullet resist and shred only
+      if(R.srOn){   // Spirit Rend: applied by this bullet, so it shreds the damage that follows (Plated's 50% roll can block it)
+        if(!srApplied&&(!R.plated||rng()<R.platedBlock))srApplied=true;
+        if(!noHs&&t>=srNext&&rng()<R.hsRate&&(!R.plated||rng()<R.platedBlock)){   // headshot off cooldown: +1 stack (max 4) and refresh the timer, even at max
+          if(srStacks<R.srMax)srStacks++; srExpire=t+R.srDur; srNext=t+R.srCd; srApplied=true;}}
       if(dealt)run.spiritHit(t);
       for(let i=0;i<hAfter.length;i++)hAfter[i].afterShot(t);
       if(R.rushOn){const wAll=wHit+x.wExtra;rushQ.push([t,wAll]);rushSum+=wAll;while(rushQ[rushHead][0]<=t-3.5){rushSum-=rushQ[rushHead][1];rushHead++;}
         if(t>=rushCd&&rushSum>=200&&chargeAb&&chargeAb.canRefill()){rushCd=t+25;chargeAb.refill();}}   // full charges: no refill, cooldown not consumed
       let lock=0; for(let i=0;i<hAct.length;i++){const l=hAct[i].act(t,x);if(l>lock)lock=l;}
-      if(!overflowActive&&R.soBuild>0){overflow+=R.soBuild*(R.plated?0.5:1);if(overflow>=1)overflowActive=true;}
+      if(!overflowActive&&R.soBuild>0){overflow+=R.soBuild*R.soPlated;if(overflow>=1)overflowActive=true;}
       if(R.bl){const cur=dealtAll(),d=cur-B.blLast;B.blLast=cur;
         if(d>0){B.hpDmg+=d*(1-R.blDefer);if(R.blDefer>0){const r=d*R.blDefer/6;B.blq.push({r,end:t+6});B.rate+=r;}}
         if(B.hpDmg>=R.hp){endT=t;killed=true;break;}}
@@ -828,24 +864,24 @@ function makeRunner(R,rng,acc){
     }
     if(!flDone&&!killed&&R.flWin<=R.engagement)acc.focus+=R.flStore*(dealtNow()-flStart);
     for(let i=0;i<hStats.length;i++){const st=hStats[i].stats();for(const k in st)acc.abStats[k]=(acc.abStats[k]||0)+st[k];}
-    acc.stacks+=S.eeStacks;acc.time+=endT;
+    acc.stacks+=S.eeStacks;acc.srStacks+=srStacks;acc.time+=endT;
     if(R.ttk){acc.ttks.push(endT);if(killed)acc.kills++;}
   };
 }
 function simulate(cfg,iters,seed){
   const R=resolve(cfg),rng=mulberry32(seed>>>0);
-  const acc={weapon:0,merc:0,tesla:0,focus:0,stacks:0,time:0,kills:0,ttks:[],abStats:{},chv:new Float64Array(R.channels.length)};
+  const acc={weapon:0,merc:0,tesla:0,focus:0,hh:0,hhProcs:0,srStacks:0,stacks:0,time:0,kills:0,ttks:[],abStats:{},chv:new Float64Array(R.channels.length)};
   const runOnce=makeRunner(R,rng,acc);
   for(let i=0;i<iters;i++)runOnce();
   const eng=R.engagement,n=iters,T=R.ttk?acc.time:n*eng,dps=k=>acc[k]/T;   // TTK: DPS over the actual kill time
   const srt=R.ttk?acc.ttks.slice().sort((a,b)=>a-b):[], pct=q=>srt.length?srt[Math.min(n-1,Math.floor(q*(n-1)+0.5))]:0;
-  const weapon=dps('weapon'),merc=dps('merc'),tesla=dps('tesla'),focus=dps('focus');
+  const weapon=dps('weapon'),merc=dps('merc'),tesla=dps('tesla'),focus=dps('focus'),hh=dps('hh');
   const ch={}; R.channels.forEach((c,i)=>{ch[c.id]=acc.chv[i]/T;});
   // canonical order: weapon, on-hit ability channels, Mercurial, Tesla, other ability channels, Focus Lens echo
   let spirit=0; for(const id of R.onHitIds)spirit+=ch[id]; spirit+=merc; spirit+=tesla; for(const id of R.otherIds)spirit+=ch[id];
-  let total=weapon; for(const id of R.onHitIds)total+=ch[id]; total+=merc; total+=tesla; for(const id of R.otherIds)total+=ch[id]; total+=focus;
+  let total=weapon; total+=hh; for(const id of R.onHitIds)total+=ch[id]; total+=merc; total+=tesla; for(const id of R.otherIds)total+=ch[id]; total+=focus;
   const abStats={}; for(const k in acc.abStats)abStats[k]=acc.abStats[k]/n;
-  return{total,focusEcho:focus,weapon,spirit,ch,channels:R.channels,mercSpirit:merc,teslaSpirit:tesla,abStats,
+  return{total,focusEcho:focus,weapon,spirit,ch,channels:R.channels,mercSpirit:merc,teslaSpirit:tesla,hhDmg:hh,hhProcs:acc.hhProcs/n,srStacks:acc.srStacks/n,abStats,
     ttk:acc.time/n,killRate:acc.kills/n,ttkP10:pct(0.10),ttkP90:pct(0.90),
     effWeaponDmg:R.weaponDmg,spiritStat:R.spirit,stacks:acc.stacks/n,
     frBase:R.rateAt(1+R.firePct+R.merc.fr+R.extraFR+R.teslaFR+R.bfPassive+R.flFR),frPeak:R.rateAt(1+R.firePct+R.peakFR+R.merc.fr+R.extraFR+R.teslaFR+R.bfPassive+R.flFR),peakTag:R.peakTag};
@@ -1034,7 +1070,7 @@ function renderHeroShell(){
   // shared item descriptions that mention this hero's abilities
   const T=HERO_TEXT[H.id];
   $('mdPlated').textContent=`Plated Armor: each bullet has a 30% chance to deflect its bullet damage, and a separate 50% chance to block ${T.plated}.`;
-  $('mdCleanse').textContent=`Debuff Remover clears ${T.cleanse.join(', ')}, all Escalating Exposure stacks (and its −8%), and Focus Lens's shred; damage Focus Lens has stored so far is dealt immediately.`;
+  $('mdCleanse').textContent=`Debuff Remover clears ${T.cleanse.join(', ')}, all Escalating Exposure stacks (and its −8%), Spirit Rend's shred (the 8% returns with your next bullet), and Focus Lens's shred; damage Focus Lens has stored so far is dealt immediately.`;
   $('mdSpell').textContent=`Spellslinger counts ${joinList(T.uses)}.`;
   $('rushTxt').textContent=H.chargeAbility?`+10% weapon damage; 200 weapon damage in 3.5s refills ${H.chargeAbility==='cardTrick'?'a card':'a charge'} (25s cooldown).`
     :`+10% weapon damage (${H.name} has no charges to refill).`;
@@ -1107,7 +1143,7 @@ const bindAbilities=()=>forAbilityUI(u=>{if(u.bind)u.bind();});
 const syncAbilities=()=>forAbilityUI(u=>{if(u.sync)u.sync();});
 const readAbilities=()=>{const o={};forAbilityUI((u,id)=>{o[id]=u.read();});return o;};
 const abilityStatText=(bl,ttk)=>{let t='';forAbilityUI(u=>{if(u.statText){const s=u.statText(bl.abStats,ttk);if(s)t+=' · '+s;}});return t;};
-['plated_on','dr_on','sil_on','inh_on','merc_cmp','merc_base','merc_card','merc_imbue','sop_imbue','merc_inv_from','merc_inv_to','tesla_cmp','tesla_base','tesla_cap','tesla_inv_from','tesla_inv_to','ee_cmp','ee_base','ee_inv_from','ee_inv_to','apr_cmp','apr_base','apr_inv_from','apr_inv_to','so_cmp','so_base','so_inv_from','so_inv_to','shw_cmp','shw_base','shw_inv_from','shw_inv_to','sop_cmp','sop_base','sop_inv_from','sop_inv_to','spl_cmp','spl_base','spl_inv_from','spl_inv_to','spl_pre','spl_pre_n','bf_cmp','bf_base','bf_inv_from','bf_inv_to','ft_cmp','ft_base','ft_delay','ls_cmp','ls_base','ls_inv_from','ls_inv_to','fl_cmp','fl_base','fl_inv_from','fl_inv_to','rush_cmp','rush_base','rush_inv_from','rush_inv_to','im_cmp','im_base','im_inv_from','im_inv_to','ss_cmp','ss_base','ss_inv_from','ss_inv_to'].forEach(id=>$(id).addEventListener('change',schedule));
+['plated_on','dr_on','sil_on','inh_on','merc_cmp','merc_base','merc_card','merc_imbue','sop_imbue','merc_inv_from','merc_inv_to','tesla_cmp','tesla_base','tesla_cap','tesla_inv_from','tesla_inv_to','ee_cmp','ee_base','ee_inv_from','ee_inv_to','apr_cmp','apr_base','apr_inv_from','apr_inv_to','so_cmp','so_base','so_inv_from','so_inv_to','shw_cmp','shw_base','shw_inv_from','shw_inv_to','sop_cmp','sop_base','sop_inv_from','sop_inv_to','spl_cmp','spl_base','spl_inv_from','spl_inv_to','spl_pre','spl_pre_n','bf_cmp','bf_base','bf_inv_from','bf_inv_to','ft_cmp','ft_base','ft_delay','ls_cmp','ls_base','ls_plated','ls_inv_from','ls_inv_to','fl_cmp','fl_base','fl_inv_from','fl_inv_to','rush_cmp','rush_base','rush_inv_from','rush_inv_to','im_cmp','im_base','im_inv_from','im_inv_to','ss_cmp','ss_base','ss_inv_from','ss_inv_to','hh_cmp','hh_base','hh_inv_from','hh_inv_to','sr_cmp','sr_base','sr_inv_from','sr_inv_to'].forEach(id=>$(id).addEventListener('change',schedule));
 $('ft_delay_s').addEventListener('input',schedule);
 function syncFtHint(){const on=$('ft_delay').checked, d=+$('ft_delay_s').value||0;
   const T=HERO_TEXT[HERO.id], c=joinList(T.casts), v=T.casts.length>1?'are':'is';
@@ -1138,6 +1174,8 @@ fillInvest('fl_inv',SPIRIT_INVEST,' Sp');
 fillInvest('rush_inv',WEAPON_INVEST,'% wpn');
 fillInvest('im_inv',WEAPON_INVEST,'% wpn');
 fillInvest('ss_inv',WEAPON_INVEST,'% wpn');
+fillInvest('hh_inv',WEAPON_INVEST,'% wpn');
+fillInvest('sr_inv',WEAPON_INVEST,'% wpn');
 $('dr_time').addEventListener('input',schedule);
 ['ttk_on','ttk_hsdr_on','ttk_spres','ttk_bures','ttk_shiv','shiv_rage','shiv_ap2','shiv_ap5'].forEach(id=>$(id).addEventListener('change',schedule));
 ['ttk_shiv','shiv_rage','shiv_ap2','shiv_ap5'].forEach(id=>$(id).addEventListener('change',()=>syncTtk()));
@@ -1215,11 +1253,13 @@ const named=()=>({
   spl:{cmp:$('spl_cmp').checked,base:$('spl_base').checked,inv:readInvest('spl_inv'),pre:$('spl_pre').checked?+$('spl_pre_n').value:0},
   bf:{cmp:$('bf_cmp').checked,base:$('bf_base').checked,inv:readInvest('bf_inv')},
   ft:{cmp:$('ft_cmp').checked,base:$('ft_base').checked,delayOn:$('ft_delay').checked,delay:+$('ft_delay_s').value||0},
-  ls:{cmp:$('ls_cmp').checked,base:$('ls_base').checked,inv:readInvest('ls_inv')},
+  ls:{cmp:$('ls_cmp').checked,base:$('ls_base').checked,inv:readInvest('ls_inv'),ignorePlated:$('ls_plated').checked},
   fl:{cmp:$('fl_cmp').checked,base:$('fl_base').checked,inv:readInvest('fl_inv')},
   rush:{cmp:$('rush_cmp').checked,base:$('rush_base').checked,inv:readInvest('rush_inv')},
   im:{cmp:$('im_cmp').checked,base:$('im_base').checked,inv:readInvest('im_inv')},
   ss:{cmp:$('ss_cmp').checked,base:$('ss_base').checked,inv:readInvest('ss_inv')},
+  hh:{cmp:$('hh_cmp').checked,base:$('hh_base').checked,inv:readInvest('hh_inv')},
+  sr:{cmp:$('sr_cmp').checked,base:$('sr_base').checked,inv:readInvest('sr_inv')},
 });
 function baselineCfg(c0,nm){
   const c=clone(c0);
@@ -1233,11 +1273,13 @@ function baselineCfg(c0,nm){
   if(nm.spl.base){c.weaponDamagePct+=nm.spl.inv;c.spellslinger={on:true,pre:nm.spl.pre};}
   if(nm.bf.base){c.weaponDamagePct+=nm.bf.inv;c.burstFire={on:true};}
   if(nm.ft.base){c.weaponDamagePct+=6;c.furyTrance={on:true,delayOn:nm.ft.delayOn,delay:nm.ft.delay};}
-  if(nm.ls.base){c.weaponDamagePct+=nm.ls.inv;c.luckyShot={on:true};}
+  if(nm.ls.base){c.weaponDamagePct+=nm.ls.inv;c.luckyShot={on:true,ignorePlated:nm.ls.ignorePlated};}
   if(nm.fl.base){c.baseSpirit+=nm.fl.inv;c.focusLens={on:true};}
   if(nm.rush.base){c.weaponDamagePct+=10+nm.rush.inv;c.rechargingRush={on:true};}
   if(nm.im.base){c.weaponDamagePct+=nm.im.inv;c.intensifyingMag={on:true};}
   if(nm.ss.base){c.weaponDamagePct+=nm.ss.inv;c.sharpshooter={on:true};}
+  if(nm.hh.base){c.weaponDamagePct+=5+nm.hh.inv;c.headhunter={on:true};}
+  if(nm.sr.base){c.weaponDamagePct+=nm.sr.inv;c.spiritRend={on:true};}
   for(const cu of customItems){if(cu.base){c.weaponDamagePct+=cu.wd;c.extraFireRate+=cu.fr/100;c.baseBulletShred+=cu.bbs;c.baseSpirit+=cu.spr;c.baseSpiritShred+=cu.sss;}}
   return c;
 }
@@ -1261,11 +1303,13 @@ function buildRows(c0,nm,mg){
   nrow(nm.spl,'spl','+ Spellslinger','--ivory',c=>{c.weaponDamagePct+=nm.spl.inv;c.spellslinger={on:true,pre:nm.spl.pre};});
   nrow(nm.bf,'bf','+ Burst Fire','--tan',c=>{c.weaponDamagePct+=nm.bf.inv;c.burstFire={on:true};});
   nrow(nm.ft,'ft','+ Fury Trance','--olive',c=>{c.weaponDamagePct+=6;c.furyTrance={on:true,delayOn:nm.ft.delayOn,delay:nm.ft.delay};});
-  nrow(nm.ls,'ls','+ Lucky Shot','--sky',c=>{c.weaponDamagePct+=nm.ls.inv;c.luckyShot={on:true};});
+  nrow(nm.ls,'ls','+ Lucky Shot','--sky',c=>{c.weaponDamagePct+=nm.ls.inv;c.luckyShot={on:true,ignorePlated:nm.ls.ignorePlated};});
   nrow(nm.fl,'fl','+ Focus Lens','--emerald',c=>{c.baseSpirit+=nm.fl.inv;c.focusLens={on:true};});
   nrow(nm.rush,'rush','+ Recharging Rush','--coral',c=>{c.weaponDamagePct+=10+nm.rush.inv;c.rechargingRush={on:true};});
   nrow(nm.im,'im','+ Intensifying Mag','--lavender',c=>{c.weaponDamagePct+=nm.im.inv;c.intensifyingMag={on:true};});
   nrow(nm.ss,'ss','+ Sharpshooter','--mint',c=>{c.weaponDamagePct+=nm.ss.inv;c.sharpshooter={on:true};});
+  nrow(nm.hh,'hh','+ Headhunter','--grass',c=>{c.weaponDamagePct+=5+nm.hh.inv;c.headhunter={on:true};});
+  nrow(nm.sr,'sr','+ Spirit Rend','--plum',c=>{c.weaponDamagePct+=nm.sr.inv;c.spiritRend={on:true};});
   customItems.forEach((cu,i)=>{if(cu.cmp&&!cu.base){const c=clone(bc);c.weaponDamagePct+=cu.wd;c.extraFireRate+=cu.fr/100;c.baseBulletShred+=cu.bbs;c.baseSpirit+=cu.spr;c.baseSpiritShred+=cu.sss;rows.push({key:'cu'+cu.id,name:'+ '+((cu.label||'').trim()||'Custom item'),color:customColor(i),cfg:c});}});
   return rows;
 }
@@ -1321,14 +1365,14 @@ function recompute(){
   if(data.length>1){
     let bi=1;for(let i=2;i<data.length;i++)if(data[i].avg>data[bi].avg)bi=i;
     const best=data[bi], dB=best.avg-data[0].avg, pB=data[0].avg>0?100*dB/data[0].avg:0;
-    const chans=[['weapon fire',bl.weapon],...bl.channels.map(c=>[c.label,bl.ch[c.id]]),['Mercurial bullets',bl.mercSpirit],['Tesla',bl.teslaSpirit],['Focus Lens echo',bl.focusEcho]].filter(c=>c[1]>0.05).sort((a,b)=>b[1]-a[1]);
+    const chans=[['weapon fire',bl.weapon],...bl.channels.map(c=>[c.label,bl.ch[c.id]]),['Mercurial bullets',bl.mercSpirit],['Tesla',bl.teslaSpirit],['Headhunter',bl.hhDmg],['Focus Lens echo',bl.focusEcho]].filter(c=>c[1]>0.05).sort((a,b)=>b[1]-a[1]);
     const top=chans[0]||['weapon fire',bl.weapon];
     const sg=dB>=0?'+':'−';
     $('verdict').innerHTML=`Over a <b>${c0.engagement.toFixed(1)}s</b> fight your biggest damage source is <b>${top[0]}</b> (${fmtN(top[1])} DPS). Of the ${data.length-1} pick${data.length-1>1?'s':''}, <b>${best.r.name.replace('+ ','')}</b> adds the most — <b>${sg}${fmtN(Math.abs(dB))} DPS</b> (${pB>=0?'+':''}${pB.toFixed(1)}%). Highlighted cells win each column.`;
   } else {
     $('verdict').innerHTML=`Baseline only — raise a <b>stat purchase</b> slider above 0 or toggle a <b>named item</b> to add comparison rows.`;
   }
-  $('buildline').textContent=`Fire rate ${bl.frBase.toFixed(1)}${bl.peakTag?`→${bl.frPeak.toFixed(1)} ${bl.peakTag}`:''}/s · Spirit ${bl.spiritStat.toFixed(0)}${abilityStatText(bl,false)}${nm.ee.base?` · EE ${bl.stacks.toFixed(1)}/12`:''}`;
+  $('buildline').textContent=`Fire rate ${bl.frBase.toFixed(1)}${bl.peakTag?`→${bl.frPeak.toFixed(1)} ${bl.peakTag}`:''}/s · Spirit ${bl.spiritStat.toFixed(0)}${abilityStatText(bl,false)}${nm.ee.base?` · EE ${bl.stacks.toFixed(1)}/12`:''}${nm.hh.base?` · Headhunter ${bl.hhProcs.toFixed(1)} procs`:''}${nm.sr.base?` · Spirit Rend ${bl.srStacks.toFixed(1)}/4 at end`:''}`;
 
   drawChart(c0,nm,mg);
 }
@@ -1351,7 +1395,7 @@ function recomputeTTK(c0,nm,rows){
     v+=d<0?` <b>${data[bi].r.name.replace('+ ','')}</b> kills fastest — <b>${Math.abs(d).toFixed(2)}s sooner</b> (−${Math.abs(100*d/b0).toFixed(1)}%).`:' None of the picks kill faster than the baseline.';
   }else v+=' Raise a stat purchase or toggle a named item to compare kill times.';
   $('verdict').innerHTML=v;
-  $('buildline').textContent=`Fire rate ${bl.frBase.toFixed(1)}${bl.peakTag?`→${bl.frPeak.toFixed(1)} ${bl.peakTag}`:''}/s · Spirit ${bl.spiritStat.toFixed(0)}${abilityStatText(bl,true)}`;
+  $('buildline').textContent=`Fire rate ${bl.frBase.toFixed(1)}${bl.peakTag?`→${bl.frPeak.toFixed(1)} ${bl.peakTag}`:''}/s · Spirit ${bl.spiritStat.toFixed(0)}${abilityStatText(bl,true)}${nm.hh.base?` · Headhunter ${bl.hhProcs.toFixed(1)} procs per kill`:''}${nm.sr.base?` · Spirit Rend ${bl.srStacks.toFixed(1)}/4 at kill`:''}`;
 }
 
 /* -------- floating comparison dock -------- */
