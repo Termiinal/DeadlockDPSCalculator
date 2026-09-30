@@ -150,7 +150,51 @@
   tbody td:first-child{text-align:left;font-family:inherit;font-weight:600}
   tbody tr:last-child td{border-bottom:none}
   .dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:9px;vertical-align:middle}
+  /* damage breakdown: click a row name */
+  .rowname{all:unset;cursor:pointer;display:inline-flex;align-items:center;border-radius:4px}
+  .rowname .caret{display:inline-flex;align-items:center;justify-content:center;width:10px;height:10px;margin-right:4px;color:var(--faint);font-size:8px;line-height:1;transition:transform .12s}
+  .rowname[aria-expanded="true"] .caret{transform:rotate(90deg);color:var(--mut)}
+  .rowname:hover .rn{text-decoration:underline;text-decoration-color:var(--faint);text-underline-offset:3px}
+  .rowname:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+  tbody tr.bdrow>td{padding:6px 12px 16px 32px;text-align:left;font-family:inherit;font-weight:400;background:#121821;white-space:normal}
+  .bdcap{font-size:11.5px;color:var(--faint);margin:2px 0 9px}
+  .bdcap b{color:var(--mut);font-weight:600}
+  .bdbar{display:flex;gap:2px;height:12px;border-radius:4px;overflow:hidden;margin-bottom:10px}
+  .bdseg{flex-basis:0;min-width:3px;transition:opacity .12s}
+  .bdwrap.hov .bdseg:not(.hl){opacity:.3}
+  .bdwrap{max-width:660px}
+  table.bdtab{min-width:0;width:100%;font-size:12px}
+  table.bdtab th{padding:5px 8px;font-size:9.5px}
+  table.bdtab td{padding:5px 8px;border-bottom:1px solid var(--grid);font-weight:400}
+  table.bdtab td:first-child{font-family:inherit;font-weight:500;color:var(--tx)}
+  table.bdtab tr.tot td{border-bottom:none;border-top:1px solid var(--line);color:var(--mut)}
+  table.bdtab tr.hl td{background:#1a2230}
+  .bdsw{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:9px;vertical-align:-1px}
+  .bdtip{position:fixed;z-index:60;pointer-events:none;background:#0b0f15;border:1px solid var(--line2);border-radius:7px;padding:6px 9px;font-size:12px;color:var(--tx);box-shadow:0 6px 18px rgba(0,0,0,.45);display:none;white-space:nowrap}
+  .bdtip .m{color:var(--mut);font-family:var(--mono);font-size:11.5px}
+  .clegend .k[data-key],.dock-row .nm[data-key]{cursor:pointer}
+  .clegend .k[data-key]:hover{color:var(--tx)}
 
+  /* stat weights */
+  .swbox{border-top:1px solid var(--line);padding:13px 18px 16px}
+  .swbox summary{cursor:pointer;list-style:none;display:flex;align-items:baseline;gap:4px 10px;flex-wrap:wrap}
+  .swbox summary::-webkit-details-marker{display:none}
+  .swbox summary .lbl{font-size:12px;text-transform:uppercase;letter-spacing:.09em;color:var(--faint);font-weight:600}
+  .swbox summary .lbl::before{content:'▸ ';color:var(--gold)}
+  .swbox[open] summary .lbl::before{content:'▾ '}
+  .swbox .busytag{margin-left:0}
+  .swsub{font-size:11.5px;color:var(--faint)}
+  .swbody{margin-top:10px;max-width:760px;overflow-x:auto}
+  @media(max-width:560px){table.swtab .swm,table.swtab th:last-child{display:none}}
+  table.swtab{min-width:0;width:100%;font-size:12.5px}
+  table.swtab th{padding:6px 8px;font-size:9.5px}
+  table.swtab td{padding:7px 8px;font-weight:400}
+  table.swtab td:first-child{font-family:inherit;font-weight:500;color:var(--tx)}
+  .swr{display:inline-flex;align-items:center;justify-content:flex-end;gap:8px}
+  .swbar{display:inline-block;height:6px;border-radius:3px;background:var(--gold);flex:none}
+  .swpm{color:var(--faint);font-size:11px;margin-left:5px}
+  .swu,.swm{color:var(--faint)}
+  .swnote{font-size:11.5px;color:var(--faint);margin-top:8px;line-height:1.5}
   .charthead{display:flex;align-items:center;justify-content:space-between;padding:14px 18px 0;flex-wrap:wrap;gap:10px;border-top:1px solid var(--line);margin-top:8px}
   .busytag{visibility:hidden;margin-left:10px;font-size:11px;color:var(--faint);font-style:italic}
   .charthead .lbl{font-size:12px;text-transform:uppercase;letter-spacing:.09em;color:var(--faint);font-weight:600}
@@ -400,6 +444,11 @@
     </div>
     <div class="chartwrap"><canvas id="chart" height="320"></canvas></div>
     <div class="clegend" id="chartlegend"></div>
+
+    <details class="swbox" id="swBox" open>
+      <summary><span class="lbl">Stat weights</span><span class="swsub" id="swSub"></span><span id="swBusy" class="busytag">updating…</span></summary>
+      <div class="swbody" id="swBody"></div>
+    </details>
   </div>
 
   <div class="card" id="howto">
@@ -410,7 +459,7 @@
         <li><b>Set your baseline stats.</b> In <i>Base values</i>, enter your boons, headshot rate, and any weapon damage, fire rate, or spirit you already have.</li>
         <li><b>Toggle abilities.</b> Turn <span id="howtoAbilities">Full Auto and Card Trick</span> on or off, and tick any AP upgrades you have leveled.<span data-ability="cardTrick"> You can also click the card slots to start the fight holding cards.</span></li>
         <li><b>Choose what items/stats to compare.</b> Each stat slider in <i>Comparison items</i> set above 0, and each item you switch on, adds its own row to the table. If you already own an item, tick its <i>add to baseline</i> box instead: every row then includes it, so the table shows what's best to buy next.</li>
-        <li><b>Table explanation.</b> Each row is your build plus that one item or stat, and the highlighted cell in each column is the best result. <i>DPS @3s</i> is a short burst, the next column uses your engagement length, and <i>Total dmg</i> is the damage dealt over that fight. With <i>Time to kill</i> on, the table shows seconds to kill instead, where lower is better.</li>
+        <li><b>Table explanation.</b> Each row is your build plus that one item or stat, and the highlighted cell in each column is the best result. <i>DPS @3s</i> is a short burst, the next column uses your engagement length, and <i>Total dmg</i> is the damage dealt over that fight. With <i>Time to kill</i> on, the table shows seconds to kill instead, where lower is better. Click any row's name to see where its damage comes from. Below the chart, <i>Stat weights</i> show what one more point of each stat is worth to your baseline.</li>
       </ol>
       <details class="model"><summary>Modeling details</summary>
         <ul class="tips">
@@ -434,6 +483,7 @@
           <li><span id="mdFalloff">Past 18m, bullet damage and on-hit effects fall off linearly to 10% at 52m (21.6m and 62.4m with Sharpshooter).</span><span id="mdNoFall"></span></li>
           <li data-ability="cardTrick">Mercurial's card bonus is added after the suit multiplier, and its bullet damage uses base damage before Weapon Damage %.</li>
           <li>Focus Lens's echo only counts if it lands before the fight ends. Time to kill caps at 60s; a <code>*</code> marks rows that sometimes don't kill in time.</li>
+          <li>Stat weights compare your baseline with the same build plus +10% Weapon Damage, +10% Fire Rate, +10 Spirit or +5% shred, divided down to one point. Both runs share their random rolls, and ± is the noise that's left. Weights describe your current build: they shift as it changes and can jump near thresholds like stack caps.</li>
           <li>Each item's key numbers are listed next to its toggle.</li>
         </ul>
       </details>
@@ -749,7 +799,11 @@ function resolve(cfg){
     rateAt:m=>WEAPON_MODELS[H.weapon.type].rate(H.weapon,S.fireRate,m),
     engagement:ttkOn?TTK_CAP:cfg.engagement,extraFR:cfg.extraFireRate||0};
 }
-function makeRunner(R,rng,acc){
+function makeRunner(R,rng,acc,seed){
+  // Each item that rolls dice gets its own random stream, so switching one on never reshuffles another's rolls
+  // (e.g. Wraith's card draws): rows in the comparison differ only by the item itself.
+  const rngJ=mulberry32((seed^0x7E57AB1E)>>>0);   // stat weights only: per-fight target HP spread (acc.jit)
+  const rngT=mulberry32((seed^0xA5A5A5A5)>>>0), rngH=mulberry32((seed^0x5A5A5A5A)>>>0), rngS=mulberry32((seed^0x3C3C3C3C)>>>0);
   // Built once per simulation; runOnce() resets per-fight state, so neither a fight nor a shot allocates.
   const S={eeStacks:0,lastEE:-1e9,eeActive:false,surgeUntil:-1e9,surgeCd:-1e9,spellStacks:0};   // item state touched by ability events
   // generic events items listen to; abilities call these
@@ -774,12 +828,12 @@ function makeRunner(R,rng,acc){
   const dealtAll=()=>dealtNow()+acc.focus;
   const rushQ=[];
   // Bloodletting HP model: hpDmg = HP actually lost; each hit's deferred share bleeds in linearly over 6s (FIFO chunks, piecewise-constant rate)
-  const B={hpDmg:0,blLast:0,dT:0,rate:0,bqi:0,cleansed:false,crossT:0,blq:[]};
+  const B={hp:0,hpDmg:0,blLast:0,dT:0,rate:0,bqi:0,cleansed:false,crossT:0,blq:[]};
   const adv=to=>{for(;;){
       if(!B.cleansed&&B.dT>=R.blTime){for(let i=B.bqi;i<B.blq.length;i++)B.blq[i].r*=(1-R.blCleanse);B.rate*=(1-R.blCleanse);B.cleansed=true;}
       if(B.dT>=to)return false;
       let nx=to; if(!B.cleansed&&R.blTime<nx)nx=R.blTime; if(B.bqi<B.blq.length&&B.blq[B.bqi].end<nx)nx=B.blq[B.bqi].end;
-      const sg=nx-B.dT; if(B.rate>0&&B.hpDmg+B.rate*sg>=R.hp){B.crossT=B.dT+(R.hp-B.hpDmg)/B.rate;B.hpDmg=R.hp;return true;}
+      const sg=nx-B.dT; if(B.rate>0&&B.hpDmg+B.rate*sg>=B.hp){B.crossT=B.dT+(B.hp-B.hpDmg)/B.rate;B.hpDmg=B.hp;return true;}
       B.hpDmg+=B.rate*sg; B.dT=nx;
       while(B.bqi<B.blq.length&&B.blq[B.bqi].end<=B.dT){B.rate-=B.blq[B.bqi].r;B.bqi++;} if(B.bqi>=B.blq.length||B.rate<1e-12)B.rate=B.bqi>=B.blq.length?0:Math.max(0,B.rate);}};
   return function runOnce(){
@@ -792,7 +846,8 @@ function makeRunner(R,rng,acc){
     let drDone=!(R.drTime<1e9), flCleansed=false;
     const runStart=dealtAll();
     B.hpDmg=0; B.blLast=runStart; B.dT=0; B.rate=0; B.bqi=0; B.cleansed=false; B.crossT=0; B.blq.length=0;
-    let endT=R.engagement, killed=false;
+    B.hp=acc.jit>0?Math.max(1,R.hp+acc.jit*(rngJ()-0.5)):R.hp;   // stat weights spread HP over ~1s of damage so kills sample every point of the firing cycle
+    let endT=R.engagement, killed=false, endS=R.engagement, prevT=0, prevHp=0;   // endS: kill time interpolated within the killing shot (smooth, for stat weights)
     if(R.spellFR>0){S.spellStacks=Math.min(R.spellPre+(R.teslaBurst>0?1:0)+(R.flStore>0?1:0),R.spellMax);}
     if(R.teslaBurst>0){
       acc.tesla+=R.outS*R.teslaBurst*(1-(R.tSpiritRes+(R.spRes?0.30:0)-R.baseSpiritShred-(R.flShredDur>0?R.flShred:0)));
@@ -800,7 +855,7 @@ function makeRunner(R,rng,acc){
     }
     while(t<R.engagement){
       if(++guard>200000)break;
-      if(R.bl&&adv(t)){endT=B.crossT;killed=true;break;}
+      if(R.bl&&adv(t)){endT=B.crossT;endS=B.crossT;killed=true;break;}
       if(!drDone&&t>=R.drTime){drDone=true;
         for(let i=0;i<hClean.length;i++)hClean[i].cleanse();   // strip ability debuffs (e.g. Diamond shred)
         S.eeStacks=0;S.eeActive=false;            // strip EE stacks + its -8% (re-applied by next spirit damage)
@@ -819,7 +874,7 @@ function makeRunner(R,rng,acc){
       const frMult=1+R.firePct+abFR+R.merc.fr+R.extraFR+R.teslaFR+(overflowActive?R.soFR:0)+(swActive?R.swFR:0)+(t<S.surgeUntil?R.surgeFR:0)+S.spellStacks*R.spellFR+R.bfPassive+(t<bfUntil?R.bfFR:0)+(ftActive?R.ftFR:0)+R.flFR, fr=R.baseFR*frMult;
       if(fr<=0)break;
       let dShred=0,abSp=0,abBu=0; for(let i=0;i<hShred.length;i++)dShred+=hShred[i].shred(t); for(let i=0;i<hSp.length;i++)abSp+=hSp[i].spShred(t); for(let i=0;i<hBu.length;i++)abBu+=hBu[i].buShred(t);
-      const low=R.ttk&&(R.bl?B.hpDmg:dealtAll()-runStart)>0.5*R.hp, resSp=R.spRes?(low?0.45:0.30):0, resBu=R.buRes?(low?0.45:0.30):0;
+      const low=R.ttk&&(R.bl?B.hpDmg:dealtAll()-runStart)>0.5*B.hp, resSp=R.spRes?(low?0.45:0.30):0, resBu=R.buRes?(low?0.45:0.30):0;
       const multNormal=1-(R.tBulletRes+resBu-R.baseBulletShred-dShred-abBu);
       const multIgnore=1-(-R.baseBulletShred-dShred-abBu);
       const deflect=R.plated?0.7:1;
@@ -842,13 +897,13 @@ function makeRunner(R,rng,acc){
       let dealt=false;
       for(let i=0;i<hHit.length;i++)if(hHit[i].onHit(t,x))dealt=true;
       if(R.merc.on){acc.merc+=mSpb*spiritMult*ampMult*R.platedBlock*R.outS*R.fall;dealt=true;}
-      if(R.tesla.on&&t>=teslaCd){if(rng()<R.tesla.proc){acc.tesla+=tDmg*spiritMult*ampMult*R.platedBlock*R.outS*R.fall;teslaCd=t+0.2;dealt=true;}}
-      if(R.hhOn&&!noHs&&t>=hhReady&&rng()<R.hsRate&&(!R.plated||rng()<R.platedBlock)){   // Headhunter: this bullet is a headshot (and Plated's 50% roll didn't block it)
+      if(R.tesla.on&&t>=teslaCd){if(rngT()<R.tesla.proc){acc.tesla+=tDmg*spiritMult*ampMult*R.platedBlock*R.outS*R.fall;teslaCd=t+0.2;dealt=true;}}
+      if(R.hhOn&&!noHs&&t>=hhReady&&rngH()<R.hsRate&&(!R.plated||rngH()<R.platedBlock)){   // Headhunter: this bullet is a headshot (and Plated's 50% roll didn't block it)
         let amp=1; for(let i=0;i<hHH.length;i++)amp+=hHH[i].hhAmp(t);
         const d=R.hhDmg*multNormal*R.outW*amp; acc.hh+=d; x.wExtra+=d; acc.hhProcs++; hhReady=t+R.hhCd;}   // bullet resist and shred only
       if(R.srOn){   // Spirit Rend: applied by this bullet, so it shreds the damage that follows (Plated's 50% roll can block it)
-        if(!srApplied&&(!R.plated||rng()<R.platedBlock))srApplied=true;
-        if(!noHs&&t>=srNext&&rng()<R.hsRate&&(!R.plated||rng()<R.platedBlock)){   // headshot off cooldown: +1 stack (max 4) and refresh the timer, even at max
+        if(!srApplied&&(!R.plated||rngS()<R.platedBlock))srApplied=true;
+        if(!noHs&&t>=srNext&&rngS()<R.hsRate&&(!R.plated||rngS()<R.platedBlock)){   // headshot off cooldown: +1 stack (max 4) and refresh the timer, even at max
           if(srStacks<R.srMax)srStacks++; srExpire=t+R.srDur; srNext=t+R.srCd; srApplied=true;}}
       if(dealt)run.spiritHit(t);
       for(let i=0;i<hAfter.length;i++)hAfter[i].afterShot(t);
@@ -858,20 +913,24 @@ function makeRunner(R,rng,acc){
       if(!overflowActive&&R.soBuild>0){overflow+=R.soBuild*R.soPlated;if(overflow>=1)overflowActive=true;}
       if(R.bl){const cur=dealtAll(),d=cur-B.blLast;B.blLast=cur;
         if(d>0){B.hpDmg+=d*(1-R.blDefer);if(R.blDefer>0){const r=d*R.blDefer/6;B.blq.push({r,end:t+6});B.rate+=r;}}
-        if(B.hpDmg>=R.hp){endT=t;killed=true;break;}}
-      else if(R.ttk&&dealtAll()-runStart>=R.hp){endT=t;killed=true;break;}
+        if(B.hpDmg>=B.hp){endT=t;endS=B.hpDmg>prevHp?prevT+(t-prevT)*(B.hp-prevHp)/(B.hpDmg-prevHp):t;killed=true;break;}
+        prevHp=B.hpDmg;prevT=t;}
+      else if(R.ttk){const dd=dealtAll()-runStart;
+        if(dd>=B.hp){endT=t;endS=dd>prevHp?prevT+(t-prevT)*(B.hp-prevHp)/(dd-prevHp):t;killed=true;break;}
+        prevHp=dd;prevT=t;}
       const gap=wpn.gap(fr,frMult); t+=lock>0?Math.max(gap,lock):gap;
     }
     if(!flDone&&!killed&&R.flWin<=R.engagement)acc.focus+=R.flStore*(dealtNow()-flStart);
+    if(acc.per)acc.per[acc.pi++]=R.ttk?endS:(dealtAll()-runStart)/R.engagement;   // this fight's DPS (smooth kill time with time to kill), for stat weights
     for(let i=0;i<hStats.length;i++){const st=hStats[i].stats();for(const k in st)acc.abStats[k]=(acc.abStats[k]||0)+st[k];}
     acc.stacks+=S.eeStacks;acc.srStacks+=srStacks;acc.time+=endT;
     if(R.ttk){acc.ttks.push(endT);if(killed)acc.kills++;}
   };
 }
-function simulate(cfg,iters,seed){
+function simulate(cfg,iters,seed,perRun,hpJitter){   // perRun: also return each fight's result (sim.per); hpJitter: HP spread per fight (stat weights)
   const R=resolve(cfg),rng=mulberry32(seed>>>0);
-  const acc={weapon:0,merc:0,tesla:0,focus:0,hh:0,hhProcs:0,srStacks:0,stacks:0,time:0,kills:0,ttks:[],abStats:{},chv:new Float64Array(R.channels.length)};
-  const runOnce=makeRunner(R,rng,acc);
+  const acc={weapon:0,merc:0,tesla:0,focus:0,hh:0,hhProcs:0,srStacks:0,stacks:0,time:0,kills:0,ttks:[],abStats:{},chv:new Float64Array(R.channels.length),per:perRun?new Float64Array(iters):null,pi:0,jit:hpJitter||0};
+  const runOnce=makeRunner(R,rng,acc,seed>>>0);
   for(let i=0;i<iters;i++)runOnce();
   const eng=R.engagement,n=iters,T=R.ttk?acc.time:n*eng,dps=k=>acc[k]/T;   // TTK: DPS over the actual kill time
   const srt=R.ttk?acc.ttks.slice().sort((a,b)=>a-b):[], pct=q=>srt.length?srt[Math.min(n-1,Math.floor(q*(n-1)+0.5))]:0;
@@ -881,7 +940,7 @@ function simulate(cfg,iters,seed){
   let spirit=0; for(const id of R.onHitIds)spirit+=ch[id]; spirit+=merc; spirit+=tesla; for(const id of R.otherIds)spirit+=ch[id];
   let total=weapon; total+=hh; for(const id of R.onHitIds)total+=ch[id]; total+=merc; total+=tesla; for(const id of R.otherIds)total+=ch[id]; total+=focus;
   const abStats={}; for(const k in acc.abStats)abStats[k]=acc.abStats[k]/n;
-  return{total,focusEcho:focus,weapon,spirit,ch,channels:R.channels,mercSpirit:merc,teslaSpirit:tesla,hhDmg:hh,hhProcs:acc.hhProcs/n,srStacks:acc.srStacks/n,abStats,
+  return{total,focusEcho:focus,weapon,spirit,ch,channels:R.channels,mercSpirit:merc,teslaSpirit:tesla,hhDmg:hh,hhProcs:acc.hhProcs/n,srStacks:acc.srStacks/n,per:acc.per,abStats,
     ttk:acc.time/n,killRate:acc.kills/n,ttkP10:pct(0.10),ttkP90:pct(0.90),
     effWeaponDmg:R.weaponDmg,spiritStat:R.spirit,stacks:acc.stacks/n,
     frBase:R.rateAt(1+R.firePct+R.merc.fr+R.extraFR+R.teslaFR+R.bfPassive+R.flFR),frPeak:R.rateAt(1+R.firePct+R.peakFR+R.merc.fr+R.extraFR+R.teslaFR+R.bfPassive+R.flFR),peakTag:R.peakTag};
@@ -1342,6 +1401,7 @@ function recompute(){
   paintRanges();syncAbilities();updateSubLabels();syncTtk();
   const c0=core(), nm=named(), mg=mags();
   const rows=buildRows(c0,nm,mg);
+  statWeights(rows[0].cfg,c0);
   if(c0.ttk.on){recomputeTTK(c0,nm,rows);drawChart(c0,nm,mg);return;}
   $('cmpHead').innerHTML='<tr><th>Item</th><th>DPS @3<span style="text-transform:none">s</span></th><th id="th_eng"></th><th>Total dmg</th></tr>';
 
@@ -1354,11 +1414,11 @@ function recompute(){
   const winners={};
   cols.forEach(c=>{let bi=0;for(let i=1;i<data.length;i++)if(data[i][c]>data[bi][c])bi=i;winners[c]=bi;});
   $('th_eng').innerHTML=`DPS @${c0.engagement%1?c0.engagement.toFixed(1):c0.engagement}<span style="text-transform:none">s</span>`;
-  $('cmpBody').innerHTML=data.map((d,i)=>{
+  TBL={ttk:false,data,c0,ncol:4,cells:data.map((d,i)=>{
     const col=cssv(d.r.color);
-    const cells=cols.map(c=>{const win=winners[c]===i&&data.length>1;const s=win?` style="background:${col};color:#11151c;font-weight:700;border-radius:5px"`:'';return `<td${s}>${fmtN(d[c])}</td>`;}).join('');
-    return `<tr><td><span class="dot" style="background:${col}"></span>${d.r.name}</td>${cells}</tr>`;
-  }).join('');
+    return cols.map(c=>{const win=winners[c]===i&&data.length>1;const s=win?` style="background:${col};color:#11151c;font-weight:700;border-radius:5px"`:'';return `<td${s}>${fmtN(d[c])}</td>`;}).join('');
+  })};
+  renderCmpBody();
 
   renderDock('dps',data,c0);
   const bl=data[0].sim;
@@ -1384,10 +1444,11 @@ function recomputeTTK(c0,nm,rows){
   $('cmpHead').innerHTML='<tr><th>Item</th><th>Time to kill</th><th>vs baseline</th><th>10–90% of runs</th><th>DPS during kill</th></tr>';
   let wT=0,wD=0;for(let i=1;i<data.length;i++){if(data[i].ttk<data[wT].ttk)wT=i;if(data[i].dps>data[wD].dps)wD=i;}
   const hl=(i,w,col)=>(w===i&&data.length>1)?` style="background:${col};color:#11151c;font-weight:700;border-radius:5px"`:'';
-  $('cmpBody').innerHTML=data.map((d,i)=>{const col=cssv(d.r.color),dt=d.ttk-b0;
+  TBL={ttk:true,data,c0,ncol:5,cells:data.map((d,i)=>{const col=cssv(d.r.color),dt=d.ttk-b0;
     const warn=d.sim.killRate<0.999?`<span title="${(100*(1-d.sim.killRate)).toFixed(0)}% of runs didn't kill within ${TTK_CAP}s" style="color:var(--rose)"> *</span>`:'';
     const dc=i===0?'<td style="color:var(--faint)">—</td>':`<td style="color:${dt<=0?'var(--green)':'var(--rose)'}">${dt<=0?'−':'+'}${Math.abs(dt).toFixed(2)}s</td>`;
-    return `<tr><td><span class="dot" style="background:${col}"></span>${d.r.name}</td><td${hl(i,wT,col)}>${fT(d.ttk)}${warn}</td>${dc}<td style="color:var(--mut)">${d.sim.ttkP10.toFixed(2)}–${d.sim.ttkP90.toFixed(2)}s</td><td${hl(i,wD,col)}>${fmtN(d.dps)}</td></tr>`;}).join('');
+    return `<td${hl(i,wT,col)}>${fT(d.ttk)}${warn}</td>${dc}<td style="color:var(--mut)">${d.sim.ttkP10.toFixed(2)}–${d.sim.ttkP90.toFixed(2)}s</td><td${hl(i,wD,col)}>${fmtN(d.dps)}</td>`;})};
+  renderCmpBody();
   renderDock('ttk',data,c0);
   const bl=data[0].sim;
   let v=`Against a <b>${Math.round(c0.ttk.hp).toLocaleString()} HP</b> target your baseline kills in <b>${fT(b0)}</b> (10–90% of runs: ${bl.ttkP10.toFixed(2)}–${bl.ttkP90.toFixed(2)}s).`;
@@ -1397,6 +1458,118 @@ function recomputeTTK(c0,nm,rows){
   $('verdict').innerHTML=v;
   $('buildline').textContent=`Fire rate ${bl.frBase.toFixed(1)}${bl.peakTag?`→${bl.frPeak.toFixed(1)} ${bl.peakTag}`:''}/s · Spirit ${bl.spiritStat.toFixed(0)}${abilityStatText(bl,true)}${nm.hh.base?` · Headhunter ${bl.hhProcs.toFixed(1)} procs per kill`:''}${nm.sr.base?` · Spirit Rend ${bl.srStacks.toFixed(1)}/4 at kill`:''}`;
 }
+
+
+
+/* -------- stat weights -------- */
+// Measured, not hand-derived: baseline vs baseline + one stat, through the same simulation with the same seed
+// (shared random rolls), divided down to one point. Anything the sim models is reflected automatically.
+const SW_STATS=[
+  {n:'Weapon Damage',step:10,pct:true, app:(c,x)=>{c.weaponDamagePct+=x;}},
+  {n:'Fire Rate',step:10,pct:true, app:(c,x)=>{c.extraFireRate+=x/100;}},
+  {n:'Spirit',step:10,pct:false,app:(c,x)=>{c.baseSpirit+=x;}},
+  {n:'Bullet resist shred',step:5,pct:true, app:(c,x)=>{c.baseBulletShred+=x;}},
+  {n:'Spirit resist shred',step:5,pct:true, app:(c,x)=>{c.baseSpiritShred+=x;}},
+];
+let swJob=0, swLast=null;
+function pairedPerPoint(a,b,step){   // mean and standard error of the per-fight differences, per point
+  const n=a.length; let m=0; for(let i=0;i<n;i++)m+=a[i]-b[i]; m/=n;
+  let v=0; for(let i=0;i<n;i++){const d=a[i]-b[i]-m;v+=d*d;} const se=n>1?Math.sqrt(v/(n-1)/n):0;
+  return {per:m/step, se:se/step};
+}
+function statWeights(bc,c0){
+  swLast={bc,c0}; const job=++swJob, ttk=!!(c0.ttk&&c0.ttk.on);
+  $('swSub').textContent=ttk?`kill time saved by one more point of each stat, vs a ${Math.round(c0.ttk.hp).toLocaleString()} HP target`
+    :`what one more point of each stat adds to your baseline's DPS @${c0.engagement%1?c0.engagement.toFixed(1):c0.engagement}s`;
+  if(!$('swBox').open){$('swBusy').style.visibility='hidden';return;}
+  $('swBusy').style.visibility='visible';
+  let base=null, i=-1, jit=0; const res=[];
+  const slice=()=>{
+    if(job!==swJob)return;                                    // superseded by a newer recompute
+    const t0=performance.now();
+    while(i<SW_STATS.length&&performance.now()-t0<12){
+      if(i<0){if(ttk)jit=simulate(bc,120,SEED).total*1.0;   // HP spread ≈ 1s of damage (time to kill only)
+        base=simulate(bc,ITER,SEED,true,jit);}
+      else{const st=SW_STATS[i],c=clone(bc);st.app(c,st.step);res.push(pairedPerPoint(simulate(c,ITER,SEED,true,jit).per,base.per,st.step));}
+      i++;}
+    if(i<SW_STATS.length){nextSlice(slice);return;}
+    renderWeights(res,ttk); $('swBusy').style.visibility='hidden';
+  };
+  nextSlice(slice);
+}
+function renderWeights(res,ttk){
+  const good=x=>ttk?-x:x, wd=good(res[0].per);                 // positive = better (less kill time with time to kill)
+  const ratio=res.map(r=>wd>1e-9?good(r.per)/wd:NaN), maxR=Math.max(1,...ratio.filter(q=>isFinite(q)));
+  const fmt=x=>ttk?`${x<=0?'−':'+'}${Math.abs(x).toFixed(3)}s`:`${x>=0?'+':'−'}${Math.abs(x).toFixed(2)} DPS`;
+  const pmMin=ttk?0.0005:0.005;
+  const rows=SW_STATS.map((st,i)=>{const r=res[i],q=ratio[i],unit=st.pct?'1%':'1 spirit';
+    const pm=r.se>=pmMin?`<span class="swpm">± ${r.se.toFixed(ttk?3:2)}</span>`:'';
+    const eq=isFinite(q)?`${unit} ${st.n} ≈ ${q.toFixed(2)}% Weapon Damage`:'';
+    const bar=isFinite(q)&&q>0?`<span class="swbar" style="width:${Math.max(2,Math.round(72*q/maxR))}px"></span>`:'';
+    return `<tr><td>${st.n}</td><td>${fmt(r.per)}${pm}<span class="swu"> per ${unit}</span></td><td title="${escAttr(eq)}"><span class="swr">${bar}${isFinite(q)?q.toFixed(2)+'×':'—'}</span></td><td class="swm">+${st.step}${st.pct?'%':''}</td></tr>`;}).join('');
+  $('swBody').innerHTML=`<table class="swtab"><thead><tr><th>Stat</th><th>Worth per point</th><th>vs Weapon Damage</th><th class="swm">Measured with</th></tr></thead><tbody>${rows}</tbody></table>
+    <div class="swnote">${ttk?'Negative means a faster kill. ':''}“vs Weapon Damage” is the exchange rate: 0.50× means a point is worth half of 1% Weapon Damage. ± is simulation noise; weights describe this build and can jump near thresholds like stack caps.</div>`;
+}
+$('swBox').addEventListener('toggle',()=>{if($('swBox').open){if(swLast)statWeights(swLast.bc,swLast.c0);}else{swJob++;$('swBusy').style.visibility='hidden';}});
+
+/* -------- damage breakdown (click a row name) -------- */
+// Sources in a fixed order per hero, so each keeps its color across rows. Categorical palette (dark steps),
+// validated on this page's surface: lightness band, chroma, CVD and normal-vision separation, 3:1 contrast.
+const SRC_COLORS=['#3987e5','#d95926','#199e70','#c98500','#d55181','#008300','#9085e9','#e66767'];
+let TBL=null; const openRows=new Set();
+function damageSources(d){
+  const sim=d.sim, cap=d.r.cfg.tesla&&d.r.cfg.tesla.capacitor;
+  const out=[{k:'weapon',n:'Weapon fire',v:sim.weapon}];
+  sim.channels.forEach((c,i)=>out.push({k:c.id,n:ABILITIES[HERO.abilities[i]].name,v:sim.ch[c.id]}));
+  out.push({k:'merc',n:'Mercurial bullets',v:sim.mercSpirit},{k:'tesla',n:cap?'Tesla + Capacitor':'Tesla',v:sim.teslaSpirit},
+           {k:'hh',n:'Headhunter',v:sim.hhDmg},{k:'fl',n:'Focus Lens echo',v:sim.focusEcho});
+  out.forEach((x,i)=>{x.col=SRC_COLORS[i%SRC_COLORS.length];});
+  return out;
+}
+function breakdownHtml(d,i){
+  const T=TBL, ttk=T.ttk, base=T.data[0], tot=d.sim.total, per=ttk?d.sim.ttk:T.c0.engagement;
+  const src=damageSources(d), bsrc=damageSources(base), MIN=0.05;
+  const eng=T.c0.engagement%1?T.c0.engagement.toFixed(1):T.c0.engagement;
+  const name=d.r.name.replace('+ ','');
+  const cap=ttk?`Where <b>${name}</b>'s damage comes from per kill (${d.sim.ttk.toFixed(2)}s on average).`
+               :`Where <b>${name}</b>'s damage comes from over a ${eng}s fight.`;
+  const bar=src.filter(x=>x.v>MIN).map(x=>{const pc=tot>0?100*x.v/tot:0;
+    return `<span class="bdseg" data-k="${x.k}" style="flex-grow:${x.v};background:${x.col}" data-tip="${escAttr(x.n)}|${fmtN(x.v)} DPS · ${pc.toFixed(1)}%"></span>`;}).join('');
+  const showD=i>0, dcell=v=>{if(Math.abs(v)<0.05)return '<td style="color:var(--faint)">—</td>';return `<td style="color:${v>0?'var(--green)':'var(--rose)'}">${v>0?'+':'−'}${fmtN(Math.abs(v))}</td>`;};
+  const rows=src.map((x,j)=>({x,b:bsrc[j]})).filter(o=>o.x.v>MIN||(showD&&o.b.v>MIN)).map(({x,b})=>{const pc=tot>0?100*x.v/tot:0;
+    return `<tr data-k="${x.k}"><td><span class="bdsw" style="background:${x.col}"></span>${x.n}</td><td>${fmtN(x.v)}</td><td>${pc.toFixed(1)}%</td><td>${fmtN(x.v*per)}</td>${showD?dcell(x.v-b.v):''}</tr>`;}).join('');
+  const head=`<tr><th>Source</th><th>${ttk?'DPS during kill':`DPS @${eng}<span style="text-transform:none">s</span>`}</th><th>Share</th><th>${ttk?'Damage per kill':'Damage'}</th>${showD?'<th>vs Baseline</th>':''}</tr>`;
+  const totRow=`<tr class="tot"><td>Total</td><td>${fmtN(tot)}</td><td>100%</td><td>${fmtN(tot*per)}</td>${showD?dcell(tot-base.sim.total):''}</tr>`;
+  return `<tr class="bdrow"><td colspan="${T.ncol}"><div class="bdwrap"><div class="bdcap">${cap}</div><div class="bdbar" role="img" aria-label="Damage by source">${bar}</div><table class="bdtab"><thead>${head}</thead><tbody>${rows}${totRow}</tbody></table></div></td></tr>`;
+}
+function renderCmpBody(){
+  const T=TBL; if(!T)return;
+  $('cmpBody').innerHTML=T.data.map((d,i)=>{const col=cssv(d.r.color), open=openRows.has(d.r.key);
+    return `<tr><td><button class="rowname" data-key="${d.r.key}" aria-expanded="${open}" title="${open?'Hide':'Show'} damage breakdown"><span class="caret">▶</span><span class="dot" style="background:${col}"></span><span class="rn">${d.r.name}</span></button></td>${T.cells[i]}</tr>`+(open?breakdownHtml(d,i):'');}).join('');
+}
+function openBreakdown(key){
+  if(!TBL||!TBL.data.some(d=>d.r.key===key))return;
+  openRows.add(key); renderCmpBody();
+  const b=document.querySelector(`#cmpBody .rowname[data-key="${key}"]`); if(b)b.closest('tr').scrollIntoView({behavior:'smooth',block:'start'});
+}
+$('cmpBody').addEventListener('click',e=>{const b=e.target.closest('.rowname');if(!b)return;const k=b.dataset.key;
+  if(openRows.has(k))openRows.delete(k);else openRows.add(k); renderCmpBody();
+  const nb=document.querySelector(`#cmpBody .rowname[data-key="${k}"]`); if(nb)nb.focus({preventScroll:true});});
+$('chartlegend').addEventListener('click',e=>{const k=e.target.closest('.k[data-key]');if(k)openBreakdown(k.dataset.key);});
+$('dockBody').addEventListener('click',e=>{const k=e.target.closest('.nm[data-key]');if(k)openBreakdown(k.dataset.key);});
+// hover: tooltip on bar segments; segment <-> table row highlight
+const bdTip=document.createElement('div'); bdTip.className='bdtip'; document.body.appendChild(bdTip);
+const bdMark=(wrap,k)=>{if(!wrap)return; wrap.classList.toggle('hov',!!k);
+  wrap.querySelectorAll('[data-k]').forEach(el=>el.classList.toggle('hl',!!k&&el.dataset.k===k));};
+$('cmpBody').addEventListener('mousemove',e=>{
+  const seg=e.target.closest('.bdseg'), row=e.target.closest('.bdtab tbody tr[data-k]'), wrap=e.target.closest('.bdwrap');
+  const k=seg?seg.dataset.k:row?row.dataset.k:null; bdMark(wrap,k);
+  document.querySelectorAll('.bdwrap.hov').forEach(w=>{if(w!==wrap)bdMark(w,null);});
+  if(seg){const [n,m]=seg.dataset.tip.split('|'); bdTip.innerHTML=`${n} <span class="m">${m}</span>`; bdTip.style.display='block';
+    const w=bdTip.offsetWidth, x=Math.min(e.clientX+14,innerWidth-w-8); bdTip.style.left=x+'px'; bdTip.style.top=(e.clientY-36)+'px';}
+  else bdTip.style.display='none';});
+$('cmpBody').addEventListener('mouseleave',()=>{bdTip.style.display='none';document.querySelectorAll('.bdwrap.hov').forEach(w=>bdMark(w,null));});
+window.addEventListener('scroll',()=>{bdTip.style.display='none';},{passive:true});
 
 /* -------- floating comparison dock -------- */
 let dockCollapsed=false;
@@ -1415,7 +1588,7 @@ function renderDock(mode,data,c0){
     const col=cssv(d.r.color);
     const cells=ttk?`<span class="v"${hl(i,wi,col)}>${fv(d[key])}</span><span class="d">${fd(d[key]-b0,i)}</span>`
                    :cols.map(c=>`<span class="v"${hl(i,win[c],col)}>${fmtN(d[c])}</span>`).join('');
-    return `<div class="dock-row"><span class="nm"><span class="dot" style="background:${col}"></span><span>${d.r.name}</span></span>${cells}</div>`;}).join('');
+    return `<div class="dock-row"><span class="nm" data-key="${d.r.key}" title="Show damage breakdown"><span class="dot" style="background:${col}"></span><span>${d.r.name}</span></span>${cells}</div>`;}).join('');
   let sum;
   if(data.length>1){let bi=1;for(let i=2;i<data.length;i++)if(ttk?data[i][key]<data[bi][key]:data[i][key]>data[bi][key])bi=i;const dx=data[bi][key]-b0;
     sum=`Best: <b>${data[bi].r.name.replace('+ ','')}</b> ${fd(dx,1)}`;}
@@ -1444,7 +1617,7 @@ const nextSlice=f=>{if(!yieldCh){setTimeout(f,0);return;}yieldQ.push(f);yieldCh.
 function drawChart(c0,nm,mg){
   const job=++chartJob;
   const base=buildRows(c0,nm,mg).slice(0,8);
-  const series=base.map(r=>({name:r.name,color:cssv(r.color),pts:[]}));
+  const series=base.map(r=>({name:r.name,key:r.key,color:cssv(r.color),pts:[]}));
   const tm=!!(c0.ttk&&c0.ttk.on), hpM=tm&&X_MODE==='eng';
   const xr=hpM?[100,Math.max(500,2*c0.ttk.hp)]:(X_MODE==='eng'?[1,30]:[0,HERO.stats.boonCap]);
   const xs=[];for(let i=0;i<CHART_PTS;i++)xs.push(xr[0]+(xr[1]-xr[0])*i/(CHART_PTS-1));
@@ -1481,7 +1654,7 @@ function paintChart(){
   g.fillStyle=cssv('--faint');g.textAlign='center';g.fillText(hpM?'target HP':(X_MODE==='eng'?'engagement length':'boons'),L+pw/2,H-12);
   for(const s of series){g.strokeStyle=s.color;g.lineWidth=s.name==='Baseline'?1.6:2.2;g.beginPath();s.pts.forEach((p,i)=>{const xx=X(p.x),yy=Y(p.y);i?g.lineTo(xx,yy):g.moveTo(xx,yy);});g.stroke();}
   if(X_MODE==='eng'){const ex=X(hpM?c0.ttk.hp:c0.engagement);g.strokeStyle=cssv('--line2');g.setLineDash([4,4]);g.lineWidth=1;g.beginPath();g.moveTo(ex,T);g.lineTo(ex,T+ph);g.stroke();g.setLineDash([]);}
-  $('chartlegend').innerHTML=series.map(s=>`<span class="k"><span class="ln" style="background:${s.color}"></span>${s.name}</span>`).join('');
+  $('chartlegend').innerHTML=series.map(s=>`<span class="k" data-key="${s.key}" title="Show ${escAttr(s.name.replace('+ ',''))}'s damage breakdown"><span class="ln" style="background:${s.color}"></span>${s.name}</span>`).join('');
 }
 let resizeT=null; window.addEventListener('resize',()=>{clearTimeout(resizeT);resizeT=setTimeout(paintChart,120);});   // redraw only; no re-simulation
 recompute();
