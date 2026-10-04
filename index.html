@@ -9,7 +9,7 @@
     --bg:#0d1117; --panel:#151b25; --panel2:#1a212d; --line:#232c39; --line2:#33404f;
     --tx:#e8ebf0; --mut:#9aa4b2; --faint:#69737f; --grid:#1d2530;
     --gold:#f2ab4b; --teal:#3fc7cf; --violet:#ab88ea; --slate:#7c8898;
-    --green:#5fd39a; --orange:#e0744d; --rose:#e06d8f; --blue:#6ea8fe; --lime:#c3e88d; --pink:#e884c4; --yellow:#e6d24a; --cyan:#4fd0d8; --magenta:#cf5ae0; --indigo:#7a86f0; --crimson:#e34d5c; --ivory:#dfe3ea; --tan:#c49a6c; --olive:#a4a632; --sky:#9ad4ff; --emerald:#1fa67a; --coral:#ff7f66; --lavender:#cdb8ff; --mint:#9df0cf; --grass:#7dd13b; --plum:#b0579a;
+    --green:#5fd39a; --orange:#e0744d; --rose:#e06d8f; --blue:#6ea8fe; --lime:#c3e88d; --pink:#e884c4; --yellow:#e6d24a; --cyan:#4fd0d8; --magenta:#cf5ae0; --indigo:#7a86f0; --crimson:#e34d5c; --ivory:#dfe3ea; --tan:#c49a6c; --olive:#a4a632; --sky:#9ad4ff; --emerald:#1fa67a; --coral:#ff7f66; --lavender:#cdb8ff; --mint:#9df0cf; --grass:#7dd13b; --plum:#b0579a; --steel:#7fa6c9;
     --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
   }
   *{box-sizing:border-box}
@@ -422,6 +422,13 @@
           <div class="minirow"><label class="mini"><input type="checkbox" id="sr_base"> <b>add to baseline</b></label><label class="mini">wpn invest <select id="sr_inv_from" class="invsel" title="tier before this purchase"></select> → <select id="sr_inv_to" class="invsel" title="tier after this purchase"></select></label></div>
         </div>
       </div>
+      <div class="togcell" id="orCell" style="display:none">
+        <label class="sw"><input type="checkbox" id="or_cmp"><span class="track"></span></label>
+        <div class="body"><div class="tn">Opening Rounds <span style="color:var(--faint);font-weight:400;font-size:11px">time to kill</span></div>
+          <div class="td">+8% weapon damage, +7 spirit; +25% more vs targets above 50% health.</div>
+          <div class="minirow"><label class="mini"><input type="checkbox" id="or_base"> <b>add to baseline</b></label><label class="mini">wpn invest <select id="or_inv_from" class="invsel" title="tier before this purchase"></select> → <select id="or_inv_to" class="invsel" title="tier after this purchase"></select></label></div>
+        </div>
+      </div>
     </div>
 
     <div class="seclabel">Custom items — bundle multiple stats into one comparison; toggle a row on to edit its stats</div>
@@ -475,6 +482,7 @@
           <li>Fire-rate bonuses add together; separate damage reductions multiply.</li>
           <li>Lucky Shot, Plated Armor, and Armor Piercing Rounds use their average effect rather than rolling each bullet. Lucky Shot doubles body-shot damage only; the headshot bonus and spirit on-hit effects aren't doubled. With its <i>Ignore Plated</i> option on, lucky bullets skip Plated Armor entirely: no deflect and no 50% block.</li>
           <li>Headhunter's bonus goes on the first headshot after its cooldown (each bullet rolls your headshot rate; no headshots during Bullet Dance). It's weapon damage reduced by bullet resist and raised by shred, and Inhibitor still reduces it; Weapon Damage %, the headshot multiplier, Lucky Shot, falloff, Armor Piercing and Plated's deflect don't touch it. Plated's 50% roll can block it, leaving it ready for the next headshot.</li>
+          <li>Opening Rounds needs <i>Time to kill</i>, since it depends on the target's health: its +25% adds to Weapon Damage % while the target has more than half its HP left (HP actually lost, with Bloodletting), so it also raises Fixation's per-stack value.</li>
           <li>Spirit Rend's 8% shred starts once your first bullet hits and refreshes with every bullet. Headshot stacks (+7% each, up to 4 for 36% total) share one 8s timer (extended by duration bonuses): each headshot off the 2s cooldown adds a stack and refreshes the timer, even at 4 stacks, and all stacks drop if it runs out. Headshots roll your headshot rate per bullet (none during Bullet Dance), and Plated's 50% roll can block the shred or a stack.</li>
           <li id="mdPlated"></li>
           <li id="mdCleanse"></li>
@@ -773,6 +781,7 @@ function resolve(cfg){
   const ftFirst=ftOn&&ftc.delayOn&&ftStart<=0;   // delay ticked at 0s: Fury Trance before abilities
   const abilityStart=ftFirst?ftDur:0;             // abilities are first usable once any opening lockout ends
   const hhOn=!!(cfg.headhunter&&cfg.headhunter.on), hhDmg=hhOn?75+4*boons:0;   // Headhunter: next headshot deals bonus weapon damage, 8s cooldown
+  const orOn=ttkOn&&!!(cfg.openingRounds&&cfg.openingRounds.on);   // Opening Rounds: +25% Weapon Damage % while the target is above 50% HP (time to kill only)
   const srOn=!!(cfg.spiritRend&&cfg.spiritRend.on);   // Spirit Rend: bullets shred 8% spirit resist; headshots +7% per stack (max 4, 2s cooldown)
   const surgeCardSp=surgeOn?28:0, surgeFR=surgeOn?0.20:0, surgeDur=surgeOn?8*durMult:0;   // Surge of Power: imbues the charge ability
   // abilities
@@ -791,7 +800,7 @@ function resolve(cfg){
   return{H,boons,spirit,flatWeapon,weaponDmg,wdPerBullet,wdBody:weaponDmg,hsRate:cfg.headshotRate,hsMult,luckyFrac:luckyBonus>0?0.25:0,lsIgnore,soPlated:plated?(lsIgnore?0.625:0.5):1,plated,aprIgnore,platedBlock,teslaDmgBase,
     soFR,soSpirit,soBuild,swFR,swSpirit,swDur,surgeFR,surgeDur,spellFR,spellMax,spellPre,bfPassive,bfFR,bfDur,bfCd,ftFR,ftDur,ftStart,abilityStart,luckyBonus,flFR,flShred,flShredDur,flWin,flStore,drTime,rushOn,imOn,wdFrac,fall,outW,outS,ttk:ttkOn,hp:ttkHP,spRes,buRes,bl,blDefer,blCleanse,blTime,
     abilities, channels, onHitIds, otherIds, onHitIdx, otherIdx, chargeId:H.chargeAbility, peakFR, peakTag,
-    surgeTarget, hhOn, hhDmg, hhCd:8, srOn, srBase:0.08, srStack:0.07, srMax:4, srCd:2, srDur:8*durMult,
+    surgeTarget, hhOn, hhDmg, hhCd:8, orOn, orBonus:0.25, srOn, srBase:0.08, srStack:0.07, srMax:4, srCd:2, srDur:8*durMult,
     merc:{on:merc.on,fr:mercFR},
     tesla:{on:tesla.on,proc:teslaProc},ee,teslaFR,teslaBurst,
     baseFR:S.fireRate,firePct:cfg.fireRatePct/100,tBulletRes:cfg.targetBulletResist/100,baseBulletShred:cfg.baseBulletShred/100,
@@ -886,11 +895,13 @@ function makeRunner(R,rng,acc,seed){
       const mSpb=R.merc.on?R.flatWeapon*(0.20+0.0038*curSp):0, tDmg=R.teslaDmgBase+0.19*curSp;
       const imRamp=R.imOn?0.45*Math.min(1,t/2.5):0;
       const imMul=R.imOn?(1+R.wdFrac+imRamp)/(1+R.wdFrac):1;   // ramp adds to Weapon Damage %
+      const orAdd=R.orOn&&!low?R.orBonus:0;                        // Opening Rounds: target above 50% HP
+      const wMul=R.orOn?(1+R.wdFrac+imRamp+orAdd)/(1+R.wdFrac):imMul;   // both add to Weapon Damage %
       const wBase=noHs?R.wdBody:R.wdPerBullet, plainFactor=R.aprIgnore*multIgnore+(1-R.aprIgnore)*multNormal;   // plainFactor: no Plated at all
       const wHit=(R.lsIgnore?(1-R.luckyFrac)*wBase*weaponFactor+R.luckyFrac*(wBase+R.wdBody)*plainFactor   // lucky bullets skip Plated
-                            :(wBase+R.luckyBonus)*weaponFactor)*R.outW*imMul*R.fall; acc.weapon+=wHit;
+                            :(wBase+R.luckyBonus)*weaponFactor)*R.outW*wMul*R.fall; acc.weapon+=wHit;
       x.curSp=curSp; x.spiritMult=spiritMult; x.ampMult=ampMult; x.locked=ftActive; x.first=wpn.first();
-      x.noHs=noHs; x.hsMult=noHs?1:R.hsMult; x.wdFrac=R.wdFrac+imRamp; x.wExtra=0;
+      x.noHs=noHs; x.hsMult=noHs?1:R.hsMult; x.wdFrac=R.orOn?R.wdFrac+imRamp+orAdd:R.wdFrac+imRamp; x.wExtra=0;
       x.wf=weaponFactor*R.outW*R.fall;                                                                                  // bullet damage that isn't Weapon Damage %-scaled
       x.wfBlk=(R.aprIgnore*multIgnore+(1-R.aprIgnore)*multNormal*deflect*(R.plated?0.5:1))*R.outW*R.fall;                 // ...that Plated's 50% roll also blocks
       x.wfNP=plainFactor*R.outW*R.fall;                                                                                  // ...on a lucky bullet that skips Plated
@@ -1202,7 +1213,7 @@ const bindAbilities=()=>forAbilityUI(u=>{if(u.bind)u.bind();});
 const syncAbilities=()=>forAbilityUI(u=>{if(u.sync)u.sync();});
 const readAbilities=()=>{const o={};forAbilityUI((u,id)=>{o[id]=u.read();});return o;};
 const abilityStatText=(bl,ttk)=>{let t='';forAbilityUI(u=>{if(u.statText){const s=u.statText(bl.abStats,ttk);if(s)t+=' · '+s;}});return t;};
-['plated_on','dr_on','sil_on','inh_on','merc_cmp','merc_base','merc_card','merc_imbue','sop_imbue','merc_inv_from','merc_inv_to','tesla_cmp','tesla_base','tesla_cap','tesla_inv_from','tesla_inv_to','ee_cmp','ee_base','ee_inv_from','ee_inv_to','apr_cmp','apr_base','apr_inv_from','apr_inv_to','so_cmp','so_base','so_inv_from','so_inv_to','shw_cmp','shw_base','shw_inv_from','shw_inv_to','sop_cmp','sop_base','sop_inv_from','sop_inv_to','spl_cmp','spl_base','spl_inv_from','spl_inv_to','spl_pre','spl_pre_n','bf_cmp','bf_base','bf_inv_from','bf_inv_to','ft_cmp','ft_base','ft_delay','ls_cmp','ls_base','ls_plated','ls_inv_from','ls_inv_to','fl_cmp','fl_base','fl_inv_from','fl_inv_to','rush_cmp','rush_base','rush_inv_from','rush_inv_to','im_cmp','im_base','im_inv_from','im_inv_to','ss_cmp','ss_base','ss_inv_from','ss_inv_to','hh_cmp','hh_base','hh_inv_from','hh_inv_to','sr_cmp','sr_base','sr_inv_from','sr_inv_to'].forEach(id=>$(id).addEventListener('change',schedule));
+['plated_on','dr_on','sil_on','inh_on','merc_cmp','merc_base','merc_card','merc_imbue','sop_imbue','merc_inv_from','merc_inv_to','tesla_cmp','tesla_base','tesla_cap','tesla_inv_from','tesla_inv_to','ee_cmp','ee_base','ee_inv_from','ee_inv_to','apr_cmp','apr_base','apr_inv_from','apr_inv_to','so_cmp','so_base','so_inv_from','so_inv_to','shw_cmp','shw_base','shw_inv_from','shw_inv_to','sop_cmp','sop_base','sop_inv_from','sop_inv_to','spl_cmp','spl_base','spl_inv_from','spl_inv_to','spl_pre','spl_pre_n','bf_cmp','bf_base','bf_inv_from','bf_inv_to','ft_cmp','ft_base','ft_delay','ls_cmp','ls_base','ls_plated','ls_inv_from','ls_inv_to','fl_cmp','fl_base','fl_inv_from','fl_inv_to','rush_cmp','rush_base','rush_inv_from','rush_inv_to','im_cmp','im_base','im_inv_from','im_inv_to','ss_cmp','ss_base','ss_inv_from','ss_inv_to','hh_cmp','hh_base','hh_inv_from','hh_inv_to','sr_cmp','sr_base','sr_inv_from','sr_inv_to','or_cmp','or_base','or_inv_from','or_inv_to'].forEach(id=>$(id).addEventListener('change',schedule));
 $('ft_delay_s').addEventListener('input',schedule);
 function syncFtHint(){const on=$('ft_delay').checked, d=+$('ft_delay_s').value||0;
   const T=HERO_TEXT[HERO.id], c=joinList(T.casts), v=T.casts.length>1?'are':'is';
@@ -1235,6 +1246,7 @@ fillInvest('im_inv',WEAPON_INVEST,'% wpn');
 fillInvest('ss_inv',WEAPON_INVEST,'% wpn');
 fillInvest('hh_inv',WEAPON_INVEST,'% wpn');
 fillInvest('sr_inv',WEAPON_INVEST,'% wpn');
+fillInvest('or_inv',WEAPON_INVEST,'% wpn');
 $('dr_time').addEventListener('input',schedule);
 ['ttk_on','ttk_hsdr_on','ttk_spres','ttk_bures','ttk_shiv','shiv_rage','shiv_ap2','shiv_ap5'].forEach(id=>$(id).addEventListener('change',schedule));
 ['ttk_shiv','shiv_rage','shiv_ap2','shiv_ap5'].forEach(id=>$(id).addEventListener('change',()=>syncTtk()));
@@ -1243,7 +1255,7 @@ $('ttk_on').addEventListener('change',()=>syncTtk());
 $('ttk_hp_r').addEventListener('input',()=>{$('ttk_hp').value=$('ttk_hp_r').value;schedule();});
 $('ttk_hp').addEventListener('input',()=>{$('ttk_hp_r').value=$('ttk_hp').value;schedule();});
 $('ttk_hsdr').addEventListener('input',schedule);
-function syncTtk(){const on=$('ttk_on').checked;$('ttkopts').style.display=on?'flex':'none';
+function syncTtk(){const on=$('ttk_on').checked;$('ttkopts').style.display=on?'flex':'none';$('orCell').style.display=on?'':'none';
   const sv=$('ttk_shiv').checked;$('shivopts').style.display=sv?'flex':'none';
   if(sv){const df=25+($('shiv_rage').checked?15:0)+($('shiv_ap5').checked?15:0),cl=$('shiv_ap2').checked?70:30,tm=Math.max(0,+$('shiv_time').value||0);
     $('shiv_hint').textContent=`${df}% of damage taken is delayed over 6s · the active at ${tm.toFixed(1)}s clears ${cl}% of what's still delayed`;}
@@ -1319,6 +1331,7 @@ const named=()=>({
   ss:{cmp:$('ss_cmp').checked,base:$('ss_base').checked,inv:readInvest('ss_inv')},
   hh:{cmp:$('hh_cmp').checked,base:$('hh_base').checked,inv:readInvest('hh_inv')},
   sr:{cmp:$('sr_cmp').checked,base:$('sr_base').checked,inv:readInvest('sr_inv')},
+  or:{cmp:$('ttk_on').checked&&$('or_cmp').checked,base:$('ttk_on').checked&&$('or_base').checked,inv:readInvest('or_inv')},   // time to kill only
 });
 function baselineCfg(c0,nm){
   const c=clone(c0);
@@ -1339,6 +1352,7 @@ function baselineCfg(c0,nm){
   if(nm.ss.base){c.weaponDamagePct+=nm.ss.inv;c.sharpshooter={on:true};}
   if(nm.hh.base){c.weaponDamagePct+=5+nm.hh.inv;c.headhunter={on:true};}
   if(nm.sr.base){c.weaponDamagePct+=nm.sr.inv;c.spiritRend={on:true};}
+  if(nm.or.base){c.weaponDamagePct+=8+nm.or.inv;c.baseSpirit+=7;c.openingRounds={on:true};}
   for(const cu of customItems){if(cu.base){c.weaponDamagePct+=cu.wd;c.extraFireRate+=cu.fr/100;c.baseBulletShred+=cu.bbs;c.baseSpirit+=cu.spr;c.baseSpiritShred+=cu.sss;}}
   return c;
 }
@@ -1369,6 +1383,7 @@ function buildRows(c0,nm,mg){
   nrow(nm.ss,'ss','+ Sharpshooter','--mint',c=>{c.weaponDamagePct+=nm.ss.inv;c.sharpshooter={on:true};});
   nrow(nm.hh,'hh','+ Headhunter','--grass',c=>{c.weaponDamagePct+=5+nm.hh.inv;c.headhunter={on:true};});
   nrow(nm.sr,'sr','+ Spirit Rend','--plum',c=>{c.weaponDamagePct+=nm.sr.inv;c.spiritRend={on:true};});
+  nrow(nm.or,'or','+ Opening Rounds','--steel',c=>{c.weaponDamagePct+=8+nm.or.inv;c.baseSpirit+=7;c.openingRounds={on:true};});
   customItems.forEach((cu,i)=>{if(cu.cmp&&!cu.base){const c=clone(bc);c.weaponDamagePct+=cu.wd;c.extraFireRate+=cu.fr/100;c.baseBulletShred+=cu.bbs;c.baseSpirit+=cu.spr;c.baseSpiritShred+=cu.sss;rows.push({key:'cu'+cu.id,name:'+ '+((cu.label||'').trim()||'Custom item'),color:customColor(i),cfg:c});}});
   return rows;
 }
