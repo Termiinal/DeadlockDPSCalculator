@@ -474,10 +474,12 @@
           <li id="mdWeapon" style="display:none"></li>
           <li id="mdStats">Bullet damage is <code>(5.64 + 0.14·boons) × (1 + Weapon Damage %)</code>; headshots deal ×1.65 on bullet damage only. Boons also give 1.1 spirit each.</li>
           <li>Numbers are averages over many seeded simulated fights, so the same inputs always give the same results.</li>
-          <li>Abilities and active items are used once per fight at the start<span data-ability="fullAuto"> (Full Auto first)</span><span data-ability="sleepDagger"> (Sleep Dagger first, then Bullet Dance)</span>, unless an item lets you set its timing. No recasts.</li>
+          <li>Abilities and active items are used once per fight at the start<span data-ability="fullAuto"> (Full Auto first)</span><span data-ability="sleepDagger"> (Sleep Dagger first, then Bullet Dance)</span><span data-ability="threadsap"> (Threadsap first, then Baba's Brew)</span>, unless an item lets you set its timing. No recasts.</li>
           <li data-ability="sleepDagger">Sleep Dagger lands before the first bullet; it isn't a bullet, so no falloff or Plated Armor. Its 1AP shred lowers bullet resist only, for 6s (extended by duration bonuses).</li>
           <li data-ability="fixation">Fixation stacks build by their average per bullet (1, or 3 on a headshot), and each bullet's bonus uses the stacks already on the target before it hits. The bonus can headshot and gets Lucky Shot and falloff; its per-stack value grows with Weapon Damage % (including Intensifying Magazine's ramp) but isn't multiplied by it. The 1AP bursts trigger at every 20 stacks up to and including max, then stop while you stay at max; they're spirit damage and fall off with range like other on-hit effects.</li>
           <li data-ability="bulletDance">Bullet Dance's duration uses your spirit when it's cast. While it lasts, every bullet is a body shot and adds 1 Fixation stack; its flat damage gets Lucky Shot but not Weapon Damage %.</li>
+          <li data-ability="threadsap">Threadsap lands before the first bullet. Its stolen spirit lasts the whole fight and counts for everything that scales with spirit, abilities and items alike: it steals 10 + 0.9·boons per target hit, capped at 45 + 2·boons, and you gain 175% of that (the target count only changes the steal). The 50 cast damage doesn't fall off; the on-hit damage falls off and Plated's 50% roll can block it. Debuff Remover returns all of the stolen spirit, from every target hit, and the on-hit stops.</li>
+          <li data-ability="brew">Baba's Brew is cast at the start. Its damage ticks continuously for 8s (extended by duration bonuses) using your current spirit, and its spirit resist shred applies to all of your spirit damage, including the Brew itself. Debuff Remover ends it.</li>
           <li data-ability="cardTrick">Cards build 3.4% per body hit and 5.1% per headshot, and are thrown as soon as they're ready (0.6s apart); a starting hand throws left to right. Suits come from a 2-of-each deck plus a 1/9 Joker chance (1/5 at 5AP): Spades ×1.6, Diamonds −7% both resists for 5s, and a Joker counts as every suit.</li>
           <li>Fire-rate bonuses add together; separate damage reductions multiply.</li>
           <li>Lucky Shot, Plated Armor, and Armor Piercing Rounds use their average effect rather than rolling each bullet. Lucky Shot doubles body-shot damage only; the headshot bonus and spirit on-hit effects aren't doubled. With its <i>Ignore Plated</i> option on, lucky bullets skip Plated Armor entirely: no deflect and no 50% block.</li>
@@ -547,6 +549,16 @@ const HEROES={
     abilities:['sleepDagger','fixation','bulletDance'],
     chargeAbility:null,
     imbueDefault:'sleepDagger'
+  },
+  baba:{
+    id:'baba', name:'Baba',
+    stats:{bullet:8.8, bulletPerBoon:0.41, spiritPerBoon:1.1, boonCap:35, fireRate:3.23,
+           headshotBonus:0.65*0.8,             // crit damage reduced by 20%: headshots ×1.52
+           falloffStart:15, falloffEnd:42},
+    weapon:{type:'auto'},
+    abilities:['threadsap','brew'],
+    chargeAbility:null,
+    imbueDefault:'threadsap'
   }
 };
 // Hero-specific wording for the shared item notes in Modeling details and the Fury Trance hint (see renderHeroShell).
@@ -562,7 +574,10 @@ const HERO_TEXT={
     cleanse:["Power Surge's spirit resist shred"], heldNote:''},
   haze:{casts:['Sleep Dagger','Bullet Dance'], uses:['the Sleep Dagger and Bullet Dance casts','the Capacitor burst','the Fury Trance and Focus Lens activations'],
     plated:"that bullet's Fixation stack and Fixation damage, and its Mercurial / Tesla spirit (not the Capacitor burst or Sleep Dagger)",
-    cleanse:["Sleep Dagger's bullet resist shred",'all Fixation stacks (they rebuild as you keep shooting)'], heldNote:''}
+    cleanse:["Sleep Dagger's bullet resist shred",'all Fixation stacks (they rebuild as you keep shooting)'], heldNote:''},
+  baba:{casts:['Threadsap',"Baba's Brew"], uses:["the Threadsap and Baba's Brew casts",'the Capacitor burst','the Fury Trance and Focus Lens activations'],
+    plated:"that bullet's Threadsap / Mercurial / Tesla spirit (not the Capacitor burst, Threadsap's cast or Baba's Brew)",
+    cleanse:["Baba's Brew (its damage and its spirit resist shred)",'all the spirit Threadsap stole (its on-hit damage stops)'], heldNote:''}
 };
 
 /* ======================= WEAPON MODELS ======================= */
@@ -587,6 +602,7 @@ const WEAPON_MODELS={
 //   peak(P)         optional peak fire-rate bonus for the build readout
 //   create(P,run)   -> hooks, built once per simulation; reset() starts each fight. The engine calls them each shot in this order:
 //     cast(t,sp)     start-of-fight use (sp = current spirit); calls run.abilityUsed(P.id,t)
+//     spirit(t)      spirit this ability currently grants (counts for every spirit scaling, abilities and items)
 //     noHs(t)        true while headshots are impossible (every bullet is a body shot)
 //     fireRate(t)    additive fire-rate bonus
 //     shred(t)       shred on both resists
@@ -597,7 +613,8 @@ const WEAPON_MODELS={
 //                    adds itself to x.wExtra so weapon-damage items count it; x.wdFrac is the current Weapon Damage %
 //     afterShot(t)   per-bullet upkeep (e.g. building charges)
 //     act(t,x)       discrete uses (e.g. throwing a card); returns a shooting lockout in seconds
-//     cleanse()      enemy debuff remover strips this ability's debuffs
+//     cleanse(t)     enemy debuff remover strips this ability's debuffs at time t
+//     finish(t,x)    end of the fight at t: settle damage over time still ticking after the last shot
 //     canRefill()/refill()   charge abilities only (Recharging Rush)
 //     stats()        per-fight counters for the readout
 // imbuable:false marks abilities (passives) that imbue items can't target; they're left out of the imbue dropdowns.
@@ -728,6 +745,52 @@ const ABILITIES={
           run.chv[P.ci]+=(hb.base+hb.perSp*x.curSp)*Math.min(1,(t-st.lastHit)/hb.charge)*x.spiritMult*x.ampMult*R.platedBlock*R.outS*R.fall; st.lastHit=t; return true; },
         stats(){ return {bdDur:st.dur}; }
       };}
+  },
+  threadsap:{
+    name:'Threadsap', channel:{id:'ts',label:'Threadsap',onHit:true},
+    resolve(a,env){ if(!a||!a.on)return null;
+      return {dmg:50, onBase:8+(a.ap1?8:0), onSp:0.26, targets:Math.max(1,Math.round(+a.targets||1))}; },
+    create(P,run){ const R=run.R, b=R.boons;
+      const stolen=Math.min(45+2*b,(10+0.9*b)*P.targets), gain=stolen*1.75;   // steal per target hit, capped, granted at 175%
+      const st={cast:false,pending:false,lastHit:-1e9,cleansed:false};
+      return{
+        reset(){ st.cast=false; st.pending=false; st.lastHit=-1e9; st.cleansed=false; },
+        cast(t){ if(!st.cast&&t>=R.abilityStart){ st.cast=true; st.pending=true; run.abilityUsed(P.id,t);} },   // lands before the first bullet
+        spirit(){ return st.cast&&!st.cleansed?gain:0; },             // stolen spirit: lasts the whole fight unless the target cleanses
+        onHit(t,x){ const c=run.chv; let sp=false; const hb=P.hit;
+          if(st.pending){ st.pending=false;                              // the cast: 50 spirit damage, no falloff or Plated roll
+            const bonus=hb?hb.base+hb.perSp*x.curSp:0; if(hb)st.lastHit=t;
+            c[P.ci]+=(P.dmg+bonus)*x.spiritMult*x.ampMult*R.outS; sp=true; }
+          if(st.cast&&!st.cleansed){                                     // while spirit is stolen: on-hit spirit damage per bullet (incl. the first)
+            const spv=x.curSp+P.imbueSp[0]+P.imbueSp[1];
+            const bonus=hb?(hb.base+hb.perSp*x.curSp)*Math.min(1,(t-st.lastHit)/hb.charge):0; if(hb)st.lastHit=t;
+            c[P.ci]+=(P.onBase+P.onSp*spv+bonus)*x.spiritMult*x.ampMult*R.platedBlock*R.outS*R.fall; sp=true; }
+          return sp; },
+        cleanse(){ if(st.cast)st.cleansed=true; },                      // debuff remover returns all of the stolen spirit (every target, for simplicity)
+        stats(){ return {tsGain:st.cast?gain:0, tsStolen:st.cast?stolen:0}; }
+      };}
+  },
+  brew:{
+    name:"Baba's Brew", channel:{id:'brew',label:"Baba's Brew",onHit:false},
+    resolve(a,env){ if(!a||!a.on)return null;
+      return {dps:a.ap5?16:12, perSp:a.ap5?0.2:0.15, shred:a.ap5?0.20:0.15, dur:8*env.durMult}; },
+    create(P,run){ const R=run.R; const st={cast:false,first:false,start:0,end:0,last:0};
+      // damage over time: accrued from the last settled moment up to t, using the current spirit and resists
+      const accrue=(t,x)=>{ if(!st.cast)return false; const a=Math.max(st.last,st.start), b=Math.min(t,st.end); if(t>st.last)st.last=t; if(b<=a)return false;
+        const m=t>=st.end?x.spiritMult+P.shred:x.spiritMult;           // the interval still had Brew's own shred if it has since expired
+        const spv=x.curSp+P.imbueSp[0]+P.imbueSp[1];
+        run.chv[P.ci]+=(P.dps+P.perSp*spv)*(b-a)*m*x.ampMult*R.outS; return true; };
+      return{
+        reset(){ st.cast=false; st.first=false; st.start=0; st.end=0; st.last=0; },
+        cast(t){ if(!st.cast&&t>=R.abilityStart){ st.cast=true; st.first=true; st.start=t; st.end=t+P.dur; st.last=t; run.abilityUsed(P.id,t);} },
+        spShred(t){ return st.cast&&t<st.end?P.shred:0; },              // target spirit resist −15% (−20% at 5AP) while it lasts
+        onHit(t,x){ let hit=accrue(t,x);
+          if(st.first){ st.first=false; const hb=P.hit;                  // imbue bonus on its first damage instance
+            if(hb){ run.chv[P.ci]+=(hb.base+hb.perSp*x.curSp)*x.spiritMult*x.ampMult*R.outS; hit=true; } }
+          return hit; },
+        finish(t,x){ accrue(t,x); },
+        cleanse(t){ if(st.cast&&t<st.end)st.end=t; }                     // debuff remover ends the brew (damage and shred)
+      };}
   }
 };
 
@@ -828,7 +891,7 @@ function makeRunner(R,rng,acc,seed){
   const abs=[]; let chargeAb=null;
   for(const a of R.abilities){const inst=a.def.create(a.P,run);abs.push(inst);if(a.id===R.chargeId)chargeAb=inst;}
   // hook lists (ability order preserved); indexed loops keep the per-shot path allocation-free
-  const hk=n=>abs.filter(a=>a[n]), hCast=hk('cast'), hNoHs=hk('noHs'), hFR=hk('fireRate'), hShred=hk('shred'), hSp=hk('spShred'), hBu=hk('buShred'), hHit=hk('onHit'), hAfter=hk('afterShot'), hAct=hk('act'), hClean=hk('cleanse'), hStats=hk('stats'), hHH=hk('hhAmp');   // hhAmp(t): additive amplification of Headhunter's bonus (none yet)
+  const hk=n=>abs.filter(a=>a[n]), hCast=hk('cast'), hNoHs=hk('noHs'), hFR=hk('fireRate'), hShred=hk('shred'), hSp=hk('spShred'), hBu=hk('buShred'), hHit=hk('onHit'), hAfter=hk('afterShot'), hAct=hk('act'), hClean=hk('cleanse'), hStats=hk('stats'), hHH=hk('hhAmp'), hSpirit=hk('spirit'), hFin=hk('finish');   // hhAmp(t): additive amplification of Headhunter's bonus (none yet)
   const x={curSp:0,spiritMult:0,ampMult:0,locked:false,first:true,noHs:false,hsMult:1,wf:0,wfBlk:0,wdFrac:0,wExtra:0,wfNP:0};   // per-shot context, reused
   const wpn=WEAPON_MODELS[R.H.weapon.type].create(R.H.weapon);
   // damage dealt so far, summed in canonical order: weapon, on-hit ability channels, Mercurial, Tesla, other ability channels
@@ -866,15 +929,17 @@ function makeRunner(R,rng,acc,seed){
       if(++guard>200000)break;
       if(R.bl&&adv(t)){endT=B.crossT;endS=B.crossT;killed=true;break;}
       if(!drDone&&t>=R.drTime){drDone=true;
-        for(let i=0;i<hClean.length;i++)hClean[i].cleanse();   // strip ability debuffs (e.g. Diamond shred)
+        for(let i=0;i<hFin.length;i++)hFin[i].finish(R.drTime,x);     // settle damage over time up to the removal, before spirit or shred change
+        for(let i=0;i<hClean.length;i++)hClean[i].cleanse(R.drTime);   // strip ability debuffs (e.g. Diamond shred), at the exact remover time
         S.eeStacks=0;S.eeActive=false;            // strip EE stacks + its -8% (re-applied by next spirit damage)
         srApplied=false;srStacks=0;               // strip Spirit Rend (its 8% returns with the next bullet)
         if(!flDone){acc.focus+=R.flStore*(dealtNow()-flStart);flDone=true;}   // Focus Lens: stored damage dealt early
         flCleansed=true;}                     // Focus Lens: shred removed
       if(!flDone&&t>=R.flWin){acc.focus+=R.flStore*(dealtNow()-flStart);flDone=true;}
       const swActive=t<R.swDur;
-      const curSp=R.spirit+(overflowActive?R.soSpirit:0)+(swActive?R.swSpirit:0);
-      for(let i=0;i<hCast.length;i++)hCast[i].cast(t,curSp);
+      const curSp0=R.spirit+(overflowActive?R.soSpirit:0)+(swActive?R.swSpirit:0);
+      for(let i=0;i<hCast.length;i++)hCast[i].cast(t,curSp0);
+      let curSp=curSp0; for(let i=0;i<hSpirit.length;i++)curSp+=hSpirit[i].spirit(t);   // spirit granted by abilities (Baba: Threadsap's stolen spirit)
       let noHs=false; for(let i=0;i<hNoHs.length;i++)if(hNoHs[i].noHs(t))noHs=true;
       if(!ftCast&&R.ftFR>0&&t>=R.ftStart){ftCast=true;run.abilityUsed();}
       const ftActive=ftCast&&t<R.ftStart+R.ftDur;
@@ -931,6 +996,7 @@ function makeRunner(R,rng,acc,seed){
         prevHp=dd;prevT=t;}
       const gap=wpn.gap(fr,frMult); t+=lock>0?Math.max(gap,lock):gap;
     }
+    for(let i=0;i<hFin.length;i++)hFin[i].finish(endT,x);   // damage over time still ticking after the last shot
     if(!flDone&&!killed&&R.flWin<=R.engagement)acc.focus+=R.flStore*(dealtNow()-flStart);
     if(acc.per)acc.per[acc.pi++]=R.ttk?endS:(dealtAll()-runStart)/R.engagement;   // this fight's DPS (smooth kill time with time to kill), for stat weights
     for(let i=0;i<hStats.length;i++){const st=hStats[i].stats();for(const k in st)acc.abStats[k]=(acc.abStats[k]||0)+st[k];}
@@ -1115,6 +1181,34 @@ const ABILITY_UI={
     read:()=>({on:$('bd_on').checked,ap1:pillOn('bd_ap1'),ap2:pillOn('bd_ap2')}),
     sync(){ const off=!$('bd_on').checked; ['bd_ap1','bd_ap2'].forEach(cb=>pillEl(cb).classList.toggle('dim',off)); },
     statText:st=>st.bdDur?`Bullet Dance ${st.bdDur.toFixed(1)}s`:''
+  },
+  threadsap:{
+    html:()=>`<div class="subcard">
+        <h3><label class="sw"><input type="checkbox" id="ts_on" checked><span class="track"></span></label> Threadsap</h3>
+        <p class="desc">Deals 50 spirit damage and steals spirit (×1.75); bullets then deal <code>8 + 0.26·Spirit</code> spirit damage.</p>
+        <div class="opts">
+          <div class="pill" data-cb="ts_ap1"><span class="t">1 AP</span><span class="s">+8 on-hit (16)</span></div>
+        </div>
+        <div class="rrinv" id="tsinv">Targets hit <select id="ts_targets" class="invsel" title="enemies hit by Threadsap; only changes how much spirit is stolen">${[1,2,3,4,5].map(n=>`<option value="${n}">${n}</option>`).join('')}</select><span id="ts_steal"></span></div>
+      </div>`,
+    bind(){ $('ts_on').addEventListener('change',schedule); $('ts_targets').addEventListener('change',schedule); },
+    read:()=>({on:$('ts_on').checked,ap1:pillOn('ts_ap1'),targets:+$('ts_targets').value||1}),
+    sync(){ const off=!$('ts_on').checked; pillEl('ts_ap1').classList.toggle('dim',off); $('tsinv').style.opacity=off?'.4':'1';
+      const b=Math.min(getB('boons'),HERO.stats.boonCap), cap=45+2*b, stolen=Math.min(cap,(10+0.9*b)*(+$('ts_targets').value||1)), f=x=>(Math.round(x*10)/10).toString();
+      $('ts_steal').textContent=`· steals ${f(stolen)}${stolen>=cap?' (cap)':''} → +${f(stolen*1.75)} spirit`; },
+    statText:st=>st.tsGain?`+${Math.round(st.tsGain)} stolen spirit`:''
+  },
+  brew:{
+    html:()=>`<div class="subcard">
+        <h3><label class="sw"><input type="checkbox" id="brew_on" checked><span class="track"></span></label> Baba's Brew</h3>
+        <p class="desc">For 8s: <code>12 + 0.15·Spirit</code> spirit damage per second and −15% spirit resist.</p>
+        <div class="opts">
+          <div class="pill" data-cb="brew_ap5"><span class="t">5 AP</span><span class="s">16 + 0.2·Sp · −20%</span></div>
+        </div>
+      </div>`,
+    bind(){ $('brew_on').addEventListener('change',schedule); },
+    read:()=>({on:$('brew_on').checked,ap5:pillOn('brew_ap5')}),
+    sync(){ pillEl('brew_ap5').classList.toggle('dim',!$('brew_on').checked); }
   }
 };
 const joinList=a=>a.length<2?(a[0]||''):a.slice(0,-1).join(', ')+(a.length>2?',':'')+' and '+a[a.length-1];
