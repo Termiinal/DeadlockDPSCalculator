@@ -1236,8 +1236,7 @@ function renderHeroShell(){
   $('mdPlated').textContent=`Plated Armor: each bullet has a 30% chance to deflect its bullet damage, and a separate 50% chance to block ${T.plated}.`;
   $('mdCleanse').textContent=`Debuff Remover clears ${T.cleanse.join(', ')}, all Escalating Exposure stacks (and its −8%), Spirit Rend's shred (the 8% returns with your next bullet), and Focus Lens's shred; damage Focus Lens has stored so far is dealt immediately.`;
   $('mdSpell').textContent=`Spellslinger counts ${joinList(T.uses)}.`;
-  $('rushTxt').textContent=H.chargeAbility?`+10% weapon damage; 200 weapon damage in 3.5s refills ${H.chargeAbility==='cardTrick'?'a card':'a charge'} (25s cooldown).`
-    :`+10% weapon damage (${H.name} has no charges to refill).`;
+  $('rushTxt').textContent=`+10% weapon damage; 200 weapon damage in 3.5s refills ${H.chargeAbility==='cardTrick'?'a card':'a charge'} (25s cooldown).`;
 }
 renderHeroShell();
 const clone=o=>JSON.parse(JSON.stringify(o));
