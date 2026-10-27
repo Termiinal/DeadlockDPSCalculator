@@ -352,7 +352,7 @@
       <div class="togcell">
         <label class="sw"><input type="checkbox" id="spl_cmp"><span class="track"></span></label>
         <div class="body"><div class="tn">Spellslinger</div>
-          <div class="td">+11% fire rate per ability or active item used, up to 6 stacks.</div>
+          <div class="td">+5% cooldown reduction; +11% fire rate per ability or item used (max 6).</div>
           <div class="minirow"><label class="mini"><input type="checkbox" id="spl_base"> <b>add to baseline</b></label><label class="mini">wpn invest <select id="spl_inv_from" class="invsel" title="tier before this purchase"></select> → <select id="spl_inv_to" class="invsel" title="tier after this purchase"></select></label></div>
           <div class="minirow"><label class="mini"><input type="checkbox" id="spl_pre"> pre-stacked</label><select id="spl_pre_n" class="invsel" title="stacks at start of combat"><option value="1">1 stack</option><option value="2">2 stacks</option><option value="3" selected>3 stacks</option><option value="4">4 stacks</option><option value="5">5 stacks</option><option value="6">6 stacks</option></select></div>
         </div>
@@ -480,7 +480,7 @@
           <li data-ability="bulletDance">Bullet Dance's duration uses your spirit when it's cast. While it lasts, every bullet is a body shot and adds 1 Fixation stack; its flat damage gets Lucky Shot but not Weapon Damage %.</li>
           <li data-ability="threadsap">Threadsap lands before the first bullet. Its stolen spirit lasts the whole fight and counts for everything that scales with spirit, abilities and items alike: it steals 10 + 0.9·boons per target hit, capped at 45 + 2·boons, and you gain 175% of that (the target count only changes the steal). The 50 cast damage doesn't fall off; the on-hit damage falls off and Plated's 50% roll can block it. Debuff Remover returns all of the stolen spirit, from every target hit, and the on-hit stops.</li>
           <li data-ability="brew">Baba's Brew is cast at the start. Its damage ticks continuously for 8s (extended by duration bonuses) using your current spirit, and its spirit resist shred applies to all of your spirit damage, including the Brew itself. Debuff Remover ends it.</li>
-          <li data-ability="cardTrick">Cards build 3.4% per body hit and 5.1% per headshot, and are thrown as soon as they're ready (0.6s apart); a starting hand throws left to right. Suits come from a 2-of-each deck plus a 1/9 Joker chance (1/5 at 5AP): Spades ×1.6, Diamonds −7% both resists for 5s, and a Joker counts as every suit.</li>
+          <li data-ability="cardTrick">Cards build 3.4% per body hit and 5.1% per headshot, plus another 3.4% when Lucky Shot procs; cooldown reduction (Rapid Recharge 14%, Spellslinger 5%, added together) builds them faster. They're thrown as soon as they're ready (0.6s apart); a starting hand throws left to right. Suits come from a 2-of-each deck plus a 1/9 Joker chance (1/5 at 5AP): Spades ×1.6, Diamonds −7% both resists for 5s, and a Joker counts as every suit.</li>
           <li>Fire-rate bonuses add together; separate damage reductions multiply.</li>
           <li>Lucky Shot, Plated Armor, and Armor Piercing Rounds use their average effect rather than rolling each bullet. Lucky Shot doubles body-shot damage only; the headshot bonus and spirit on-hit effects aren't doubled. With its <i>Ignore Plated</i> option on, lucky bullets skip Plated Armor entirely: no deflect and no 50% block.</li>
           <li>Headhunter's bonus goes on the first headshot after its cooldown (each bullet rolls your headshot rate; no headshots during Bullet Dance). It's weapon damage reduced by bullet resist and raised by shred, and Inhibitor still reduces it; Weapon Damage %, the headshot multiplier, Lucky Shot, falloff, Armor Piercing and Plated's deflect don't touch it. Plated's 50% roll can block it, leaving it ready for the next headshot.</li>
@@ -559,6 +559,17 @@ const HEROES={
     abilities:['threadsap','brew'],
     chargeAbility:null,
     imbueDefault:'threadsap'
+  },
+  solomon:{
+    id:'solomon', name:'Solomon',
+    stats:{bullet:30, bulletPerBoon:0.4, bulletPerSpirit:0.14,   // base bullet damage also scales with spirit
+           spiritPerBoon:1.1, boonCap:35, fireRate:2,
+           headshotBonus:0.65,                 // not yet specified for Solomon: the standard ×1.65
+           falloffStart:20, falloffEnd:46},
+    weapon:{type:'auto'},
+    abilities:[],                              // none modeled yet
+    chargeAbility:null,
+    imbueDefault:null
   }
 };
 // Hero-specific wording for the shared item notes in Modeling details and the Fury Trance hint (see renderHeroShell).
@@ -577,7 +588,10 @@ const HERO_TEXT={
     cleanse:["Sleep Dagger's bullet resist shred",'all Fixation stacks (they rebuild as you keep shooting)'], heldNote:''},
   baba:{casts:['Threadsap',"Baba's Brew"], uses:["the Threadsap and Baba's Brew casts",'the Capacitor burst','the Fury Trance and Focus Lens activations'],
     plated:"that bullet's Threadsap / Mercurial / Tesla spirit (not the Capacitor burst, Threadsap's cast or Baba's Brew)",
-    cleanse:["Baba's Brew (its damage and its spirit resist shred)",'all the spirit Threadsap stole (its on-hit damage stops)'], heldNote:''}
+    cleanse:["Baba's Brew (its damage and its spirit resist shred)",'all the spirit Threadsap stole (its on-hit damage stops)'], heldNote:''},
+  solomon:{casts:[], uses:['the Capacitor burst','the Fury Trance and Focus Lens activations'],
+    plated:"that bullet's Mercurial / Tesla spirit (not the Capacitor burst)",
+    cleanse:[], heldNote:''}
 };
 
 /* ======================= WEAPON MODELS ======================= */
@@ -643,7 +657,9 @@ const ABILITIES={
     name:'Card Trick', channel:{id:'card',label:'cards',onHit:false},
     resolve(a,env){ if(!a||!a.on)return null; const im=env.imbue, maxCards=4+im.extraCharges;
       return {cardConst:45+(a.ap2?40:0), cardCoef:0.55+(a.ap2?0.4:0), spades:a.ap5?2.0:1.6, dShred:a.ap5?0.11:0.07, pJoker:a.ap5?0.20:(1/9),
-        genPerShot:(env.headshotRate*0.051+(1-env.headshotRate)*0.034)*(1/(1-im.cdr))*env.platedBlock,
+        genPerShot:env.luckyGen>0   // a Lucky Shot proc adds a second 3.4% instance of card generation
+          ?((env.headshotRate*0.051+(1-env.headshotRate)*0.034)*env.platedBlock+env.luckyGen*0.034)*(1/(1-im.cdr))
+          :(env.headshotRate*0.051+(1-env.headshotRate)*0.034)*(1/(1-im.cdr))*env.platedBlock,
         maxCards, startSuits:(a.startSuits||[]).slice(0,maxCards), diamondDur:5*env.durMult}; },
     create(P,run){ const R=run.R, rng=run.rng; const q=[]; let stack=[]; const st={prog:0,lastThrow:-1e9,nextThrow:0,diamondUntil:-1e9,throws:0};
       const addCard=()=>{if(q.length<P.maxCards){let suit;if(rng()<P.pJoker)suit='J';else{if(stack.length===0)stack=['S','S','D','D','C','C','H','H'];const idx=(rng()*stack.length)|0;suit=stack.splice(idx,1)[0];}q.push(suit);}};
@@ -800,7 +816,7 @@ function resolve(cfg){
   const boons=Math.min(cfg.boons,S.boonCap);
   const merc=cfg.mercurial;
   const spirit=cfg.baseSpirit+S.spiritPerBoon*boons+(merc.on?7:0);
-  const flatWeapon=S.bullet+S.bulletPerBoon*boons;
+  const flatWeapon=S.bullet+S.bulletPerBoon*boons+(S.bulletPerSpirit||0)*spirit;   // Solomon: base bullet damage scales with spirit
   const rangeM=+cfg.range||0, ssOn=!!(cfg.sharpshooter&&cfg.sharpshooter.on);   // Sharpshooter: +10% wpn dmg, +60% more at 15m+, falloff range +20%
   const wdPctEff=cfg.weaponDamagePct+(ssOn?10+(rangeM>=15?60:0):0);
   const weaponDmg=flatWeapon*(1+wdPctEff/100);
@@ -848,7 +864,9 @@ function resolve(cfg){
   const srOn=!!(cfg.spiritRend&&cfg.spiritRend.on);   // Spirit Rend: bullets shred 8% spirit resist; headshots +7% per stack (max 4, 2s cooldown)
   const surgeCardSp=surgeOn?28:0, surgeFR=surgeOn?0.20:0, surgeDur=surgeOn?8*durMult:0;   // Surge of Power: imbues the charge ability
   // abilities
-  const env={durMult, headshotRate:cfg.headshotRate, platedBlock, imbue:{cdr:rrOn?0.14:0, extraCharges:rrOn?2:0}};
+  // luckyGen: share of bullets that roll Lucky Shot and get through Plated's 50% roll (lucky bullets skip it with the Ignore Plated option)
+  const luckyGen=luckyBonus>0?0.25*(plated?(lsIgnore?1:aprIgnore+(1-aprIgnore)*0.5):1):0;
+  const env={durMult, headshotRate:cfg.headshotRate, platedBlock, luckyGen, imbue:{cdr:(rrOn?0.14:0)+(spellOn?0.05:0), extraCharges:rrOn?2:0}};   // cooldown reduction adds up: Rapid Recharge 14%, Spellslinger 5%
   // imbue items attach to one ability each (default: the hero's imbueDefault); Rapid Recharge always targets the charge ability
   const surgeTarget=surge.imbue||H.imbueDefault, mercTarget=merc.imbue||H.imbueDefault;
   const mercHit=(merc.on&&merc.cardBonus)?{base:60,perSp:0.16,charge:14}:null;
@@ -866,6 +884,7 @@ function resolve(cfg){
     surgeTarget, hhOn, hhDmg, hhCd:8, orOn, orBonus:0.25, srOn, srBase:0.08, srStack:0.07, srMax:4, srCd:2, srDur:8*durMult,
     merc:{on:merc.on,fr:mercFR},
     tesla:{on:tesla.on,proc:teslaProc},ee,teslaFR,teslaBurst,
+    bps:S.bulletPerSpirit||0,
     baseFR:S.fireRate,firePct:cfg.fireRatePct/100,tBulletRes:cfg.targetBulletResist/100,baseBulletShred:cfg.baseBulletShred/100,
     tSpiritRes:cfg.targetSpiritResist/100,baseSpiritShred:cfg.baseSpiritShred/100,
     rateAt:m=>WEAPON_MODELS[H.weapon.type].rate(H.weapon,S.fireRate,m),
@@ -940,6 +959,7 @@ function makeRunner(R,rng,acc,seed){
       const curSp0=R.spirit+(overflowActive?R.soSpirit:0)+(swActive?R.swSpirit:0);
       for(let i=0;i<hCast.length;i++)hCast[i].cast(t,curSp0);
       let curSp=curSp0; for(let i=0;i<hSpirit.length;i++)curSp+=hSpirit[i].spirit(t);   // spirit granted by abilities (Baba: Threadsap's stolen spirit)
+      const spScale=R.bps>0?1+R.bps*(curSp-R.spirit)/R.flatWeapon:1;   // spirit-scaled bullets: spirit gained mid-fight raises base damage
       let noHs=false; for(let i=0;i<hNoHs.length;i++)if(hNoHs[i].noHs(t))noHs=true;
       if(!ftCast&&R.ftFR>0&&t>=R.ftStart){ftCast=true;run.abilityUsed();}
       const ftActive=ftCast&&t<R.ftStart+R.ftDur;
@@ -957,14 +977,15 @@ function makeRunner(R,rng,acc,seed){
       if(srStacks>0&&t>=srExpire)srStacks=0;   // Spirit Rend: headshot stacks share one timer; all drop when it runs out
       const spiritMult=1-(R.tSpiritRes+resSp-R.baseSpiritShred-dShred-abSp-eeShred-(t<R.flShredDur&&!flCleansed?R.flShred:0)-(srApplied?R.srBase+srStacks*R.srStack:0));
       const ampMult=1+S.eeStacks*0.045;
-      const mSpb=R.merc.on?R.flatWeapon*(0.20+0.0038*curSp):0, tDmg=R.teslaDmgBase+0.19*curSp;
+      const mSpb=R.merc.on?(R.bps>0?R.flatWeapon*spScale:R.flatWeapon)*(0.20+0.0038*curSp):0, tDmg=R.teslaDmgBase+0.19*curSp;
       const imRamp=R.imOn?0.45*Math.min(1,t/2.5):0;
       const imMul=R.imOn?(1+R.wdFrac+imRamp)/(1+R.wdFrac):1;   // ramp adds to Weapon Damage %
       const orAdd=R.orOn&&!low?R.orBonus:0;                        // Opening Rounds: target above 50% HP
       const wMul=R.orOn?(1+R.wdFrac+imRamp+orAdd)/(1+R.wdFrac):imMul;   // both add to Weapon Damage %
       const wBase=noHs?R.wdBody:R.wdPerBullet, plainFactor=R.aprIgnore*multIgnore+(1-R.aprIgnore)*multNormal;   // plainFactor: no Plated at all
-      const wHit=(R.lsIgnore?(1-R.luckyFrac)*wBase*weaponFactor+R.luckyFrac*(wBase+R.wdBody)*plainFactor   // lucky bullets skip Plated
-                            :(wBase+R.luckyBonus)*weaponFactor)*R.outW*wMul*R.fall; acc.weapon+=wHit;
+      let wHit=(R.lsIgnore?(1-R.luckyFrac)*wBase*weaponFactor+R.luckyFrac*(wBase+R.wdBody)*plainFactor   // lucky bullets skip Plated
+                            :(wBase+R.luckyBonus)*weaponFactor)*R.outW*wMul*R.fall;
+      if(R.bps>0)wHit*=spScale; acc.weapon+=wHit;
       x.curSp=curSp; x.spiritMult=spiritMult; x.ampMult=ampMult; x.locked=ftActive; x.first=wpn.first();
       x.noHs=noHs; x.hsMult=noHs?1:R.hsMult; x.wdFrac=R.orOn?R.wdFrac+imRamp+orAdd:R.wdFrac+imRamp; x.wExtra=0;
       x.wf=weaponFactor*R.outW*R.fall;                                                                                  // bullet damage that isn't Weapon Damage %-scaled
@@ -1216,25 +1237,27 @@ function renderHeroShell(){
   const H=HERO, S=H.stats;
   document.title=`${H.name} DPS — abilities & item comparison`;
   document.querySelectorAll('.heroName').forEach(e=>e.textContent=H.name);
-  $('abilityGrid').innerHTML=H.abilities.map(id=>ABILITY_UI[id].html()).join('\n');
+  $('abilityGrid').innerHTML=H.abilities.length?H.abilities.map(id=>ABILITY_UI[id].html()).join('\n')
+    :`<p class="desc" style="grid-column:1/-1;margin:0">Empty for now</p>`;
   $('abilityGrid').classList.toggle('n3',H.abilities.length===3);
   $('abilityExtra').innerHTML=H.abilities.map(id=>ABILITY_UI[id].extra?ABILITY_UI[id].extra():'').join('');
   const names=H.abilities.map(id=>ABILITIES[id].name);
-  $('howtoAbilities').textContent=names.length>1?names.slice(0,-1).join(', ')+' and '+names[names.length-1]:(names[0]||'');
+  $('howtoAbilities').textContent=names.length>1?names.slice(0,-1).join(', ')+' and '+names[names.length-1]:(names[0]||'abilities');
   document.querySelectorAll('[data-ability]').forEach(e=>{e.style.display=H.abilities.includes(e.dataset.ability)?'':'none';});
   const imbOpts=H.abilities.filter(id=>ABILITIES[id].imbuable!==false).map(id=>`<option value="${id}">${ABILITIES[id].name}</option>`).join('');   // imbue targets: this hero's non-passive abilities
-  for(const sid of ['merc_imbue','sop_imbue']){$(sid).innerHTML=imbOpts;$(sid).value=H.imbueDefault;}
+  for(const sid of ['merc_imbue','sop_imbue']){$(sid).innerHTML=imbOpts||'<option value="">no abilities</option>';$(sid).value=H.imbueDefault||'';$(sid).disabled=!imbOpts;}
   const W=H.weapon; $('mdWeapon').style.display=W.type==='burst'?'':'none';
   if(W.type==='burst')$('mdWeapon').textContent=`${H.name} fires ${W.shots}-round bursts: shots are ${W.shotDelay}s apart, then a ${W.burstDelay}s pause before the next burst. Fire-rate bonuses shorten only the pause.`;
   const f0=S.falloffStart, f1=S.falloffEnd, g0=f0*120/100, g1=f1*120/100;
   $('mdFalloff').textContent=`Past ${f0}m, bullet damage and on-hit effects fall off linearly to 10% at ${f1}m (${g0}m and ${g1}m with Sharpshooter).`;
   const exempt=H.abilities.map(id=>ABILITIES[id].channel).filter(c=>!c.onHit).map(c=>c.label);   // non-bullet ability damage (e.g. cards)
   $('mdNoFall').textContent=exempt.length?` ${exempt.map((l,i)=>i?l:l[0].toUpperCase()+l.slice(1)).join(', ')} and the Capacitor burst don't fall off.`:` The Capacitor burst doesn't fall off.`;
-  $('mdStats').innerHTML=`Bullet damage is <code>(${S.bullet} + ${S.bulletPerBoon}·boons) × (1 + Weapon Damage %)</code>; headshots deal ×${(1+S.headshotBonus).toFixed(2)} on bullet damage only. Boons also give ${S.spiritPerBoon} spirit each.`;
+  $('mdStats').innerHTML=`Bullet damage is <code>(${S.bullet} + ${S.bulletPerBoon}·boons${S.bulletPerSpirit?` + ${S.bulletPerSpirit}·Spirit`:''}) × (1 + Weapon Damage %)</code>; headshots deal ×${(1+S.headshotBonus).toFixed(2)} on bullet damage only. Boons also give ${S.spiritPerBoon} spirit each.`
+    +(S.bulletPerSpirit?` Spirit gained during the fight (Shadow Weave, Spiritual Overflow) raises bullet damage as it happens, and Mercurial's bullets use this spirit-scaled base damage.`:'');
   // shared item descriptions that mention this hero's abilities
   const T=HERO_TEXT[H.id];
   $('mdPlated').textContent=`Plated Armor: each bullet has a 30% chance to deflect its bullet damage, and a separate 50% chance to block ${T.plated}.`;
-  $('mdCleanse').textContent=`Debuff Remover clears ${T.cleanse.join(', ')}, all Escalating Exposure stacks (and its −8%), Spirit Rend's shred (the 8% returns with your next bullet), and Focus Lens's shred; damage Focus Lens has stored so far is dealt immediately.`;
+  $('mdCleanse').textContent=`Debuff Remover clears ${joinList([...T.cleanse,'all Escalating Exposure stacks (and its −8%)',"Spirit Rend's shred (the 8% returns with your next bullet)","Focus Lens's shred"])}; damage Focus Lens has stored so far is dealt immediately.`;
   $('mdSpell').textContent=`Spellslinger counts ${joinList(T.uses)}.`;
   $('rushTxt').textContent=`+10% weapon damage; 200 weapon damage in 3.5s refills ${H.chargeAbility==='cardTrick'?'a card':'a charge'} (25s cooldown).`;
 }
@@ -1256,13 +1279,13 @@ function makeSlider(gridEl,b){
 const BASE=[
   {id:'boons',label:'Boons',min:0,max:HERO.stats.boonCap,step:1,val:20,sub:1},
   {id:'hs',label:'Headshot rate',min:0,max:100,step:1,val:18,suffix:'%',sub:1},
-  {id:'wd',label:'Weapon Damage',min:0,max:200,step:1,val:0,suffix:'%',sub:1},
+  {id:'wd',label:'Weapon Damage',min:0,max:300,step:1,val:0,suffix:'%',sub:1},
   {id:'fr',label:'Fire Rate',min:0,max:150,step:1,val:0,suffix:'%',sub:1},
   {id:'tbr',label:'Target bullet resist',min:-30,max:80,step:1,val:0,suffix:'%',sub:1},
   {id:'bbs',label:'Base bullet resist shred',min:0,max:60,step:1,val:0,suffix:'%',sub:1},
   {id:'eng',label:'Engagement length',min:1,max:30,step:0.5,val:6,suffix:'s'},
   {id:'range',label:'Engagement range',min:0,max:60,step:1,val:15,suffix:'m',sub:1},
-  {id:'spr',label:'Spirit',min:22,max:200,step:1,val:22,sub:1},
+  {id:'spr',label:'Spirit',min:22,max:300,step:1,val:22,sub:1},
   {id:'tsr',label:'Target spirit resist',min:-30,max:80,step:1,val:0,suffix:'%',sub:1},
   {id:'bss',label:'Base spirit resist shred',min:0,max:60,step:1,val:0,suffix:'%',sub:1},
 ];
@@ -1282,13 +1305,13 @@ const getB=id=>+$(`r_${id}`).value;
 let spiritItem=0;
 const spiritFloor=()=>Math.round(HERO.stats.spiritPerBoon*getB('boons'));
 function syncSpiritSlider(){
-  const floor=spiritFloor(), total=Math.min(floor+spiritItem,200);
+  const floor=spiritFloor(), total=Math.min(floor+spiritItem,300);
   const r=$('r_spr'),n=$('n_spr');
   r.min=floor;n.min=floor;r.value=total;n.value=total;$('v_spr').textContent=total;
 }
 function onSpiritInput(){
   const floor=spiritFloor();
-  let val=Math.round(+$('n_spr').value); if(!(val>=floor))val=floor; if(val>200)val=200;
+  let val=Math.round(+$('n_spr').value); if(!(val>=floor))val=floor; if(val>300)val=300;
   spiritItem=val-floor;
   $('r_spr').value=val;$('n_spr').value=val;$('v_spr').textContent=val;
 }
@@ -1311,6 +1334,7 @@ $('ft_delay_s').addEventListener('input',schedule);
 function syncFtHint(){const on=$('ft_delay').checked, d=+$('ft_delay_s').value||0;
   const T=HERO_TEXT[HERO.id], c=joinList(T.casts), v=T.casts.length>1?'are':'is';
   $('ft_delay_wrap').style.opacity=on?'1':'.4';
+  if(!T.casts.length){$('ft_hint').textContent=on&&d>0?`Activates at ${d.toFixed(1)}s.`:'Activates at 0s.';return;}
   $('ft_hint').textContent=!on?`Activates at 0s, right after ${c} ${v} cast.`:(d<=0?`Activates at 0s before ${c} — ${c} ${v} cast when Fury Trance expires.`:`Activates at ${d.toFixed(1)}s${T.heldNote?'; '+T.heldNote:''}.`);}
 $('ft_delay').addEventListener('change',syncFtHint);$('ft_delay_s').addEventListener('input',syncFtHint);syncFtHint();
 
@@ -1486,7 +1510,7 @@ const cssv=v=>getComputedStyle(document.documentElement).getPropertyValue(v).tri
 const setSub=(id,t)=>{const e=$('sub_'+id);if(e)e.textContent=t;};
 function updateSubLabels(){
   const boons=getB('boons'),hr=getB('hs')/100,wd=getB('wd'),fr=getB('fr'),tbr=getB('tbr'),bbs=getB('bbs'),spr=getB('spr'),tsr=getB('tsr'),bss=getB('bss');
-  const S=HERO.stats, flatW=S.bullet+S.bulletPerBoon*boons, wdmg=flatW*(1+wd/100), boonSp=S.spiritPerBoon*boons;
+  const S=HERO.stats, flatW=S.bullet+S.bulletPerBoon*boons+(S.bulletPerSpirit||0)*spr, wdmg=flatW*(1+wd/100), boonSp=S.spiritPerBoon*boons;
   setSub('boons',`${wdmg.toFixed(2)} dmg/bullet · +${boonSp.toFixed(1)} spirit`);
   setSub('hs',`avg ×${(1+hr*S.headshotBonus).toFixed(2)} bullet dmg`);
   setSub('wd',`×${(1+wd/100).toFixed(2)} on base ${flatW.toFixed(2)}`);
