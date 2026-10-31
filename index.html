@@ -324,21 +324,21 @@
       <div class="togcell">
         <label class="sw"><input type="checkbox" id="apr_cmp"><span class="track"></span></label>
         <div class="body"><div class="tn">Armor Piercing Rounds</div>
-          <div class="td">+8% weapon damage; 55% of bullets ignore bullet resist and Plated Armor.</div>
+          <div class="td">+8% weapon damage; 60% of bullets ignore bullet resist and Plated Armor.</div>
           <div class="minirow"><label class="mini"><input type="checkbox" id="apr_base"> <b>add to baseline</b></label><label class="mini">wpn invest <select id="apr_inv_from" class="invsel" title="tier before this purchase"></select> → <select id="apr_inv_to" class="invsel" title="tier after this purchase"></select></label></div>
         </div>
       </div>
       <div class="togcell">
         <label class="sw"><input type="checkbox" id="so_cmp"><span class="track"></span></label>
         <div class="body"><div class="tn">Spiritual Overflow</div>
-          <div class="td">+6 spirit, +13% duration. After ~12 bullets: +30 spirit, +25% fire rate.</div>
+          <div class="td">+8 spirit, +13% duration. After ~12 bullets: +30 spirit, +25% fire rate.</div>
           <div class="minirow"><label class="mini"><input type="checkbox" id="so_base"> <b>add to baseline</b></label><label class="mini">wpn invest <select id="so_inv_from" class="invsel" title="tier before this purchase"></select> → <select id="so_inv_to" class="invsel" title="tier after this purchase"></select></label></div>
         </div>
       </div>
       <div class="togcell">
         <label class="sw"><input type="checkbox" id="shw_cmp"><span class="track"></span></label>
         <div class="body"><div class="tn">Shadow Weave</div>
-          <div class="td">+25% fire rate and +25 spirit for the first 5s of the fight.</div>
+          <div class="td">+50% weapon damage and +25 spirit for the first 5s of the fight.</div>
           <div class="minirow"><label class="mini"><input type="checkbox" id="shw_base"> <b>add to baseline</b></label><label class="mini">wpn invest <select id="shw_inv_from" class="invsel" title="tier before this purchase"></select> → <select id="shw_inv_to" class="invsel" title="tier after this purchase"></select></label></div>
         </div>
       </div>
@@ -367,7 +367,7 @@
       <div class="togcell">
         <label class="sw"><input type="checkbox" id="ft_cmp"><span class="track"></span></label>
         <div class="body"><div class="tn">Fury Trance <span style="color:var(--faint);font-weight:400;font-size:11px">active</span></div>
-          <div class="td">+6% weapon damage. Active: +32% fire rate for 6.5s, but no abilities.</div>
+          <div class="td">+10% weapon damage. Active: +32% fire rate for 6.5s, but no abilities.</div>
           <div class="minirow"><label class="mini"><input type="checkbox" id="ft_base"> <b>add to baseline</b></label></div>
           <div class="minirow"><label class="mini"><input type="checkbox" id="ft_delay"> time before activation</label><label class="mini" id="ft_delay_wrap"><input type="number" id="ft_delay_s" min="0" max="30" step="0.1" value="2"> s</label></div>
           <div class="td" id="ft_hint" style="margin-top:4px"></div>
@@ -832,7 +832,7 @@ function resolve(cfg){
   const teslaBurst=(tesla.on&&tesla.capacitor)?100:0;
   const ee=cfg.escalatingExposure.on;
   const plated=cfg.platedArmor;
-  const aprIgnore=cfg.apr?0.55:0;
+  const aprIgnore=cfg.apr?0.60:0;   // Armor Piercing Rounds: 60% of bullets ignore bullet resist and Plated Armor
   const lsIgnore=!!(plated&&cfg.luckyShot&&cfg.luckyShot.on&&cfg.luckyShot.ignorePlated);   // Lucky Shot option: lucky bullets skip Plated Armor entirely (possible game bug)
   const platedBlock=plated?(lsIgnore?0.75*(aprIgnore+(1-aprIgnore)*0.5)+0.25:(aprIgnore+(1-aprIgnore)*0.5)):1;   // share of bullets whose on-hit effects get through
   const tk=cfg.ttk||{}, ttkOn=!!tk.on, ttkHP=ttkOn?Math.max(1,+tk.hp||1):0;
@@ -850,7 +850,7 @@ function resolve(cfg){
   const outW=cfg.inhibitor?0.70:1, outS=outW*(cfg.silencer?0.75:1);   // Inhibitor: all dmg -30%; Silencer: spirit dmg -25%
   const drTime=(cfg.debuffRemover&&cfg.debuffRemover.on)?Math.max(0,+cfg.debuffRemover.time||0):1e9;   // enemy cleanse time
   const soFR=soOn?0.25:0, soSpirit=soOn?30:0, soBuild=soOn?0.115/1.35:0;
-  const swFR=swOn?0.25:0, swSpirit=swOn?25:0, swDur=swOn?5*durMult:0;
+  const swWD=swOn?0.50:0, swSpirit=swOn?25:0, swDur=swOn?5*durMult:0;   // Shadow Weave: +50% Weapon Damage % and +25 spirit for the opening 5s
   const surge=cfg.surge||{}, surgeOn=!!surge.on;
   const spellOn=!!(cfg.spellslinger&&cfg.spellslinger.on), spellFR=spellOn?0.11:0, spellMax=6;
   const spellPre=spellOn?Math.max(0,Math.min(spellMax,Math.round(cfg.spellslinger.pre||0))):0;
@@ -879,7 +879,7 @@ function resolve(cfg){
   let peakFR=0, peakTag=''; for(const a of abilities)if(a.def.peak){const pk=a.def.peak(a.P);peakFR+=pk.fr;peakTag=pk.tag;}
   const hsMult=1+cfg.headshotRate*S.headshotBonus*(1-hsDR);   // average headshot multiplier on bullet damage (wdPerBullet = weaponDmg·hsMult)
   return{H,boons,spirit,flatWeapon,weaponDmg,wdPerBullet,wdBody:weaponDmg,hsRate:cfg.headshotRate,hsMult,luckyFrac:luckyBonus>0?0.25:0,lsIgnore,soPlated:plated?(lsIgnore?0.625:0.5):1,plated,aprIgnore,platedBlock,teslaDmgBase,
-    soFR,soSpirit,soBuild,swFR,swSpirit,swDur,surgeFR,surgeDur,spellFR,spellMax,spellPre,bfPassive,bfFR,bfDur,bfCd,ftFR,ftDur,ftStart,abilityStart,luckyBonus,flFR,flShred,flShredDur,flWin,flStore,drTime,rushOn,imOn,wdFrac,fall,outW,outS,ttk:ttkOn,hp:ttkHP,spRes,buRes,bl,blDefer,blCleanse,blTime,
+    soFR,soSpirit,soBuild,swWD,swSpirit,swDur,surgeFR,surgeDur,spellFR,spellMax,spellPre,bfPassive,bfFR,bfDur,bfCd,ftFR,ftDur,ftStart,abilityStart,luckyBonus,flFR,flShred,flShredDur,flWin,flStore,drTime,rushOn,imOn,wdFrac,fall,outW,outS,ttk:ttkOn,hp:ttkHP,spRes,buRes,bl,blDefer,blCleanse,blTime,
     abilities, channels, onHitIds, otherIds, onHitIdx, otherIdx, chargeId:H.chargeAbility, peakFR, peakTag,
     surgeTarget, hhOn, hhDmg, hhCd:8, orOn, orBonus:0.25, srOn, srBase:0.08, srStack:0.07, srMax:4, srCd:2, srDur:8*durMult,
     merc:{on:merc.on,fr:mercFR},
@@ -965,7 +965,7 @@ function makeRunner(R,rng,acc,seed){
       const ftActive=ftCast&&t<R.ftStart+R.ftDur;
       if(R.bfFR>0&&t>=bfNext){bfUntil=t+R.bfDur;bfNext=t+R.bfCd;}
       let abFR=0; for(let i=0;i<hFR.length;i++)abFR+=hFR[i].fireRate(t);
-      const frMult=1+R.firePct+abFR+R.merc.fr+R.extraFR+R.teslaFR+(overflowActive?R.soFR:0)+(swActive?R.swFR:0)+(t<S.surgeUntil?R.surgeFR:0)+S.spellStacks*R.spellFR+R.bfPassive+(t<bfUntil?R.bfFR:0)+(ftActive?R.ftFR:0)+R.flFR, fr=R.baseFR*frMult;
+      const frMult=1+R.firePct+abFR+R.merc.fr+R.extraFR+R.teslaFR+(overflowActive?R.soFR:0)+(t<S.surgeUntil?R.surgeFR:0)+S.spellStacks*R.spellFR+R.bfPassive+(t<bfUntil?R.bfFR:0)+(ftActive?R.ftFR:0)+R.flFR, fr=R.baseFR*frMult;
       if(fr<=0)break;
       let dShred=0,abSp=0,abBu=0; for(let i=0;i<hShred.length;i++)dShred+=hShred[i].shred(t); for(let i=0;i<hSp.length;i++)abSp+=hSp[i].spShred(t); for(let i=0;i<hBu.length;i++)abBu+=hBu[i].buShred(t);
       const low=R.ttk&&(R.bl?B.hpDmg:dealtAll()-runStart)>0.5*B.hp, resSp=R.spRes?(low?0.45:0.30):0, resBu=R.buRes?(low?0.45:0.30):0;
@@ -981,13 +981,14 @@ function makeRunner(R,rng,acc,seed){
       const imRamp=R.imOn?0.45*Math.min(1,t/2.5):0;
       const imMul=R.imOn?(1+R.wdFrac+imRamp)/(1+R.wdFrac):1;   // ramp adds to Weapon Damage %
       const orAdd=R.orOn&&!low?R.orBonus:0;                        // Opening Rounds: target above 50% HP
-      const wMul=R.orOn?(1+R.wdFrac+imRamp+orAdd)/(1+R.wdFrac):imMul;   // both add to Weapon Damage %
+      const swAdd=swActive?R.swWD:0;                                   // Shadow Weave window
+      const wMul=R.orOn||R.swWD>0?(1+R.wdFrac+imRamp+orAdd+swAdd)/(1+R.wdFrac):imMul;   // all add to Weapon Damage %
       const wBase=noHs?R.wdBody:R.wdPerBullet, plainFactor=R.aprIgnore*multIgnore+(1-R.aprIgnore)*multNormal;   // plainFactor: no Plated at all
       let wHit=(R.lsIgnore?(1-R.luckyFrac)*wBase*weaponFactor+R.luckyFrac*(wBase+R.wdBody)*plainFactor   // lucky bullets skip Plated
                             :(wBase+R.luckyBonus)*weaponFactor)*R.outW*wMul*R.fall;
       if(R.bps>0)wHit*=spScale; acc.weapon+=wHit;
       x.curSp=curSp; x.spiritMult=spiritMult; x.ampMult=ampMult; x.locked=ftActive; x.first=wpn.first();
-      x.noHs=noHs; x.hsMult=noHs?1:R.hsMult; x.wdFrac=R.orOn?R.wdFrac+imRamp+orAdd:R.wdFrac+imRamp; x.wExtra=0;
+      x.noHs=noHs; x.hsMult=noHs?1:R.hsMult; x.wdFrac=R.orOn||R.swWD>0?R.wdFrac+imRamp+orAdd+swAdd:R.wdFrac+imRamp; x.wExtra=0;
       x.wf=weaponFactor*R.outW*R.fall;                                                                                  // bullet damage that isn't Weapon Damage %-scaled
       x.wfBlk=(R.aprIgnore*multIgnore+(1-R.aprIgnore)*multNormal*deflect*(R.plated?0.5:1))*R.outW*R.fall;                 // ...that Plated's 50% roll also blocks
       x.wfNP=plainFactor*R.outW*R.fall;                                                                                  // ...on a lucky bullet that skips Plated
@@ -1456,12 +1457,12 @@ function baselineCfg(c0,nm){
   if(nm.tesla.base){c.tesla={on:true,capacitor:nm.tesla.cap};c.weaponDamagePct+=nm.tesla.inv;}
   if(nm.ee.base){c.escalatingExposure={on:true};c.baseSpirit+=nm.ee.inv;}
   if(nm.apr.base){c.weaponDamagePct+=8+nm.apr.inv;c.apr=true;}
-  if(nm.so.base){c.baseSpirit+=6;c.weaponDamagePct+=nm.so.inv;c.spiritOverflow={on:true};}
+  if(nm.so.base){c.baseSpirit+=8;c.weaponDamagePct+=nm.so.inv;c.spiritOverflow={on:true};}
   if(nm.shw.base){c.weaponDamagePct+=nm.shw.inv;c.shadowWeave={on:true};}
   if(nm.sop.base){c.baseSpirit+=nm.sop.inv;c.surge={on:true,imbue:nm.sop.imbue};}
   if(nm.spl.base){c.weaponDamagePct+=nm.spl.inv;c.spellslinger={on:true,pre:nm.spl.pre};}
   if(nm.bf.base){c.weaponDamagePct+=nm.bf.inv;c.burstFire={on:true};}
-  if(nm.ft.base){c.weaponDamagePct+=6;c.furyTrance={on:true,delayOn:nm.ft.delayOn,delay:nm.ft.delay};}
+  if(nm.ft.base){c.weaponDamagePct+=10;c.furyTrance={on:true,delayOn:nm.ft.delayOn,delay:nm.ft.delay};}
   if(nm.ls.base){c.weaponDamagePct+=nm.ls.inv;c.luckyShot={on:true,ignorePlated:nm.ls.ignorePlated};}
   if(nm.fl.base){c.baseSpirit+=nm.fl.inv;c.focusLens={on:true};}
   if(nm.rush.base){c.weaponDamagePct+=10+nm.rush.inv;c.rechargingRush={on:true};}
@@ -1487,12 +1488,12 @@ function buildRows(c0,nm,mg){
   nrow(nm.tesla,'tesla','+ Tesla','--lime',c=>{c.tesla={on:true,capacitor:nm.tesla.cap};c.weaponDamagePct+=nm.tesla.inv;});
   nrow(nm.ee,'ee','+ Escalating Exp.','--green',c=>{c.escalatingExposure={on:true};c.baseSpirit+=nm.ee.inv;});
   nrow(nm.apr,'apr','+ Armor Piercing','--pink',c=>{c.weaponDamagePct+=8+nm.apr.inv;c.apr=true;});
-  nrow(nm.so,'so','+ Spiritual Overflow','--magenta',c=>{c.baseSpirit+=6;c.weaponDamagePct+=nm.so.inv;c.spiritOverflow={on:true};});
+  nrow(nm.so,'so','+ Spiritual Overflow','--magenta',c=>{c.baseSpirit+=8;c.weaponDamagePct+=nm.so.inv;c.spiritOverflow={on:true};});
   nrow(nm.shw,'shw','+ Shadow Weave','--indigo',c=>{c.weaponDamagePct+=nm.shw.inv;c.shadowWeave={on:true};});
   nrow(nm.sop,'sop','+ Surge of Power','--crimson',c=>{c.baseSpirit+=nm.sop.inv;c.surge={on:true,imbue:nm.sop.imbue};});
   nrow(nm.spl,'spl','+ Spellslinger','--ivory',c=>{c.weaponDamagePct+=nm.spl.inv;c.spellslinger={on:true,pre:nm.spl.pre};});
   nrow(nm.bf,'bf','+ Burst Fire','--tan',c=>{c.weaponDamagePct+=nm.bf.inv;c.burstFire={on:true};});
-  nrow(nm.ft,'ft','+ Fury Trance','--olive',c=>{c.weaponDamagePct+=6;c.furyTrance={on:true,delayOn:nm.ft.delayOn,delay:nm.ft.delay};});
+  nrow(nm.ft,'ft','+ Fury Trance','--olive',c=>{c.weaponDamagePct+=10;c.furyTrance={on:true,delayOn:nm.ft.delayOn,delay:nm.ft.delay};});
   nrow(nm.ls,'ls','+ Lucky Shot','--sky',c=>{c.weaponDamagePct+=nm.ls.inv;c.luckyShot={on:true,ignorePlated:nm.ls.ignorePlated};});
   nrow(nm.fl,'fl','+ Focus Lens','--emerald',c=>{c.baseSpirit+=nm.fl.inv;c.focusLens={on:true};});
   nrow(nm.rush,'rush','+ Recharging Rush','--coral',c=>{c.weaponDamagePct+=10+nm.rush.inv;c.rechargingRush={on:true};});
